@@ -35,11 +35,10 @@ sqlite3 database json model
   end
   s.subspec 'Model' do |c|
       c.source_files = 'Alpha/Model/*.swift'
+      c.dependency 'Alpha/Alpha'
   end
   s.subspec 'Mirror' do |c|
       c.source_files = 'Alpha/Mirror/*.swift'
+      c.dependency 'Alpha/Alpha'
   end
-  # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.frameworks = 'UIKit', 'SQLite3'
-  # s.dependency 'AFNetworking', '~> 2.3'
 end
