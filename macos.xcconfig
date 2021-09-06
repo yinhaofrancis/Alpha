@@ -1,0 +1,15 @@
+//
+//  macos.xcconfig
+//  Alpha
+//
+//  Created by hao yin on 2021/7/28.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+SDKROOT=macosx
+ARCHS=x86_64
+MACOSX_DEPLOYMENT_TARGET=11.2.3
+BUILD_LIBRARY_FOR_DISTRIBUTION=TRUE
+ENABLE_BITCODE=true
+

@@ -1,0 +1,14 @@
+//
+//  Mob.xcconfig
+//  Alpha
+//
+//  Created by hao yin on 2021/8/18.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+SDKROOT=iphoneos
+ARCHS=arm64
+IPHONEOS_DEPLOYMENT_TARGET=14.4
+BUILD_LIBRARY_FOR_DISTRIBUTION=TRUE
+ENABLE_BITCODE=true
