@@ -41,4 +41,8 @@ sqlite3 database json model
       c.source_files = 'Alpha/Mirror/*.swift'
       c.dependency 'Alpha/Alpha'
   end
+  s.subspec 'Objc' do |c|
+      c.source_files = 'Alpha/Mirror/*.swift'
+      c.dependency 'Alpha/Model'
+  end
 end

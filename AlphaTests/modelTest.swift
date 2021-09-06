@@ -27,7 +27,7 @@ class modelTest: XCTestCase {
         
         
         self.pool.write { db in
-            for i in 0 ..< 10{
+            for _ in 0 ..< 10{
                 let j:JSON = ["sdada":"dasdasd","cc":3.0,"dd":arc4random() % 100,"dsdsd":["dd","d"],"sad":"dasdasd","k":["a":1]]
                 try db.insert("a", j)
             }

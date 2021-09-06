@@ -438,10 +438,9 @@ extension Database{
             try self.update(name, json.rowid, json)
         }
     }
-
-    public func query(name:String,condition:Condition? = nil,value:[String:String] = [:]) throws ->[JSON]{
+    func query(name:String,conditionString:String?,value:[String:String] = [:]) throws ->[JSON]{
+        let sql = "select *,ROWID from \(name)" + ((conditionString?.count ?? 0) > 0 ? " where " + conditionString! : "")
         var result:[JSON] = []
-        let sql = "select *,ROWID from \(name)" + (condition != nil ? " where " + condition!.conditionCode : "")
         let rs = try self.query(sql: sql)
         for i in value {
             rs.bind(name: i.value)?.bind(value: i.value)
@@ -473,6 +472,10 @@ extension Database{
         }
         rs.close()
         return result
+    }
+    
+    public func query(name:String,condition:Condition? = nil,value:[String:String] = [:]) throws ->[JSON]{
+        try self.query(name: name, conditionString: condition?.conditionCode ?? "", value: value)
     }
     public func delete(name:String,rowid:Int) throws {
         let sql = "delete from \(name) where `rowid`=\(rowid)"

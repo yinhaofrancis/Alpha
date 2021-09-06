@@ -49,6 +49,16 @@
                ReferencedContainer = "container:Alpha.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "A9660CA626E5BCBD00CB98B6"
+               BuildableName = "AlphaOcTests.xctest"
+               BlueprintName = "AlphaOcTests"
+               ReferencedContainer = "container:Alpha.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
