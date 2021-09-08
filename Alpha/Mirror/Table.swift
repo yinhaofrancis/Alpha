@@ -162,34 +162,17 @@ public class Model:NSObject,SQLCode{
     var result:SQLResult = SQLResult()
     required public init(modelId:String) {
         self.modelId = modelId
-//        self.database = database
         super.init()
-//        var a = self
-//        try? SQLResult.query(db: database, modelId: modelId, model: &a)
     }
     required public init(result:SQLResult){
         super.init()
         self.load(result: result)
     }
     func load(result:SQLResult){
-//        let relateMap = self.relateMap
         for i in result.value {
-//            if let relate = relateMap[i.key]{
-//                let obj:Model? = class_createInstance(relate, 0) as? Model
-//                if obj != nil{
-//
-//                    try? SQLResult.query(db: database, modelId: i.value as! String, model: &obj!)
-//                    obj?.modelId = i.value as! String
-//                }
-//
-//                self.setValue(obj, forKey: i.key)
-//            }else{
-                self.setValue(i.value, forKey: i.key)
-//            }
+            self.setValue(i.value, forKey: i.key)
         }
-//        self.database = database
         self.result = result
-
     }
 
     public var relateMap:[String:AnyClass]{
@@ -231,16 +214,6 @@ public class Model:NSObject,SQLCode{
                 } else if ctype == "T@\"NSData\""{
                     result.append((key,modelSqlType(sqlType: "BLOB",value: self.value(forKey: key) as? Data)))
                 }else{
-//                    let mtype = ctype.components(separatedBy: "\"")[1]
-//                    guard let mp = mtype.cString(using: .utf8) else { continue }
-//                    guard let c = objc_getClass(mp) as? AnyClass else { continue }
-//                    if String(cString: class_getName(class_getSuperclass(c))) == "Alpha.Model"{
-//                        if let v = self.value(forKey: key) as? Model{
-//                            result.append((key,modelSqlType(sqlType: "TEXT",value:v.modelId)))
-//                        }else{
-//                            result.append((key,modelSqlType(sqlType: "TEXT",value:nil)))
-//                        }
-//                    }
                 }
             }
             
@@ -277,8 +250,17 @@ public class Model:NSObject,SQLCode{
         public var value: OriginValue?
         
         public var path: AnyKeyPath?
-        
-        
+    }
+}
+extension Database{
+    public func save(model:Model) throws{
+        try self.save(model: model)
+    }
+    public func query<T:Model>(modelId:String,type:T.Type) throws ->T?{
+        return try self.select(model: T(modelId: modelId))
+    }
+    public func delete<T:Model>(modelId:String,type:T.Type) throws{
+        try self.delete(model: T(modelId: modelId))
     }
 }
 

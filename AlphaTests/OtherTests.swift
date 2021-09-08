@@ -60,6 +60,24 @@ class OtherTests: XCTestCase {
             
         }
     }
+    func testMemory() throws {
+        let db = try Database()
+        let js:JSON = ["dsd":"sdsd"]
+        try db.create(obj: mk())
+        let mkd = mk()
+        mkd.a = "dsdsd"
+        try db.save(model: mkd)
+        try db.save("dsd", js)
+        try db.save("dsd", js)
+        try db.save("dsd", js)
+        try db.save("dsd", js)
+        let a = try db.query(name: "dsd")
+        let u = try Env.home().appendingPathComponent("backupup")
+        
+        let back = try BackupDatabase(url: u, source: db)
+        try back.backup()
+        print(a)
+    }
     func testDBQueue() throws{
         self.poor.write { db in
             try db.drop(modelType: mk.self)

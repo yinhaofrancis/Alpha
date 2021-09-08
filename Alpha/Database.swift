@@ -67,6 +67,14 @@ public class Database:Hashable{
         }
         self.hook()
     }
+    public init() throws{
+        self.url = URL(string: "file:memdb1?mode=memory&cache=shared")!
+        sqlite3_open(url.path, &self.sqlite)
+        if(self.sqlite == nil){
+            throw NSError(domain: "create memory sqlite3 fail", code: 0, userInfo: [:])
+        }
+        self.hook()
+    }
     deinit {
         sqlite3_close(self.sqlite)
     }

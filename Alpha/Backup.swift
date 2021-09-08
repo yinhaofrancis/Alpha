@@ -35,7 +35,7 @@ public class BackupDatabase{
         }
     }
     
-    public func backup() throws {
+    public func backup(page:Int = -1) throws {
         if self.pbackUp == nil{
             let p = sqlite3_backup_init(backUpDb, "main",sourceDB.sqlite , "main")
             self.pbackUp = p
@@ -47,7 +47,7 @@ public class BackupDatabase{
         }
         repeat{
             print(self.remaining,self.pageCount)
-            let r = sqlite3_backup_step(self.pbackUp, 1)
+            let r = sqlite3_backup_step(self.pbackUp, Int32(page))
             if r == SQLITE_OK || r == SQLITE_BUSY || r == SQLITE_LOCKED{
                 sqlite3_sleep(100)
             }else{
