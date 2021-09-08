@@ -118,3 +118,12 @@ public class ScalarFunction{
         return String(cString: sqlite3_value_text(value))
     }
 }
+extension Database{
+    public func addScalarFunction(function:ScalarFunction){
+        sqlite3_create_function(self.sqlite!, function.name, function.nArg, SQLITE_UTF8, Unmanaged.passUnretained(function).toOpaque(), { ctx, i, ret in
+            let call = Unmanaged<ScalarFunction>.fromOpaque(sqlite3_user_data(ctx)).takeUnretainedValue()
+            call.ctx = ctx
+            call.call(call,i,ret?.pointee)
+        }, nil, nil)
+    }
+}

@@ -253,9 +253,7 @@ public class Model:NSObject,SQLCode{
     }
 }
 extension Database{
-    public func save(model:Model) throws{
-        try self.save(model: model)
-    }
+
     public func query<T:Model>(modelId:String,type:T.Type) throws ->T?{
         return try self.select(model: T(modelId: modelId))
     }

@@ -345,13 +345,6 @@ extension Database{
         let sql = "ALTER TABLE \(name) ADD COLUMN \(columeName) \(typedef) \(notnull ? "default `\(defaultValue)`" : "" )"
         try self.exec(sql: sql)
     }
-    public func addScalarFunction(function:ScalarFunction){
-        sqlite3_create_function(self.sqlite!, function.name, function.nArg, SQLITE_UTF8, Unmanaged.passUnretained(function).toOpaque(), { ctx, i, ret in
-            let call = Unmanaged<ScalarFunction>.fromOpaque(sqlite3_user_data(ctx)).takeUnretainedValue()
-            call.ctx = ctx
-            call.call(call,i,ret?.pointee)
-        }, nil, nil)
-    }
     public func checkpoint(type:WalMode,log:Int32,total:Int32) throws {
         let l = UnsafeMutablePointer<Int32>.allocate(capacity: 1)
         let t = UnsafeMutablePointer<Int32>.allocate(capacity: 1)
@@ -496,7 +489,7 @@ extension Database{
         get{
             do{
                 let r = try self.query(sql: "PRAGMA foreign_keys")
-                try r.step()
+                try r.step() 
                 let a = r.column(index: 0, type: Int32.self).value() > 0
                 r.close()
                 return a

@@ -56,6 +56,7 @@ public class DataBasePool{
             try? DataBasePool.restore(name: name)
         }
         self.wdb = try Database(url: url)
+        self.wdb.foreignKey = true
         self.url = url
         self.thread = Thread(block: {
             self.timer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true, block: { t in
@@ -132,7 +133,6 @@ public class DataBasePool{
         self.queue.async(execute: DispatchWorkItem(flags: .barrier, block: {
             let db = self.wdb
             do {
-                db.foreignKey = true
                 try db.begin()
                 if try callback(db){
                     try db.commit()
@@ -149,7 +149,6 @@ public class DataBasePool{
         self.queue.sync(execute: DispatchWorkItem(flags: .barrier, block: {
             let db = self.wdb
             do {
-                db.foreignKey = true
                 try db.begin()
                 if try callback(db){
                     try db.commit()
