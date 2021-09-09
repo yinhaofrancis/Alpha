@@ -454,8 +454,26 @@ extension Database{
         r.close()
         return map
     }
+    public func alterTableName(name:String,newName:String) throws {
+        let sql = "ALTER TABLE \(name) RENAME TO \(newName)"
+        try self.exec(sql: sql)
+    }
+    public func drop(name:String) throws{
+        try exec(sql: "drop table \(name)")
+    }
+    public func renameColumn(name:String,columeName:String,newName:String) throws {
+        try self.exec(sql: "ALTER TABLE \(name) RENAME COLUMN \(columeName) TO \(newName)")
+    }
     public func tableExists(name:String) throws ->Bool{
        return  try self.dataMaster(type: "table", name: name).count > 0
+    }
+    public func copyTable(to:String,from:String,keyMaps:[String:String]) throws{
+        let copySql = "INSERT INTO `\(to)`(\(keyMaps.values.joined(separator: ","))) SELECT \(keyMaps.keys.joined(separator: ",")) FROM `\(from)`"
+        try self.exec(sql: copySql)
+    }
+    public func copyTable(to:String,from:String,keys:[String]) throws{
+        let copySql = "INSERT INTO `\(to)` SELECT \(keys.joined(separator: ",")) FROM `\(from)`"
+        try self.exec(sql: copySql)
     }
     public func tableForeignKeyInfo(name:String) throws ->[String:TableForeignKeyInfo]{
         let r = try self.query(sql: "PRAGMA foreign_key_list(\(name));")

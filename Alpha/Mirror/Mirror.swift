@@ -617,12 +617,6 @@ extension SQLCode{
 }
 
 extension Database {
-    public func fetch<T:SQLCode>(request:FetchRequest<T>) throws->ResultSet{
-        let rs = try self.query(sql: request.sql)
-        request.doSelectBind(result: rs)
-        return rs
-    }
-
     public func create<T:SQLCode>(obj:T) throws{
         if try self.tableExists(name: T.tableName){
             let column = try self.tableInfo(name: T.tableName)
@@ -667,13 +661,7 @@ extension Database {
         try self.addColumn(name: name, columeName: columeName, typedef: typedef,notnull: notnull,defaultValue: defaultValue)
     }
     
-    public func alterTableName(name:String,newName:String) throws {
-        let sql = "ALTER TABLE \(name) RENAME TO \(newName)"
-        try self.exec(sql: sql)
-    }
-    public func renameColumn(name:String,columeName:String,newName:String) throws {
-        try self.exec(sql: "ALTER TABLE \(name) RENAME COLUMN \(columeName) TO \(newName)")
-    }
+    
     public func exists<T:SQLCode>(model:T) throws ->Bool{
         let req = FetchRequest(obj: model,key:.count("*"))
         req.loadKeyMap(map: model.primaryConditionBindMap)

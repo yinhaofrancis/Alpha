@@ -215,3 +215,10 @@ public class FetchRequest<T:SQLCode>{
     }
 }
 
+extension Database {
+    public func fetch<T:SQLCode>(request:FetchRequest<T>) throws->ResultSet{
+        let rs = try self.query(sql: request.sql)
+        request.doSelectBind(result: rs)
+        return rs
+    }
+}

@@ -78,6 +78,7 @@ class OtherTests: XCTestCase {
         try back.backup()
         print(a)
     }
+    
     func testDBQueue() throws{
         self.poor.write { db in
             try db.drop(modelType: mk.self)
@@ -113,4 +114,6 @@ class OtherTests: XCTestCase {
             }
         }
     }
+    
 }
+

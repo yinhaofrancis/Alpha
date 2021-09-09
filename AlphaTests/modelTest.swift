@@ -59,5 +59,57 @@ class modelTest: XCTestCase {
         }
     }
 
+    func testObject() throws{
+        let aa = a()
+        self.pool.writeSync { db in
+            try db.drop(name: "c")
+            try db.drop(name: "a")
+            try aa.create(db: db)
+            try c().create(db: db)
+            aa.a = 1
+            aa.string = "dsadasdadad"
+            try aa.insert(db: db)
+            aa.stringw = "aaaaaaaaaa"
+            try aa.update(db: db)
+            try db.copyTable(to: "c", from: "a", keyMaps: ["string":"cc","stringw":"bb","a":"aa"])
+            let c = b()
+            try c.create(db: db)
+            try aa.delete(db: db)
+        }
+    }
 }
 
+class a:Object{
+    
+    @Col
+    var string:String = ""
+    
+    @NullableCol
+    var stringw:String?
+    
+    @Col([.primary])
+    var a:Int = 0
+}
+class b:Object{
+    override var name: String{
+        return "a"
+    }
+    @Col
+    var strsdfsdfsi:String = ""
+    
+    @NullableCol
+    var stringw:String?
+    
+    @Col([.primary])
+    var a:Int = 0
+}
+class c:Object{
+    @Col
+    var cc:String = ""
+    
+    @NullableCol
+    var bb:String?
+    
+    @Col([.primary])
+    var aa:Int = 0
+}
