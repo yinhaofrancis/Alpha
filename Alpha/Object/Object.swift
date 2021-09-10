@@ -60,11 +60,7 @@ extension Optional:DataType where Wrapped == DataType {
             return v.bind(rs: rs, key: key)
         }
     }
-    
-//    public mutating func colume(rs: Database.ResultSet, key: String) {
-//        self?.colume(rs: rs, index: rs.index(paramName: key))
-//    }
-    
+        
     public func bind(rs: Database.ResultSet, index: Int32) {
         switch self {
         case .none:
@@ -73,16 +69,6 @@ extension Optional:DataType where Wrapped == DataType {
             return v.bind(rs: rs, index:index)
         }
     }
-    
-//    public mutating func colume(rs: Database.ResultSet, index: Int32) {
-//        switch self {
-//        case .none:
-//           return
-//        case .some:
-//            let v = rs.column(index: index, type: Wrapped.self)
-//            self = .some(v as! DataType)
-//        }
-//    }
 }
 extension String:DataType{
     public static func define() -> DataTypeDef {
@@ -92,20 +78,9 @@ extension String:DataType{
     public func bind(rs: Database.ResultSet, index: Int32) {
         rs.bind(index: index).bind(value: self)
     }
-    
-//    public mutating func colume(rs: Database.ResultSet, index: Int32) {
-//        self.removeAll()
-//        self.append(rs.column(index: index, type: Self.self).value())
-//    }
-    
     public func bind(rs: Database.ResultSet, key: String) {
         rs.bind(name: key)?.bind(value: self)
     }
-    
-//    public mutating func colume(rs: Database.ResultSet, key: String) {
-//        self.removeAll()
-//        self.append(rs.column(index: rs.index(paramName: key), type: Self.self).value())
-//    }
 }
 extension Int:DataType{
     public static func define() -> DataTypeDef {
@@ -116,20 +91,9 @@ extension Int:DataType{
     public func bind(rs: Database.ResultSet, index: Int32) {
         rs.bind(index: index).bind(value: self)
     }
-    
-//    public mutating func colume(rs: Database.ResultSet, index: Int32) {
-//        let i = rs.column(index: index, type: Self.self).value()
-//        self = i
-//    }
-//
     public func bind(rs: Database.ResultSet, key: String) {
         rs.bind(name: key)?.bind(value: self)
     }
-    
-//    public mutating func colume(rs: Database.ResultSet, key: String) {
-//        self = rs.column(index: rs.index(paramName: key), type: Self.self).value()
-//    }
-    
 }
 extension Double:DataType{
     public static func define() -> DataTypeDef {
@@ -140,19 +104,10 @@ extension Double:DataType{
     public func bind(rs: Database.ResultSet, index: Int32) {
         rs.bind(index: index).bind(value: self)
     }
-    
-//    public mutating func colume(rs: Database.ResultSet, index: Int32) {
-//        let i = rs.column(index: index, type: Self.self).value()
-//        self = i
-//    }
-    
+
     public func bind(rs: Database.ResultSet, key: String) {
         rs.bind(name: key)?.bind(value: self)
     }
-    
-//    public mutating func colume(rs: Database.ResultSet, key: String) {
-//        self = rs.column(index: rs.index(paramName: key), type: Self.self).value()
-//    }
 }
 extension Data:DataType{
     public static func define() -> DataTypeDef {
@@ -172,10 +127,6 @@ extension Data:DataType{
         rs.bind(name: key)?.bind(value: self)
     }
     
-//    public mutating func colume(rs: Database.ResultSet, key: String) {
-//        self.removeAll()
-//        self.append(rs.column(index: rs.index(paramName: key), type: Self.self).value())
-//    }
 }
 
 public protocol ColDef{
