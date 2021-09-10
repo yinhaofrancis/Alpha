@@ -97,7 +97,7 @@ public class Database:Hashable{
         
         private var stmt:OpaquePointer
         private var nextSql:String?
-        private unowned var db:Database
+        unowned var db:Database
         public init(stmt:OpaquePointer,db:Database,nextSql:String? = nil) {
             self.stmt = stmt
             self.db = db
@@ -493,8 +493,8 @@ extension Database{
         r.close()
         return map
     }
-    public func integrityCheck(table:String) throws ->Bool{
-        let r = try self.query(sql: "PRAGMA INTEGRITY_CHECK(\(table))")
+    public func integrityCheck(table:String = "") throws ->Bool{
+        let r = try self.query(sql: table.count > 0 ? "PRAGMA INTEGRITY_CHECK(\(table))" : "PRAGMA INTEGRITY_CHECK")
         if try r.step(){
             let v = r.column(index: 0, type: String.self).value() == "ok"
             r.close()

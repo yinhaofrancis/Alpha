@@ -55,7 +55,13 @@ public class DataBasePool{
         }else if !FileManager.default.fileExists(atPath: url.path){
             try? DataBasePool.restore(name: name)
         }
+        
         self.wdb = try Database(url: url)
+        if try wdb.integrityCheck() == false{
+            self.wdb.close()
+            try? DataBasePool.restore(name: name)
+            self.wdb = try Database(url: url)
+        }
         self.wdb.foreignKey = true
         self.url = url
         self.thread = Thread(block: {

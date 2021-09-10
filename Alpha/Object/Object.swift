@@ -13,6 +13,7 @@ public struct DataMode: OptionSet {
     public static let none = DataMode([])
     public static let primary = DataMode(rawValue: 1 << 0)
     public static let notnull = DataMode(rawValue: 1 << 1)
+    public static let unique = DataMode(rawValue: 1 << 2)
     public init(rawValue: UInt8) {
         self.rawValue = rawValue
     }
@@ -22,6 +23,8 @@ public enum DataTypeDef {
     case double
     case text
     case blob
+    case object
+    case null
     public var define:String{
         switch self {
         
@@ -33,26 +36,22 @@ public enum DataTypeDef {
             return "TEXT"
         case .blob:
             return "BLOB"
+        case .object:
+            return "INTEGER"
+        case .null:
+            return "null"
         }
     }
 }
 public protocol DataType{
-    var define:DataTypeDef { get }
+    static func define()->DataTypeDef
     func bind(rs:Database.ResultSet,key:String)
-    mutating func colume(rs:Database.ResultSet,key:String)
     func bind(rs:Database.ResultSet,index:Int32)
-    mutating func  colume(rs:Database.ResultSet,index:Int32)
 }
 extension Optional:DataType where Wrapped == DataType {
-    public var define: DataTypeDef {
-        switch self {
-        case .none:
-            return .text
-        case let .some(v):
-            return v.define
-        }
+    public static func define() -> DataTypeDef {
+        .null
     }
-    
     public func bind(rs: Database.ResultSet, key: String) {
         switch self {
         case .none:
@@ -62,9 +61,9 @@ extension Optional:DataType where Wrapped == DataType {
         }
     }
     
-    public mutating func colume(rs: Database.ResultSet, key: String) {
-        self?.colume(rs: rs, index: rs.index(paramName: key))
-    }
+//    public mutating func colume(rs: Database.ResultSet, key: String) {
+//        self?.colume(rs: rs, index: rs.index(paramName: key))
+//    }
     
     public func bind(rs: Database.ResultSet, index: Int32) {
         switch self {
@@ -75,130 +74,148 @@ extension Optional:DataType where Wrapped == DataType {
         }
     }
     
-    public mutating func colume(rs: Database.ResultSet, index: Int32) {
-        switch self {
-        case .none:
-           return
-        case .some:
-            let v = rs.column(index: index, type: Wrapped.self)
-            self = .some(v as! DataType)
-        }
-    }
-    
-    
+//    public mutating func colume(rs: Database.ResultSet, index: Int32) {
+//        switch self {
+//        case .none:
+//           return
+//        case .some:
+//            let v = rs.column(index: index, type: Wrapped.self)
+//            self = .some(v as! DataType)
+//        }
+//    }
 }
 extension String:DataType{
-    public func bind(rs: Database.ResultSet, index: Int32) {
-        rs.bind(index: index).bind(value: self)
-    }
-    
-    public mutating func colume(rs: Database.ResultSet, index: Int32) {
-        self.removeAll()
-        self.append(rs.column(index: index, type: Self.self).value())
-    }
-    
-    public func bind(rs: Database.ResultSet, key: String) {
-        rs.bind(name: key)?.bind(value: self)
-    }
-    
-    public mutating func colume(rs: Database.ResultSet, key: String) {
-        self.removeAll()
-        self.append(rs.column(index: rs.index(paramName: key), type: Self.self).value())
-    }
-    
-    public var define: DataTypeDef{
+    public static func define() -> DataTypeDef {
         return .text
     }
-}
-extension Int:DataType{
-    public var define: DataTypeDef{
-        return .integer
-    }
+    
     public func bind(rs: Database.ResultSet, index: Int32) {
         rs.bind(index: index).bind(value: self)
     }
     
-    public mutating func colume(rs: Database.ResultSet, index: Int32) {
-        let i = rs.column(index: index, type: Self.self).value()
-        self = i
-    }
+//    public mutating func colume(rs: Database.ResultSet, index: Int32) {
+//        self.removeAll()
+//        self.append(rs.column(index: index, type: Self.self).value())
+//    }
     
     public func bind(rs: Database.ResultSet, key: String) {
         rs.bind(name: key)?.bind(value: self)
     }
     
-    public mutating func colume(rs: Database.ResultSet, key: String) {
-        self = rs.column(index: rs.index(paramName: key), type: Self.self).value()
+//    public mutating func colume(rs: Database.ResultSet, key: String) {
+//        self.removeAll()
+//        self.append(rs.column(index: rs.index(paramName: key), type: Self.self).value())
+//    }
+}
+extension Int:DataType{
+    public static func define() -> DataTypeDef {
+        return .integer
     }
+    
+
+    public func bind(rs: Database.ResultSet, index: Int32) {
+        rs.bind(index: index).bind(value: self)
+    }
+    
+//    public mutating func colume(rs: Database.ResultSet, index: Int32) {
+//        let i = rs.column(index: index, type: Self.self).value()
+//        self = i
+//    }
+//
+    public func bind(rs: Database.ResultSet, key: String) {
+        rs.bind(name: key)?.bind(value: self)
+    }
+    
+//    public mutating func colume(rs: Database.ResultSet, key: String) {
+//        self = rs.column(index: rs.index(paramName: key), type: Self.self).value()
+//    }
     
 }
 extension Double:DataType{
-    public var define: DataTypeDef{
+    public static func define() -> DataTypeDef {
         return .double
     }
+    
+   
     public func bind(rs: Database.ResultSet, index: Int32) {
         rs.bind(index: index).bind(value: self)
     }
     
-    public mutating func colume(rs: Database.ResultSet, index: Int32) {
-        let i = rs.column(index: index, type: Self.self).value()
-        self = i
-    }
+//    public mutating func colume(rs: Database.ResultSet, index: Int32) {
+//        let i = rs.column(index: index, type: Self.self).value()
+//        self = i
+//    }
     
     public func bind(rs: Database.ResultSet, key: String) {
         rs.bind(name: key)?.bind(value: self)
     }
     
-    public mutating func colume(rs: Database.ResultSet, key: String) {
-        self = rs.column(index: rs.index(paramName: key), type: Self.self).value()
-    }
+//    public mutating func colume(rs: Database.ResultSet, key: String) {
+//        self = rs.column(index: rs.index(paramName: key), type: Self.self).value()
+//    }
 }
 extension Data:DataType{
-    public var define: DataTypeDef{
-        return .blob
+    public static func define() -> DataTypeDef {
+        return .double
     }
+
     public func bind(rs: Database.ResultSet, index: Int32) {
         rs.bind(index: index).bind(value: self)
     }
     
-    public mutating func colume(rs: Database.ResultSet, index: Int32) {
-        self.removeAll()
-        self.append(rs.column(index: index, type: Self.self).value())
-    }
+//    public mutating func colume(rs: Database.ResultSet, index: Int32) {
+//        self.removeAll()
+//        self.append(rs.column(index: index, type: Self.self).value())
+//    }
     
     public func bind(rs: Database.ResultSet, key: String) {
         rs.bind(name: key)?.bind(value: self)
     }
     
-    public mutating func colume(rs: Database.ResultSet, key: String) {
-        self.removeAll()
-        self.append(rs.column(index: rs.index(paramName: key), type: Self.self).value())
-    }
+//    public mutating func colume(rs: Database.ResultSet, key: String) {
+//        self.removeAll()
+//        self.append(rs.column(index: rs.index(paramName: key), type: Self.self).value())
+//    }
 }
 
 public protocol ColDef{
     var mode:DataMode { get  }
     var define:DataType { get }
+    var typeDef:DataTypeDef { get }
 }
 extension ColDef{
     public var defineCode:String{
-        return self.define.define.define + "\(self.mode.contains(.notnull) ? "not null" : "")" + "\(self.mode.defaultValue == nil ? "" : "default \(self.mode.defaultValue!)")"
+        return self.typeDef.define + "\(self.mode.contains(.unique) ? " unique " : "")" + "\(self.mode.contains(.notnull) ? " not null " : "")" + "\(self.mode.defaultValue == nil ? "" : " default \(self.mode.defaultValue!) ")"
     }
 }
 struct InnerDef:ColDef {
+    var typeDef: DataTypeDef
+
     var mode: DataMode
     
     var define: DataType
 }
 @propertyWrapper
 public struct Col<T:DataType>:ColDef{
+    public var typeDef: DataTypeDef{
+        return T.define()
+    }
+    
     public var define: DataType{
         return self.wrappedValue
     }
     public var mode:DataMode
-    public var wrappedValue:T
+    private var inner:T
+    public var wrappedValue:T{
+        get{
+            return self.inner
+        }
+        set{
+            self.inner = newValue
+        }
+    }
     public init(wrappedValue:T,_ mode:DataMode = [.none],_ defaultValue:String? = nil) {
-        self.wrappedValue = wrappedValue
+        self.inner = wrappedValue
         self.mode = mode
         self.mode.defaultValue = defaultValue
     }
@@ -206,20 +223,62 @@ public struct Col<T:DataType>:ColDef{
 
 @propertyWrapper
 public struct NullableCol<T:DataType>:ColDef{
+    public var typeDef: DataTypeDef{
+        T.define()
+    }
     public var define: DataType{
         return self.wrappedValue ?? nil
     }
     public var mode:DataMode
-    public var wrappedValue:T?
+    private var inner:T?
+    public var wrappedValue:T?{
+        get{
+            return self.inner
+        }
+        set{
+            self.inner = newValue
+        }
+    }
     public init(wrappedValue:T?,_ mode:DataMode = [.none],_ defaultValue:String? = nil) {
-        self.wrappedValue = wrappedValue
+        self.inner = wrappedValue
         self.mode = mode
         self.mode.defaultValue = defaultValue
     }
 }
 
-@objcMembers public class Object:NSObject{
-    public var rowid:Int = 0
+@objcMembers public class Object:NSObject,DataType{
+    public static func define() -> DataTypeDef {
+        return .object
+    }
+    public func classOfCollume(name:String)->AnyClass?{
+        guard let p = class_getProperty(self.classForCoder, name) else { return nil }
+        guard let a = property_copyAttributeValue(p, "T") else { return nil }
+        let string = String(cString: a).components(separatedBy: "\"")
+        if string.count == 3{
+            return NSClassFromString(string[1])
+        }
+        return nil
+    }
+    public func bind(rs: Database.ResultSet, key: String) {
+        rs.bind(name: key)?.bind(value: self.objectId)
+        try? self.queryObject(db: rs.db)
+    }
+    
+    public func colume(rs: Database.ResultSet, key: String) {
+        let name = rs.index(paramName: key)
+        self.objectId = rs.column(index: name, type: String.self).value()
+    }
+    
+    public func bind(rs: Database.ResultSet, index: Int32) {
+        rs.bind(index: index).bind(value: self.objectId)
+    }
+    
+    public func colume(rs: Database.ResultSet, index: Int32) {
+        self.objectId = rs.column(index: index, type: String.self).value()
+        try? self.queryObject(db: rs.db)
+    }
+    
+    public var objectId:String = UUID().uuidString
     public var name:String{
         return NSStringFromClass(self.classForCoder).components(separatedBy: ".").last!
     }
@@ -232,10 +291,16 @@ public struct NullableCol<T:DataType>:ColDef{
     public var normalKeyCol:[String:ColDef]{
         return Object.classKeyNormalCol(cls: Self.self,mirror: Mirror(reflecting: self))
     }
+    public var objectKeyCol:[String:ColDef]{
+        return Object.classKeyObjectCol(cls: Self.self,mirror: Mirror(reflecting: self))
+    }
     public static func classKeyCol(cls:AnyClass,mirror:Mirror)->[String:ColDef]{
         var c:UInt32 = 0
         if cls == Self.self{
-            return [:]
+            guard let v = mirror.children.filter({ i in
+                i.label == "objectId"
+            }).first?.value else { return [:]}
+            return ["objectId":InnerDef(typeDef: .text, mode: [.notnull,.unique], define: v as! String)]
         }
         let propertys = class_copyPropertyList(cls, &c)
         let km = mirror.children.reduce(into: [:]) { r, kv in
@@ -261,13 +326,13 @@ public struct NullableCol<T:DataType>:ColDef{
                 if keymap[name] != nil{
                     if pro == "c" || pro == "s" || pro == "i" || pro == "q" || pro == "C" || pro == "S" || pro == "I" || pro == "Q"{
                         
-                        keymap[name] = InnerDef(mode: .none, define: (self.value(forKey: name) as! NSNumber).intValue)
+                        keymap[name] = InnerDef(typeDef: .integer, mode: .none, define: (self.value(forKey: name) as! NSNumber).intValue)
                     }else if pro == "f" || pro == "d"{
-                        keymap[name] = InnerDef(mode: .none, define: (self.value(forKey: name) as! NSNumber).doubleValue)
+                        keymap[name] = InnerDef(typeDef: .double, mode: .none, define: (self.value(forKey: name) as! NSNumber).doubleValue)
                     }else if pro == "NSData"{
-                        keymap[name] = InnerDef(mode: .none, define:  self.value(forKey: name) as! Data)
+                        keymap[name] = InnerDef(typeDef: .object, mode: .none, define:  self.value(forKey: name) as! Data)
                     }else{
-                        keymap[name] = InnerDef(mode: .none, define: self.value(forKey: name) as! String)
+                        keymap[name] = InnerDef(typeDef: .object, mode: .none, define: self.value(forKey: name) as! Object)
                     }
                 }
             }
@@ -286,6 +351,11 @@ public struct NullableCol<T:DataType>:ColDef{
             i.value.mode != .primary
         }
     }
+    public static func classKeyObjectCol(cls:AnyClass,mirror:Mirror)->[String:ColDef]{
+        self.classKeyCol(cls: cls, mirror: mirror).filter { i in
+            i.value.typeDef == .object
+        }
+    }
     public var insertCode:String{
         let keys = self.keyCol.keys
         let a = "insert into `\(self.name)` (" + keys.joined(separator: ",") + ") values " + "(" + keys.map { i in
@@ -296,7 +366,7 @@ public struct NullableCol<T:DataType>:ColDef{
     public var condition:String{
         let keys = self.primaryKeyCol.keys
         if keys.count == 0{
-            return "rowid=\(self.rowid)"
+            return "objectId=@objectId"
         }else{
             return keys.map{$0 + "=" + "@" + $0}.joined(separator: " and ")
         }
@@ -321,47 +391,65 @@ public struct NullableCol<T:DataType>:ColDef{
         return "delete from `\(self.name)` where " + self.condition
     }
     public var selectCode:String{
-        return "select *,rowid from `\(self.name)` where " + self.condition
+        return "select * from `\(self.name)` where " + self.condition
     }
-    public func result(rs:Database.ResultSet){
+    public var selectObjectCode:String{
+        return "select * from `\(self.name)` where objectId = \(self.objectId)"
+    }
+    public func result(rs:Database.ResultSet) throws {
         let kv = self.keyCol
         for i in 0 ..< rs.columnCount{
             let name = rs.columnName(index: i)
+            print(name)
             if rs.type(index: Int32(i)) == .Null{
                 self.setValue(nil, forKey: name)
                 continue
             }
-            if(name == "rowid"){
-                let v = rs.column(index: Int32(i), type: Int.self).value()
+            if(name == "objectId"){
+                let v = rs.column(index: Int32(i), type: String.self).value()
                 self.setValue(v, forKey: name)
                 continue
             }
-            guard let define = kv[name]?.define.define else { continue }
+            guard let define = kv[name]?.typeDef else { continue }
             switch define {
             case .integer:
                 let v = rs.column(index: Int32(i), type: Int.self).value()
                 self.setValue(v, forKey: name)
+                break
             case .double:
                 let v = rs.column(index: Int32(i), type: Double.self).value()
                 self.setValue(v, forKey: name)
+                break
             case .text:
                 let v = rs.column(index: Int32(i), type: String.self).value()
                 self.setValue(v, forKey: name)
+                break
             case .blob:
                 let v = rs.column(index: Int32(i), type: Data.self).value()
                 self.setValue(v, forKey: name)
+                break
+            case .object:
+                let v = rs.column(index: Int32(i), type: String.self).value()
+                let obj:Object = class_createInstance(self.classOfCollume(name: name), 0) as! Object
+                obj.objectId = v
+                try obj.queryObject(db: rs.db)
+                self.setValue(obj, forKey: name)
+                break
+            case .null:
+                break
             }
-            
         }
     }
 
     public func bind(rs:Database.ResultSet){
         for i in self.keyCol {
             i.value.define.bind(rs: rs, key: "@" + i.key)
-            print("\(i.key)=\(i.value.define)")
         }
     }
     func writeDataCode(db:Database,sql:String) throws {
+        if try db.tableExists(name: self.name) == false{
+            try self.create(db: db)
+        }
         let rs = try db.query(sql: sql)
         self.bind(rs: rs)
         try rs.step()
@@ -373,31 +461,49 @@ public struct NullableCol<T:DataType>:ColDef{
         var res:[T] = []
         while try rs.step(){
             let obj = T()
-            obj.result(rs: rs)
+            try obj.result(rs: rs)
             res.append(obj)
         }
         rs.close()
         return res
     }
     func readDataModel<T:Object>(db:Database,sql:String,object: inout T) throws {
-        print(sql)
         let rs = try db.query(sql: sql)
         self.bind(rs: rs)
         if try rs.step() {
-            object.result(rs: rs)
+            try object.result(rs: rs)
         }
         rs.close()
     }
     public func insert(db:Database) throws{
         try self.writeDataCode(db: db, sql: self.insertCode)
+        for i in self.objectKeyCol{
+            let q = self.value(forKey: i.key) as! Object
+            try q.save(db: db)
+        }
     }
     public func update(db:Database) throws{
         try self.writeDataCode(db: db, sql: self.updateCode)
+        for i in self.objectKeyCol{
+            let q = self.value(forKey: i.key) as! Object
+            try q.save(db: db)
+        }
+    }
+    public func save(db:Database) throws{
+        do {
+            try self.insert(db: db)
+        }catch{
+            try self.update(db: db)
+        }
     }
     public func delete(db:Database) throws{
         try self.writeDataCode(db: db, sql: self.deleteCode)
     }
     public func query(db:Database) throws{
+        var a = self
+        try self.readDataModel(db: db, sql: self.selectCode, object: &a)
+    }
+    public func queryObject(db:Database) throws{
         var a = self
         try self.readDataModel(db: db, sql: self.selectCode, object: &a)
     }
@@ -420,7 +526,6 @@ public struct NullableCol<T:DataType>:ColDef{
             try db.copyTable(to: self.name, from: self.name + "_tmp", keys:copyCol)
             try db.drop(name:self.name + "_tmp")
         }
-        
     }
     public func newkey(db:Database) throws ->[String]{
         let old = try db.tableInfo(name: self.name).keys
@@ -468,11 +573,11 @@ public enum FetchKey{
         case let .count(c):
             return "count(\(c))"
         case let .max(c):
-            return "*,rowid,max(\(c))"
+            return "*,max(\(c))"
         case let .min(c):
-            return "*,rowid,min(\(c))"
+            return "*,min(\(c))"
         case .all:
-            return "*,rowid"
+            return "*"
         }
     }
 }
@@ -489,7 +594,7 @@ public class ObjectRequest<T:Object>{
         var result:[T] = []
         while try rs.step() {
             let a = T()
-            a.result(rs: rs)
+            try a.result(rs: rs)
             result.append(a)
         }
         return result
