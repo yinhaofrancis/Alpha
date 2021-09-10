@@ -65,7 +65,9 @@ class modelTest: XCTestCase {
             try db.drop(name: "c")
             try db.drop(name: "a")
             try db.drop(name: "a_tmp")
+            
             let c = c()
+            try c.checkObject(db: db)
             c.aa = 1
             c.bb = "bb"
             c.cc = "cc"
@@ -76,12 +78,16 @@ class modelTest: XCTestCase {
             try c.save(db: db)
             
             let a:[c] = try ObjectRequest(table: c.name).query(db: db)
-            XCTAssert(a.first!.fa!.a == 2) 
+            try a.first?.fa!.queryObject(db: db)
+            XCTAssert(a.first!.fa!.a == 2)
+            
+            XCTAssert(a.first!.bb == "bb")
         }
     }
     func testreflect() throws{
         let aa = c()
         let a = aa.keyCol
+        print(aa.createCode)
     }
 }
 

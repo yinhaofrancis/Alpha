@@ -20,6 +20,7 @@
 		A9A11D7A26DE2D26000D3F6C /* modelTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A11D7926DE2D26000D3F6C /* modelTest.swift */; };
 		A9D1C98826B1CEDD00F4421B /* Pool.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D1C98726B1CEDD00F4421B /* Pool.swift */; };
 		A9DDE63726EB4D4A00B4DBF8 /* OtherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A96E090526C518CF0034568D /* OtherTests.swift */; };
+		A9DDE63926EB587B00B4DBF8 /* Context.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9DDE63826EB587B00B4DBF8 /* Context.swift */; };
 		A9F6AEBC26E9AA4200177E3C /* Object.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9F6AEBB26E9AA4200177E3C /* Object.swift */; };
 /* End PBXBuildFile section */
 
@@ -61,6 +62,7 @@
 		A9A11D7726DE2990000D3F6C /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		A9A11D7926DE2D26000D3F6C /* modelTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = modelTest.swift; sourceTree = "<group>"; };
 		A9D1C98726B1CEDD00F4421B /* Pool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pool.swift; sourceTree = "<group>"; };
+		A9DDE63826EB587B00B4DBF8 /* Context.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Context.swift; sourceTree = "<group>"; };
 		A9F6AEBB26E9AA4200177E3C /* Object.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Object.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -170,6 +172,7 @@
 			isa = PBXGroup;
 			children = (
 				A9F6AEBB26E9AA4200177E3C /* Object.swift */,
+				A9DDE63826EB587B00B4DBF8 /* Context.swift */,
 			);
 			path = Object;
 			sourceTree = "<group>";
@@ -314,6 +317,7 @@
 				A925326A26AFB7520080E72D /* Backup.swift in Sources */,
 				A9580AF426B1381F00530397 /* Function.swift in Sources */,
 				A9660CA226E5B76800CB98B6 /* Objc.swift in Sources */,
+				A9DDE63926EB587B00B4DBF8 /* Context.swift in Sources */,
 				A925326526AFB7520080E72D /* Database.swift in Sources */,
 				A9A11D7826DE2990000D3F6C /* Model.swift in Sources */,
 				A925326926AFB7520080E72D /* Map.swift in Sources */,

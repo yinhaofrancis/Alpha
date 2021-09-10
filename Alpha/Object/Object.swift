@@ -37,7 +37,7 @@ public enum DataTypeDef {
         case .blob:
             return "BLOB"
         case .object:
-            return "INTEGER"
+            return "TEXT"
         case .null:
             return "null"
         }
@@ -383,7 +383,6 @@ public struct NullableCol<T:DataType>:ColDef{
                 let v = rs.column(index: Int32(i), type: String.self).value()
                 let obj:Object = class_createInstance(self.classOfCollume(name: name), 0) as! Object
                 obj.objectId = v
-                try obj.queryObject(db: rs.db)
                 self.setValue(obj, forKey: name)
                 break
             case .null:
@@ -397,10 +396,16 @@ public struct NullableCol<T:DataType>:ColDef{
             i.value.define.bind(rs: rs, key: "@" + i.key)
         }
     }
-    func writeDataCode(db:Database,sql:String) throws {
-        if try db.tableExists(name: self.name) == false{
-            try self.create(db: db)
+    public func checkObject(db:Database) throws {
+        try self.create(db: db)
+        for i in self.objectKeyCol{
+            let cls: AnyClass? = self.classOfCollume(name: i.key)
+            let inst = class_createInstance(cls, 0) as! Object
+            try inst.create(db: db)
         }
+    }
+    func writeDataCode(db:Database,sql:String) throws {
+        
         let rs = try db.query(sql: sql)
         self.bind(rs: rs)
         try rs.step()
