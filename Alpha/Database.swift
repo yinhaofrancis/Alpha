@@ -459,7 +459,7 @@ extension Database{
         try self.exec(sql: sql)
     }
     public func drop(name:String) throws{
-        try exec(sql: "drop table \(name)")
+        try exec(sql: "drop table if exists \(name)")
     }
     public func renameColumn(name:String,columeName:String,newName:String) throws {
         try self.exec(sql: "ALTER TABLE \(name) RENAME COLUMN \(columeName) TO \(newName)")

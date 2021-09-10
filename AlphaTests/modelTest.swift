@@ -64,6 +64,7 @@ class modelTest: XCTestCase {
         self.pool.writeSync { db in
             try db.drop(name: "c")
             try db.drop(name: "a")
+            try db.drop(name: "a_tmp")
             try aa.create(db: db)
             try c().create(db: db)
             aa.a = 1
@@ -72,9 +73,14 @@ class modelTest: XCTestCase {
             aa.stringw = "aaaaaaaaaa"
             try aa.update(db: db)
             try db.copyTable(to: "c", from: "a", keyMaps: ["string":"cc","stringw":"bb","a":"aa"])
-            let c = b()
-            try c.create(db: db)
+            let c = c()
+            try b().create(db: db)
             try aa.delete(db: db)
+            c.rowid = 1
+            try c.query(db: db)
+            print(c.debugDescription)
+            let result = try ObjectRequest<c>(table: "c").query(db: db)
+            print(result)
         }
     }
 }
@@ -110,6 +116,6 @@ class c:Object{
     @NullableCol
     var bb:String?
     
-    @Col([.primary])
+    @Col
     var aa:Int = 0
 }

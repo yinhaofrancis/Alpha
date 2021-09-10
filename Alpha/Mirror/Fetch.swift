@@ -7,43 +7,9 @@
 
 import Foundation
 import SQLite3
-public enum Order {
-    case asc(String)
-    case desc(String)
-    public var code:String{
-        switch self {
-        
-        case let .asc(a):
-            return "`\(a)` ASC"
-        case let .desc(a):
-            return "`\(a)` DESC"
-        }
-    }
-}
-public struct Page{
-    public let offset:Int32
-    public let limit:Int32
-}
-public enum FetchKey{
-    case count(String)
-    case max(String)
-    case min(String)
-    case all
-    
-    public var keyString:String{
-        switch self{
-     
-        case let .count(c):
-            return "count(\(c))"
-        case let .max(c):
-            return "*,max(\(c))"
-        case let .min(c):
-            return "*,min(\(c))"
-        case .all:
-            return "*"
-        }
-    }
-}
+
+
+
 public class FetchRequest<T:SQLCode>{
     public var sql:String
     public var keyMap:[String:OriginValue] = [:]

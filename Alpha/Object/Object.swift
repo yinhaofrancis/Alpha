@@ -217,7 +217,9 @@ public struct NullableCol<T:DataType>:ColDef{
         self.mode.defaultValue = defaultValue
     }
 }
+
 @objcMembers public class Object:NSObject{
+    public var rowid:Int = 0
     public var name:String{
         return NSStringFromClass(self.classForCoder).components(separatedBy: ".").last!
     }
@@ -293,8 +295,12 @@ public struct NullableCol<T:DataType>:ColDef{
     }
     public var condition:String{
         let keys = self.primaryKeyCol.keys
-        let condition = keys.map{$0 + "=" + "@" + $0}.joined(separator: " and ")
-        return condition
+        if keys.count == 0{
+            return "rowid=\(self.rowid)"
+        }else{
+            return keys.map{$0 + "=" + "@" + $0}.joined(separator: " and ")
+        }
+        
     }
     public var updateCode:String{
         let keys = self.keyCol.keys
@@ -306,39 +312,53 @@ public struct NullableCol<T:DataType>:ColDef{
         let kcm = self.keyCol.map { i in
             i.key + " " + i.value.defineCode
         }
-        let pk = ["primary key(" + self.primaryKeyCol.keys.joined(separator: ",") + ")"]
+        let pk = self.primaryKeyCol.keys.count > 0 ? ["primary key(" + self.primaryKeyCol.keys.joined(separator: ",") + ")"] : []
         let kmp = (kcm + pk).joined(separator: ",")
-        let sql = "create table `\(self.name)`" + "(\(kmp))"
+        let sql = "create table if not exists`\(self.name)`" + "(\(kmp))"
         return sql
     }
     public var deleteCode:String{
         return "delete from `\(self.name)` where " + self.condition
     }
     public var selectCode:String{
-        return "select * from `\(self.name)` where " + self.condition
+        return "select *,rowid from `\(self.name)` where " + self.condition
     }
     public func result(rs:Database.ResultSet){
-        for i in self.keyCol {
-            switch i.value.define.define {
+        let kv = self.keyCol
+        for i in 0 ..< rs.columnCount{
+            let name = rs.columnName(index: i)
+            if rs.type(index: Int32(i)) == .Null{
+                self.setValue(nil, forKey: name)
+                continue
+            }
+            if(name == "rowid"){
+                let v = rs.column(index: Int32(i), type: Int.self).value()
+                self.setValue(v, forKey: name)
+                continue
+            }
+            guard let define = kv[name]?.define.define else { continue }
+            switch define {
             case .integer:
-                let v = rs.column(index: rs.index(paramName: i.key), type: Int.self).value()
-                self.setValue(v, forKey: i.key)
+                let v = rs.column(index: Int32(i), type: Int.self).value()
+                self.setValue(v, forKey: name)
             case .double:
-                let v = rs.column(index: rs.index(paramName: i.key), type: Double.self).value()
-                self.setValue(v, forKey: i.key)
+                let v = rs.column(index: Int32(i), type: Double.self).value()
+                self.setValue(v, forKey: name)
             case .text:
-                let v = rs.column(index: rs.index(paramName: i.key), type: String.self).value()
-                self.setValue(v, forKey: i.key)
+                let v = rs.column(index: Int32(i), type: String.self).value()
+                self.setValue(v, forKey: name)
             case .blob:
-                let v = rs.column(index: rs.index(paramName: i.key), type: Data.self).value()
-                self.setValue(v, forKey: i.key)
+                let v = rs.column(index: Int32(i), type: Data.self).value()
+                self.setValue(v, forKey: name)
             }
             
         }
     }
+
     public func bind(rs:Database.ResultSet){
         for i in self.keyCol {
             i.value.define.bind(rs: rs, key: "@" + i.key)
+            print("\(i.key)=\(i.value.define)")
         }
     }
     func writeDataCode(db:Database,sql:String) throws {
@@ -347,7 +367,7 @@ public struct NullableCol<T:DataType>:ColDef{
         try rs.step()
         rs.close()
     }
-    func readDataCode<T:Object>(db:Database,sql:String,type:T.Type) throws ->[T] {
+    public func queryModel<T:Object>(db:Database,sql:String,type:T.Type) throws ->[T] {
         let rs = try db.query(sql: sql)
         self.bind(rs: rs)
         var res:[T] = []
@@ -359,6 +379,15 @@ public struct NullableCol<T:DataType>:ColDef{
         rs.close()
         return res
     }
+    func readDataModel<T:Object>(db:Database,sql:String,object: inout T) throws {
+        print(sql)
+        let rs = try db.query(sql: sql)
+        self.bind(rs: rs)
+        if try rs.step() {
+            object.result(rs: rs)
+        }
+        rs.close()
+    }
     public func insert(db:Database) throws{
         try self.writeDataCode(db: db, sql: self.insertCode)
     }
@@ -368,8 +397,9 @@ public struct NullableCol<T:DataType>:ColDef{
     public func delete(db:Database) throws{
         try self.writeDataCode(db: db, sql: self.deleteCode)
     }
-    public func query(db:Database) throws->[Object]{
-        try self.readDataCode(db: db, sql: self.selectCode,type: Self.self)
+    public func query(db:Database) throws{
+        var a = self
+        try self.readDataModel(db: db, sql: self.selectCode, object: &a)
     }
     public func create(db:Database) throws{
         if try db.tableExists(name: self.name) == false{
@@ -384,7 +414,10 @@ public struct NullableCol<T:DataType>:ColDef{
         if try self.oldKey(db: db).count > 0{
             try db.alterTableName(name: self.name, newName: self.name + "_tmp")
             try db.exec(sql: self.createCode)
-            try db.copyTable(to: self.name, from: self.name + "_tmp", keys: self.keyCol.keys.map{$0})
+            let tmps = try db.tableInfo(name: self.name + "_tmp").keys
+            let new = self.keyCol.keys
+            let copyCol = tmps.filter({new.contains($0)})
+            try db.copyTable(to: self.name, from: self.name + "_tmp", keys:copyCol)
             try db.drop(name:self.name + "_tmp")
         }
         
@@ -404,5 +437,61 @@ public struct NullableCol<T:DataType>:ColDef{
     }
     public required override init() {
         super.init()
+    }
+}
+public struct Page{
+    public let offset:Int32
+    public let limit:Int32
+}
+public enum Order {
+    case asc(String)
+    case desc(String)
+    public var code:String{
+        switch self {
+        
+        case let .asc(a):
+            return "`\(a)` ASC"
+        case let .desc(a):
+            return "`\(a)` DESC"
+        }
+    }
+}
+public enum FetchKey{
+    case count(String)
+    case max(String)
+    case min(String)
+    case all
+    
+    public var keyString:String{
+        switch self{
+     
+        case let .count(c):
+            return "count(\(c))"
+        case let .max(c):
+            return "*,rowid,max(\(c))"
+        case let .min(c):
+            return "*,rowid,min(\(c))"
+        case .all:
+            return "*,rowid"
+        }
+    }
+}
+public class ObjectRequest<T:Object>{
+    let sql:String
+    public init(table:String,key:FetchKey = .all,condition:Condition? = nil ,page:Page? = nil,order:[Order] = []){
+        self.sql = "select \(key.keyString) from `\(table)`" + ((condition?.conditionCode.count ?? 0) > 0 ? (" where " + condition!.conditionCode) : "") + (order.count > 0 ? " order by" + order.map({$0.code}).joined(separator: ",") : "") + (page == nil ? "" : " LIMIT \(page!.limit) OFFSET \(page!.offset)")
+    }
+    public func query(db:Database,valueMap:[String:DataType] = [:]) throws ->[T]{
+        let rs = try db.query(sql: sql)
+        for i in valueMap {
+            i.value.bind(rs: rs, key: i.key)
+        }
+        var result:[T] = []
+        while try rs.step() {
+            let a = T()
+            a.result(rs: rs)
+            result.append(a)
+        }
+        return result
     }
 }
