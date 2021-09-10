@@ -19,6 +19,7 @@
 		A9A11D7826DE2990000D3F6C /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A11D7726DE2990000D3F6C /* Model.swift */; };
 		A9A11D7A26DE2D26000D3F6C /* modelTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A11D7926DE2D26000D3F6C /* modelTest.swift */; };
 		A9D1C98826B1CEDD00F4421B /* Pool.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D1C98726B1CEDD00F4421B /* Pool.swift */; };
+		A9DDE63726EB4D4A00B4DBF8 /* OtherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A96E090526C518CF0034568D /* OtherTests.swift */; };
 		A9F6AEBC26E9AA4200177E3C /* Object.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9F6AEBB26E9AA4200177E3C /* Object.swift */; };
 /* End PBXBuildFile section */
 
@@ -41,16 +42,12 @@
 
 /* Begin PBXFileReference section */
 		A91CF2E426E28682007FB3B3 /* Condition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Condition.swift; sourceTree = "<group>"; };
-		A925325D26AFB7520080E72D /* Table.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Table.swift; sourceTree = "<group>"; };
 		A925325E26AFB7520080E72D /* Database.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Database.swift; sourceTree = "<group>"; };
-		A925325F26AFB7520080E72D /* Fetch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Fetch.swift; sourceTree = "<group>"; };
-		A925326126AFB7520080E72D /* Mirror.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Mirror.swift; sourceTree = "<group>"; };
 		A925326226AFB7520080E72D /* Map.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Map.swift; sourceTree = "<group>"; };
 		A925326326AFB7520080E72D /* Backup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Backup.swift; sourceTree = "<group>"; };
 		A93271E926AFB4A4009107CA /* Alpha.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Alpha.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A93271ED26AFB4A5009107CA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A93271F226AFB4A5009107CA /* AlphaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AlphaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		A93271F726AFB4A5009107CA /* AlphaTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlphaTests.swift; sourceTree = "<group>"; };
 		A93271F926AFB4A5009107CA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A9580AF126B120EA00530397 /* macos.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = macos.xcconfig; sourceTree = "<group>"; };
 		A9580AF326B1381F00530397 /* Function.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Function.swift; sourceTree = "<group>"; };
@@ -122,7 +119,6 @@
 				A9F6AEBA26E9AA2600177E3C /* Object */,
 				A9660CA026E5B73800CB98B6 /* Bridge */,
 				A9A11D7626DE2970000D3F6C /* Model */,
-				A9A11D7526DE28E6000D3F6C /* Mirror */,
 				A925326326AFB7520080E72D /* Backup.swift */,
 				A925325E26AFB7520080E72D /* Database.swift */,
 				A925326226AFB7520080E72D /* Map.swift */,
@@ -137,7 +133,6 @@
 		A93271F626AFB4A5009107CA /* AlphaTests */ = {
 			isa = PBXGroup;
 			children = (
-				A93271F726AFB4A5009107CA /* AlphaTests.swift */,
 				A96E090526C518CF0034568D /* OtherTests.swift */,
 				A974BFCD26CB6D44000F7FC2 /* HeapTest.swift */,
 				A93271F926AFB4A5009107CA /* Info.plist */,
@@ -161,16 +156,6 @@
 				A9660CAB26E5BCBD00CB98B6 /* Info.plist */,
 			);
 			path = AlphaOcTests;
-			sourceTree = "<group>";
-		};
-		A9A11D7526DE28E6000D3F6C /* Mirror */ = {
-			isa = PBXGroup;
-			children = (
-				A925325D26AFB7520080E72D /* Table.swift */,
-				A925325F26AFB7520080E72D /* Fetch.swift */,
-				A925326126AFB7520080E72D /* Mirror.swift */,
-			);
-			path = Mirror;
 			sourceTree = "<group>";
 		};
 		A9A11D7626DE2970000D3F6C /* Model */ = {
@@ -342,6 +327,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A9DDE63726EB4D4A00B4DBF8 /* OtherTests.swift in Sources */,
 				A9A11D7A26DE2D26000D3F6C /* modelTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
