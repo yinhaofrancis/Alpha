@@ -153,6 +153,21 @@ public struct JSON:CustomStringConvertible,
         }
         return JSON(nil)
     }
+    public subscript(_ index:Int)->String{
+        self[index].str()
+    }
+    public subscript(_ index:Int)->Int{
+        self[index].int()
+    }
+    public subscript(_ index:Int)->Double{
+        self[index].double()
+    }
+    public subscript(_ index:Int)->Bool{
+        self[index].bool()
+    }
+    public subscript(_ index:Int)->Date{
+        self[index].date()
+    }
     public func str()->String{
         if let str = self.content as? String{
             return str

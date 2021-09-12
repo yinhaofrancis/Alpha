@@ -32,9 +32,8 @@ class modelTest: XCTestCase {
             var j = try b.query(name: "aaa")
             for i in j{
                 XCTAssert(i.sdada == "dasdasd")
-//                XCTAssert(i.dd == 1)
-                XCTAssert(i.dsdsd[1].str() == "d")
-                XCTAssert(i.dsdsd[0].str() == "dd")
+                XCTAssert(i.dsdsd[1] == "d")
+                XCTAssert(i.dsdsd[0] == "dd")
                 XCTAssert(i.sad == "dasdasd")
                 XCTAssert(i.k.a == 1)
             }
@@ -73,15 +72,8 @@ class modelTest: XCTestCase {
         self.context.save(objct: c)
         let request = ObjectRequest<c>(table: c.name)
         let a = self.context.request(request: request)
-        
-//            try c.save(db: db)
-//
-//            let a:[c] = try .query(db: db)
-//            try a.first?.fa!.queryObject(db: db)
         XCTAssert(a.first!.fa!.a == 2)
-
         XCTAssert(a.first!.bb == "bb")
-//        }
     }
     func testreflect() throws{
         let aa = c()
