@@ -118,11 +118,6 @@ extension Data:DataType{
         rs.bind(index: index).bind(value: self)
     }
     
-//    public mutating func colume(rs: Database.ResultSet, index: Int32) {
-//        self.removeAll()
-//        self.append(rs.column(index: index, type: Self.self).value())
-//    }
-    
     public func bind(rs: Database.ResultSet, key: String) {
         rs.bind(name: key)?.bind(value: self)
     }
@@ -153,12 +148,15 @@ public struct Col<T:DataType>:ColDef{
     }
     
     public var define: DataType{
-        return self.wrappedValue
+        return self.inner
     }
     public var mode:DataMode
     private var inner:T
     public var wrappedValue:T{
         get{
+            if let ob = self.inner as? Object {
+                ob.context?.query(objct: ob)
+            }
             return self.inner
         }
         set{
@@ -178,12 +176,15 @@ public struct NullableCol<T:DataType>:ColDef{
         T.define()
     }
     public var define: DataType{
-        return self.wrappedValue ?? nil
+        return self.inner ?? nil
     }
     public var mode:DataMode
     private var inner:T?
     public var wrappedValue:T?{
         get{
+            if let objct = inner as? Object{
+                objct.context?.query(objct: objct)
+            }
             return self.inner
         }
         set{
@@ -210,6 +211,11 @@ public struct NullableCol<T:DataType>:ColDef{
         }
         return nil
     }
+    public var objects:[Object]{
+        self.objectKeyCol.compactMap { i in
+            self.value(forKey: i.key) as? Object
+        }
+    }
     public func bind(rs: Database.ResultSet, key: String) {
         rs.bind(name: key)?.bind(value: self.objectId)
         try? self.queryObject(db: rs.db)
@@ -228,7 +234,13 @@ public struct NullableCol<T:DataType>:ColDef{
         self.objectId = rs.column(index: index, type: String.self).value()
         try? self.queryObject(db: rs.db)
     }
-    
+    public weak var context:Context?{
+        didSet{
+            for i in self.objects{
+                i.context = self.context
+            }
+        }
+    }
     public var objectId:String = UUID().uuidString
     public var name:String{
         return NSStringFromClass(self.classForCoder).components(separatedBy: ".").last!
@@ -393,6 +405,7 @@ public struct NullableCol<T:DataType>:ColDef{
 
     public func bind(rs:Database.ResultSet){
         for i in self.keyCol {
+            print("bind",i.key)
             i.value.define.bind(rs: rs, key: "@" + i.key)
         }
     }
@@ -434,7 +447,7 @@ public struct NullableCol<T:DataType>:ColDef{
     public func insert(db:Database) throws{
         try self.writeDataCode(db: db, sql: self.insertCode)
         for i in self.objectKeyCol{
-            let q = self.value(forKey: i.key) as! Object
+            guard let q = i.value.define as? Object else { throw NSError(domain: "\(self) \(i.key) save error", code: 0, userInfo: nil)}
             try q.save(db: db)
         }
     }
