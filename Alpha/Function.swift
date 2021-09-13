@@ -147,7 +147,7 @@ public class AggregateFunction:Function{
     }
 }
 extension Database{
-    public func addScalarFunction(function:Function){
+    public func addFunction(function:Function){
         
         if function.funtionType == .aggregate{
             sqlite3_create_function(self.sqlite!, function.name, function.nArg, SQLITE_UTF8, Unmanaged.passRetained(function).toOpaque(), nil) { ctx, i, ret in

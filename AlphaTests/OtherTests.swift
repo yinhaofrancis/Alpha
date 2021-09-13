@@ -33,6 +33,10 @@ class OtherTests: XCTestCase {
         print(a.conditionCode)
 
     }
-    
+    func testFuction(){
+        self.poor.write { db in
+            
+        }
+    }
 }
 
