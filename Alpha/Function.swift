@@ -12,17 +12,26 @@ public enum FunctionType{
     case scalar
     case aggregate
 }
-
+public typealias CallFunction<T:Function> = (T,_ argc:Int32)->Void
+public typealias FinalFunction<T:Function> = (T)->Void
 public class Function{
+    public enum FunctionValueType:Int32{
+        case Null
+        case Float
+        case Int
+        case Blob
+        case Text
+    }
     public let name:String
     public let nArg:Int32
     public var ctx:OpaquePointer?
-    public let call:(Function,Int32,OpaquePointer?)->Void
+    public var values:UnsafeMutablePointer<OpaquePointer?>?
+    public let call:CallFunction<Function>
     
     public var funtionType:FunctionType{
         .scalar
     }
-    public init(name:String,nArg:Int32,handle:@escaping (Function,Int32,OpaquePointer?)->Void) {
+    public init(name:String,nArg:Int32,handle:@escaping CallFunction<Function>) {
         self.name = name
         self.nArg = nArg
         self.call = handle
@@ -60,7 +69,7 @@ public class Function{
         }
         let p = UnsafeMutablePointer<CChar>.allocate(capacity: v.utf8.count)
         memcpy(p, c, v.utf8.count)
-        sqlite3_result_text(sc, v.cString(using: .utf8), Int32(v.utf8.count)) { p in
+        sqlite3_result_text(sc, p, Int32(v.utf8.count)) { p in
             p?.deallocate()
         }
     }
@@ -100,38 +109,70 @@ public class Function{
         sqlite3_result_error(sc, error, Int32(error.utf8.count))
         sqlite3_result_error_code(sc, code)
     }
-    public func value(value:OpaquePointer)->Int{
+    public func value(index:Int)->Int{
+        guard let p = self.valuePointer(index: index) else { return 0}
         if MemoryLayout<Int>.size == 4{
-            return Int(sqlite3_value_int(value))
+            return Int(sqlite3_value_int(p))
         }else{
-            return Int(sqlite3_value_int64(value))
+            return Int(sqlite3_value_int64(p))
         }
     }
+    public func valuePointer(index:Int)->OpaquePointer?{
+        guard let vs = self.values else { return nil }
+        guard let p = vs.advanced(by: index).pointee else { return nil }
+        return p
+    }
     @available(iOS 12.0, *)
-    public func valueNoChange(value:OpaquePointer){
-        sqlite3_value_nochange(value)
+    public func valueNoChange(index:Int){
+        guard let p = self.valuePointer(index: index) else { return }
+        sqlite3_value_nochange(p)
     }
-    public func value(value:OpaquePointer)->Int32{
-        return sqlite3_value_int(value)
+    public func value(index:Int)->Int32{
+        guard let p = self.valuePointer(index: index) else { return 0}
+        return sqlite3_value_int(p)
     }
-    public func value(value:OpaquePointer)->Int64{
-        return sqlite3_value_int64(value)
+    public func value(index:Int)->Int64{
+        guard let p = self.valuePointer(index: index) else { return 0}
+        return sqlite3_value_int64(p)
     }
-    public func value(value:OpaquePointer)->Double{
-        return sqlite3_value_double(value)
+    public func value(index:Int)->Double{
+        guard let p = self.valuePointer(index: index) else { return 0}
+        return sqlite3_value_double(p)
     }
-    public func value(value:OpaquePointer)->Float{
-        return Float(sqlite3_value_double(value))
+    public func value(index:Int)->Float{
+        guard let p = self.valuePointer(index: index) else { return 0}
+        return Float(sqlite3_value_double(p))
     }
-    public func value(value:OpaquePointer)->String{
-        return String(cString: sqlite3_value_text(value))
+    public func value(index:Int)->String{
+        guard let p = self.valuePointer(index: index) else { return ""}
+        return String(cString: sqlite3_value_text(p))
+    }
+    public func valueType(index:Int)->FunctionValueType{
+        guard let p = self.valuePointer(index: index) else { return .Null}
+        let type = sqlite3_value_type(p)
+        switch type {
+        case SQLITE_TEXT:
+            return .Text
+        case SQLITE_INTEGER:
+            return .Int
+        case SQLITE_BLOB:
+            return .Blob
+        case SQLITE_FLOAT:
+            return .Float
+        default:
+            return .Null
+        }
     }
 }
 public class AggregateFunction:Function{
-    public let final:(Function)->Void
-    public init(name:String,nArg:Int32,step:@escaping (Function,Int32,OpaquePointer?)->Void,final:@escaping (Function)->Void) {
+    public let final:FinalFunction<AggregateFunction>
+    public let step:CallFunction<AggregateFunction>
+    public init(name:String,nArg:Int32,step:@escaping CallFunction<AggregateFunction>,final:@escaping FinalFunction<AggregateFunction>) {
         self.final = final
-        super.init(name: name, nArg: nArg, handle: step)
+        self.step = step
+        super.init(name: name, nArg: nArg) { ctx, i in
+            
+        }
     }
     public override var funtionType: FunctionType{
         return .aggregate
@@ -140,10 +181,10 @@ public class AggregateFunction:Function{
         let p = sqlite3_aggregate_context(self.ctx!, Int32(MemoryLayout<T>.size))
         return Unmanaged<T>.fromOpaque(p!).takeUnretainedValue()
     }
-    public func aggregateContext<T>(type:T.Type)->T {
+    public func aggregateContext<T>(type:T.Type)->UnsafeMutablePointer<T> {
         let p = sqlite3_aggregate_context(self.ctx!, Int32(MemoryLayout<T>.size))
-        let struc = p?.assumingMemoryBound(to: type).pointee
-        return struc!
+        let struc = (p?.assumingMemoryBound(to: type))!
+        return struc
     }
 }
 extension Database{
@@ -153,17 +194,19 @@ extension Database{
             sqlite3_create_function(self.sqlite!, function.name, function.nArg, SQLITE_UTF8, Unmanaged.passRetained(function).toOpaque(), nil) { ctx, i, ret in
                 let call = Unmanaged<AggregateFunction>.fromOpaque(sqlite3_user_data(ctx)).takeUnretainedValue()
                 call.ctx = ctx
-                call.call(call,i,ret?.pointee)
+                call.values = ret
+                call.step(call,i)
             } _: { ctx in
                 let call = Unmanaged<AggregateFunction>.fromOpaque(sqlite3_user_data(ctx)).takeUnretainedValue()
                 call.ctx = ctx
                 call.final(call)
             }
         }else{
-            sqlite3_create_function(self.sqlite!, function.name, function.nArg, SQLITE_UTF8, Unmanaged.passUnretained(function).toOpaque(), { ctx, i, ret in
+            sqlite3_create_function(self.sqlite!, function.name, function.nArg, SQLITE_UTF8, Unmanaged.passRetained(function).toOpaque(), { ctx, i, ret in
                 let call = Unmanaged<Function>.fromOpaque(sqlite3_user_data(ctx)).takeUnretainedValue()
                 call.ctx = ctx
-                call.call(call,i,ret?.pointee)
+                call.values = ret
+                call.call(call,i)
             }, nil, nil)
         }
         

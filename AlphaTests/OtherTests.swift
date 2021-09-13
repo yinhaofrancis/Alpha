@@ -34,8 +34,26 @@ class OtherTests: XCTestCase {
 
     }
     func testFuction(){
+        
         self.poor.write { db in
-            
+            let a:JSON = ["a":"dasdasd","b":1,"c":1.3]
+            for i in 0 ..< 10{
+                try db.insert("a", a)
+            }
+        }
+        self.poor.readSync { db in
+            db.addFunction(function: Function(name: "cc", nArg: 1, handle: { ctx, c in
+                let d:Double = ctx.value(index: 0) + 1.0
+                ctx.ret(v: "(\(d))")
+            }))
+            db.addFunction(function: AggregateFunction(name: "Cou", nArg: 1, step: { ctx, c in
+                let c = ctx.aggregateContext(type: Int.self)
+                c.pointee += 1
+            }, final: { ctx in
+                let c = ctx.aggregateContext(type: Int.self)
+                ctx.ret(v: c.pointee + 1)
+            }))
+            try db.exec(sql: "select * , count(*),cc(c),Cou(c) from a")
         }
     }
 }
