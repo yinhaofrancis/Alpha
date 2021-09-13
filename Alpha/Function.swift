@@ -8,12 +8,21 @@
 import Foundation
 import SQLite3
 
-public class ScalarFunction{
+public enum FunctionType{
+    case scalar
+    case aggregate
+}
+
+public class Function{
     public let name:String
     public let nArg:Int32
     public var ctx:OpaquePointer?
-    public let call:(ScalarFunction,Int32,OpaquePointer?)->Void
-    public init(name:String,nArg:Int32,handle:@escaping (ScalarFunction,Int32,OpaquePointer?)->Void) {
+    public let call:(Function,Int32,OpaquePointer?)->Void
+    
+    public var funtionType:FunctionType{
+        .scalar
+    }
+    public init(name:String,nArg:Int32,handle:@escaping (Function,Int32,OpaquePointer?)->Void) {
         self.name = name
         self.nArg = nArg
         self.call = handle
@@ -118,12 +127,45 @@ public class ScalarFunction{
         return String(cString: sqlite3_value_text(value))
     }
 }
+public class AggregateFunction:Function{
+    public let final:(Function)->Void
+    public init(name:String,nArg:Int32,step:@escaping (Function,Int32,OpaquePointer?)->Void,final:@escaping (Function)->Void) {
+        self.final = final
+        super.init(name: name, nArg: nArg, handle: step)
+    }
+    public override var funtionType: FunctionType{
+        return .aggregate
+    }
+    public func aggregateContext<T:AnyObject>(type:T.Type)->T {
+        let p = sqlite3_aggregate_context(self.ctx!, Int32(MemoryLayout<T>.size))
+        return Unmanaged<T>.fromOpaque(p!).takeUnretainedValue()
+    }
+    public func aggregateContext<T>(type:T.Type)->T {
+        let p = sqlite3_aggregate_context(self.ctx!, Int32(MemoryLayout<T>.size))
+        let struc = p?.assumingMemoryBound(to: type).pointee
+        return struc!
+    }
+}
 extension Database{
-    public func addScalarFunction(function:ScalarFunction){
-        sqlite3_create_function(self.sqlite!, function.name, function.nArg, SQLITE_UTF8, Unmanaged.passUnretained(function).toOpaque(), { ctx, i, ret in
-            let call = Unmanaged<ScalarFunction>.fromOpaque(sqlite3_user_data(ctx)).takeUnretainedValue()
-            call.ctx = ctx
-            call.call(call,i,ret?.pointee)
-        }, nil, nil)
+    public func addScalarFunction(function:Function){
+        
+        if function.funtionType == .aggregate{
+            sqlite3_create_function(self.sqlite!, function.name, function.nArg, SQLITE_UTF8, Unmanaged.passRetained(function).toOpaque(), nil) { ctx, i, ret in
+                let call = Unmanaged<AggregateFunction>.fromOpaque(sqlite3_user_data(ctx)).takeUnretainedValue()
+                call.ctx = ctx
+                call.call(call,i,ret?.pointee)
+            } _: { ctx in
+                let call = Unmanaged<AggregateFunction>.fromOpaque(sqlite3_user_data(ctx)).takeUnretainedValue()
+                call.ctx = ctx
+                call.final(call)
+            }
+        }else{
+            sqlite3_create_function(self.sqlite!, function.name, function.nArg, SQLITE_UTF8, Unmanaged.passUnretained(function).toOpaque(), { ctx, i, ret in
+                let call = Unmanaged<Function>.fromOpaque(sqlite3_user_data(ctx)).takeUnretainedValue()
+                call.ctx = ctx
+                call.call(call,i,ret?.pointee)
+            }, nil, nil)
+        }
+        
     }
 }
