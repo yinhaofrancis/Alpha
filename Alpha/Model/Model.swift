@@ -120,6 +120,16 @@ public struct JSON:CustomStringConvertible,
             self.setKeyValue(dynamicMember: dynamicMember, json: JSON(newValue))
         }
     }
+    public subscript(dynamicMember dynamicMember:String)->Date{
+        get{
+            self.keyValue(dynamicMember: dynamicMember)?.date() ?? Date(timeIntervalSince1970: 0)
+        }
+        set{
+            let a = DateFormatter()
+            a.dateFormat = JSON.dateFormat
+            self.setKeyValue(dynamicMember: dynamicMember, json: JSON(a.string(from: newValue)))
+        }
+    }
     public subscript(dynamicMember dynamicMember:String)->Int{
         get{
             self.keyValue(dynamicMember: dynamicMember)?.int() ?? 0
@@ -373,7 +383,7 @@ public struct JSON:CustomStringConvertible,
             return self.str()
         }
     }
-    public static var dateFormat:String = "yyyy-mm-dd HH:mm:ss"
+    public static var dateFormat:String = "yyyy-MM-dd HH:mm:ss.SSS"
 }
 extension Database{
     func insert(_ dic: [String : JSON], _ name: String) throws {

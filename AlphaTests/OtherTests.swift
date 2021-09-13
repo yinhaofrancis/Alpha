@@ -37,24 +37,44 @@ class OtherTests: XCTestCase {
         
         self.poor.write { db in
             let a:JSON = ["a":"dasdasd","b":1,"c":1.3]
+            try db.drop(name: "a")
             for i in 0 ..< 10{
-                try db.insert("a", a)
+                var b:JSON = a;
+                b.dddd = i
+                b.aaaa = "\(Double(i * i) * 1.1) end"
+                b.ddd = Date()
+                try db.insert("a", b)
             }
         }
         self.poor.readSync { db in
+            struct save {
+                var sum:Double
+                var count:Int
+            }
             db.addFunction(function: Function(name: "cc", nArg: 1, handle: { ctx, c in
                 let d:Double = ctx.value(index: 0) + 1.0
                 ctx.ret(v: "(\(d))")
             }))
             db.addFunction(function: AggregateFunction(name: "Cou", nArg: 1, step: { ctx, c in
-                let c = ctx.aggregateContext(type: Int.self)
-                c.pointee += 1
+                let c = ctx.aggregateContext(type: save.self)
+                c.pointee.count += 1
+                c.pointee.sum += ctx.value(index: 0)
             }, final: { ctx in
-                let c = ctx.aggregateContext(type: Int.self)
-                ctx.ret(v: c.pointee + 1)
+                let c = ctx.aggregateContext(type: save.self)
+                ctx.ret(v: c.pointee.sum / Double(c.pointee.count))
             }))
-            try db.exec(sql: "select * , count(*),cc(c),Cou(c) from a")
+            try db.exec(sql: "select * , count(*),cc(c),Cou(dddd) as A from a")
+            
+            let r = try db.query(name: "a", conditionString: nil)
+            for i in r{
+                print(i.aaaa)
+                print(i.ddd)
+            }
         }
+    }
+    
+    func testVTab(){
+        
     }
 }
 
