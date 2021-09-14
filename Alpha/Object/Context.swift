@@ -9,6 +9,7 @@ import Foundation
 
 public class Context{
     public let pool:DataBasePool
+    public var cache:[String:[String:Object]] = [:]
     public init(name:String) throws {
         self.pool = try DataBasePool(name: name)
     }
@@ -23,23 +24,32 @@ public class Context{
         return results
     }
     public func query<T:Object>(objct:T){
-        self.pool.readSync { db in
-            try objct.queryObject(db: db)
-            objct.context = self
+        if (objct.objectId.count > 0){
+            self.pool.readSync { db in
+                try objct.queryObject(db: db)
+                objct.context = self
+            }
         }
     }
     public func save<T:Object>(objct:T){
         objct.context = self
-        self.pool.writeSync{ db in
+        self.pool.write{ db in
             try objct.save(db: db)
         }
     }
     public func create<T:Object>(type:T.Type)->T{
         let obj = T()
-        self.pool.writeSync { db in
+        obj.context = self
+        self.pool.write { db in
             try obj.checkObject(db: db)
-            obj.context = self
         }
         return obj
+    }
+    public func delete<T:Object>(objct:T){
+        objct.context = nil
+        self.pool.write{ db in
+            try objct.delete(db: db)
+            
+        }
     }
 }
