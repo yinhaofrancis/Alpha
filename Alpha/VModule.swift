@@ -77,7 +77,7 @@ public class VModule:VirtualTableInterface{
      
     public var isXShadowName: Bool = false
     
-    public var module:sqlite3_module = sqlite3_module()
+    public var module = UnsafeMutablePointer<sqlite3_module>.allocate(capacity: 1)
     
     public var name:String
     
@@ -98,27 +98,31 @@ public class VModule:VirtualTableInterface{
     }
     public func loadModule(db:Database) throws{
         self.db = db
-        self.module.xConnect = connect(db:pAux:argc:argv:ppVtab:perror:)
-        self.module.xBestIndex = bestIndex(table:index:)
-        self.module.xDisconnect = xdisconnect(table:)
-        self.module.xOpen = xopen(table:cursor:)
-        self.module.xClose = xclose(cursor:)
-        self.module.xFilter = xfilter(pVtabCursor:idxNum:idxStr:argc:argv:)
-        self.module.xNext = xnext(cur:)
-        self.module.xEof = xeof(cur:)
-        self.module.xColumn = xColumn(cur:ctx:i:)
-        self.module.xRowid = xrowid(cur:prowId:)
+        memset(self.module, 0, MemoryLayout<sqlite3_module>.size)
+        var module = sqlite3_module()
+        module.xConnect = connect(db:pAux:argc:argv:ppVtab:perror:)
+        module.xBestIndex = bestIndex(table:index:)
+        module.xDisconnect = xdisconnect(table:)
+        module.xOpen = xopen(table:cursor:)
+        module.xClose = xclose(cursor:)
+        module.xFilter = xfilter(pVtabCursor:idxNum:idxStr:argc:argv:)
+        module.xNext = xnext(cur:)
+        module.xEof = xeof(cur:)
+        module.xColumn = xColumn(cur:ctx:i:)
+        module.xRowid = xrowid(cur:prowId:)
+        self.module.assign(repeating: module, count: 1)
         if self.isXCreate{
-            self.module.xCreate = create(db:pAux:argc:argv:ppVtab:perror:)
+            module.xCreate = create(db:pAux:argc:argv:ppVtab:perror:)
         }
-        self.module.iVersion = 1
-        let rs = sqlite3_create_module(db.sqlite, self.name, &self.module,Unmanaged.passRetained(self).toOpaque())
+        module.iVersion = 0
+        let rs = sqlite3_create_module(db.sqlite, self.name, self.module,Unmanaged.passUnretained(self).toOpaque())
         if rs != SQLITE_OK{
             throw NSError(domain:"create module", code: 0, userInfo: nil)
         }
     }
     
     public func connect(arg:[String],tab:inout VTab,error:inout String?){
+        sqlite3_declare_vtab(tab.module.db?.sqlite, "CREATE TABLE x(a,b)")
     }
     public func disconnect(tab:VTab){
         
@@ -150,6 +154,10 @@ public class VModule:VirtualTableInterface{
     }
     public func colume(cur:VTabCursor,ctx:SQLContext,index:Int32)->Int32{
         return SQLITE_OK
+    }
+    deinit {
+        self.module.deallocate()
+        sqlite3_create_module(self.db?.sqlite, self.name, nil, nil)
     }
 }
 func connect(db:OpaquePointer?,

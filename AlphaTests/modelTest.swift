@@ -13,7 +13,7 @@ class modelTest: XCTestCase {
 
     }
     
-    var db = try! DataBasePool.createExtraDb(name: "ddd")
+    var db = try! Database()
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
@@ -88,11 +88,14 @@ class modelTest: XCTestCase {
         XCTAssert(p.pointee.index == 1)
         XCTAssert(p.pointee.n == 2.9)
     }
-    let vt = VModule(name: "aaaa")
+    
     public func testVT() throws{
-        
+        let vt = VModule(name: "ak")
+//        vt.isXCreate = true
         try vt.loadModule(db: db)
-        try db.exec(sql: "select * from aaaa()")
+//        try db.exec(sql: "PRAGMA table_info(ak)")
+//        try db.exec(sql: "CREATE VIRTUAL TABLE a USING ak(main);")
+        try db.exec(sql: "select * from ak;")
     }
 }
 struct A {

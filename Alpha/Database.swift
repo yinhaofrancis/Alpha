@@ -304,7 +304,7 @@ extension Database{
         print("SQL:"+sql)
         #endif
         var error:UnsafeMutablePointer<CChar>?
-        sqlite3_exec(self.sqlite, sql, { arg, len, v,col in
+        let rs = sqlite3_exec(self.sqlite, sql, { arg, len, v,col in
             #if DEBUG
             print("<<<<<<<<<<<<")
             for i in 0 ..< len{
@@ -317,6 +317,8 @@ extension Database{
             return 0
         }, nil, &error)
         if let e = error{
+            
+            print(String(cString: sqlite3_errmsg(self.sqlite)),String(cString: sqlite3_errstr(rs)))
             let data = Data(bytes: e, count: strlen(e))
             sqlite3_free(error)
             throw NSError(domain: String(data: data, encoding: .utf8) ?? "unknow error", code: 0, userInfo: ["sql":sql])
