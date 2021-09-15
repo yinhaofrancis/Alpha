@@ -12,23 +12,24 @@ class modelTest: XCTestCase {
     override func setUpWithError() throws {
 
     }
-    var context = try! Context(name: "pool")
+    
+    var db = try! DataBasePool.createExtraDb(name: "ddd")
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
     func testExample() throws {
         
+        let context = try Context(name: "pool")
         
-        
-        self.context.pool.write { db in
+        context.pool.write { db in
             for _ in 0 ..< 10{
                 let j:JSON = ["sdada":"dasdasd","cc":3.0,"dd":arc4random() % 100,"dsdsd":["dd","d"],"sad":"dasdasd","k":["a":1]]
                 try db.insert("aaa", j)
             }
 
         }
-        self.context.pool.writeSync { b in
+        context.pool.writeSync { b in
             var j = try b.query(name: "aaa")
             for i in j{
                 XCTAssert(i.sdada == "dasdasd")
@@ -54,32 +55,53 @@ class modelTest: XCTestCase {
     }
 
     func testObject() throws{
-        self.context.pool.writeSync { db in
+        let context = try Context(name: "pool")
+        context.pool.writeSync { db in
             try db.drop(name: "c")
             try db.drop(name: "a")
             try db.drop(name: "a_tmp")
             
         }
-        let c = self.context.create(type: c.self)
+        let c = context.create(type: c.self)
         
         c.aa = 1
         c.bb = "bb"
         c.cc = "cc"
-        c.fa = self.context.create(type: a.self)
+        c.fa = context.create(type: a.self)
         c.fa?.a = 2
         c.fa?.string = "string"
         c.fa?.stringw = "stringw"
-        self.context.save(objct: c)
+        context.save(objct: c)
         let request = ObjectRequest<c>(table: c.name)
-        let a = self.context.request(request: request)
+        let a = context.request(request: request)
         XCTAssert(a.first!.fa!.a == 2)
         XCTAssert(a.first!.bb == "bb")
     }
     func testreflect() throws{
-        let aa = c()
-        let a = aa.keyCol
-        print(aa.createCode)
+        let b = UnsafeMutablePointer<B>.allocate(capacity: 1)
+        var bb = B(a: A(index: 1, n: 2.9), mm: "MM")
+        memcpy(b, &bb, MemoryLayout<B>.size)
+        let p = unsafeBitCast(b, to: UnsafeMutablePointer<A>.self)
+        pp(p: p)
     }
+    public func pp(p:UnsafeMutablePointer<A>){
+        XCTAssert(p.pointee.index == 1)
+        XCTAssert(p.pointee.n == 2.9)
+    }
+    let vt = VModule(name: "aaaa")
+    public func testVT() throws{
+        
+        try vt.loadModule(db: db)
+        try db.exec(sql: "select * from aaaa()")
+    }
+}
+struct A {
+    var index:Int
+    var n:Double
+}
+struct B {
+    var a:A
+    var mm:String
 }
 
 class a:Object{

@@ -8,34 +8,20 @@
 import Foundation
 import SQLite3
 
+
+
 public enum FunctionType{
     case scalar
     case aggregate
 }
 public typealias CallFunction<T:Function> = (T,_ argc:Int32)->Void
 public typealias FinalFunction<T:Function> = (T)->Void
-public class Function{
-    public enum FunctionValueType:Int32{
-        case Null
-        case Float
-        case Int
-        case Blob
-        case Text
-    }
-    public let name:String
-    public let nArg:Int32
+
+
+
+public class SQLContext{
     public var ctx:OpaquePointer?
     public var values:UnsafeMutablePointer<OpaquePointer?>?
-    public let call:CallFunction<Function>
-    
-    public var funtionType:FunctionType{
-        .scalar
-    }
-    public init(name:String,nArg:Int32,handle:@escaping CallFunction<Function>) {
-        self.name = name
-        self.nArg = nArg
-        self.call = handle
-    }
     public func ret(v:Int){
         guard let c = ctx else {
             return
@@ -147,7 +133,7 @@ public class Function{
         guard let p = self.valuePointer(index: index) else { return ""}
         return String(cString: sqlite3_value_text(p))
     }
-    public func valueType(index:Int)->FunctionValueType{
+    public func valueType(index:Int)->ContextValueType{
         guard let p = self.valuePointer(index: index) else { return .Null}
         let type = sqlite3_value_type(p)
         switch type {
@@ -163,6 +149,34 @@ public class Function{
             return .Null
         }
     }
+    public enum ContextValueType:Int32{
+        case Null
+        case Float
+        case Int
+        case Blob
+        case Text
+    }
+}
+
+public class Function:SQLContext{
+    
+    public let name:String
+    public let nArg:Int32
+    
+    
+    public weak var db:Database?
+    public let call:CallFunction<Function>
+    
+    public var funtionType:FunctionType{
+        .scalar
+    }
+    public init(name:String,nArg:Int32,handle:@escaping CallFunction<Function>) {
+        self.name = name
+        self.nArg = nArg
+        self.call = handle
+    }
+   
+   
 }
 public class AggregateFunction:Function{
     public let final:FinalFunction<AggregateFunction>
@@ -189,7 +203,7 @@ public class AggregateFunction:Function{
 }
 extension Database{
     public func addFunction(function:Function){
-        
+        function.db = self
         if function.funtionType == .aggregate{
             sqlite3_create_function(self.sqlite!, function.name, function.nArg, SQLITE_UTF8, Unmanaged.passRetained(function).toOpaque(), nil) { ctx, i, ret in
                 let call = Unmanaged<AggregateFunction>.fromOpaque(sqlite3_user_data(ctx)).takeUnretainedValue()

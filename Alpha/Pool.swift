@@ -39,7 +39,9 @@ public class DataBasePool{
     }
     public let queue:DispatchQueue = DispatchQueue(label: "database", qos: .background, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil)
     
-    public private(set) var url:URL
+    public var url:URL{
+        self.wdb.url
+    }
     private var read:List<Database> = List()
     private var wdb:Database
     private var semphone = DispatchSemaphore(value: 3)
@@ -47,23 +49,15 @@ public class DataBasePool{
     private var thread:Thread?
     private var timer:Timer?
     public init(name:String) throws {
-        let url = try DataBasePool.checkDir().appendingPathComponent(name)
-        let back = try DataBasePool.checkBackUpDir().appendingPathComponent(name)
-        self.dbName = name
-        if !FileManager.default.fileExists(atPath: url.path) && !FileManager.default.fileExists(atPath: back.path){
-            FileManager.default.createFile(atPath: url.path, contents: nil, attributes: nil)
-        }else if !FileManager.default.fileExists(atPath: url.path){
-            try? DataBasePool.restore(name: name)
-        }
         
-        self.wdb = try Database(url: url)
+        self.wdb = try DataBasePool.createExtraDb(name: name)
         if try wdb.integrityCheck() == false{
             self.wdb.close()
             try? DataBasePool.restore(name: name)
-            self.wdb = try Database(url: url)
+            self.wdb = try DataBasePool.createExtraDb(name: name)
         }
+        self.dbName = name
         self.wdb.foreignKey = true
-        self.url = url
         self.thread = Thread(block: {
             self.timer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true, block: { t in
                 self.backup()
@@ -72,6 +66,18 @@ public class DataBasePool{
         })
         self.thread?.start()
         
+    }
+    public static func createExtraDb(name:String) throws ->Database{
+        let url = try DataBasePool.checkDir().appendingPathComponent(name)
+        let back = try DataBasePool.checkBackUpDir().appendingPathComponent(name)
+        
+        if !FileManager.default.fileExists(atPath: url.path) && !FileManager.default.fileExists(atPath: back.path){
+            FileManager.default.createFile(atPath: url.path, contents: nil, attributes: nil)
+        }else if !FileManager.default.fileExists(atPath: url.path){
+            try? DataBasePool.restore(name: name)
+        }
+        
+        return try Database(url: url)
     }
     public func loadMode(mode:Mode) throws {
         try self.queue.sync {
@@ -164,6 +170,16 @@ public class DataBasePool{
             }catch{
                 print(error)
                 try? db.rollback()
+            }
+        }))
+    }
+    public func perform(callback:@escaping (Database) throws ->Void){
+        self.queue.sync(execute: DispatchWorkItem(flags: .barrier, block: {
+            let db = self.wdb
+            do {
+                try callback(db)
+            }catch{
+                print(error)
             }
         }))
     }

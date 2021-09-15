@@ -52,4 +52,9 @@ public class Context{
             
         }
     }
+    public func loadFunction(function:Function){
+        self.pool.write { db in
+            db.addFunction(function: function)
+        }
+    }
 }

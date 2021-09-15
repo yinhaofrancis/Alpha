@@ -16,6 +16,7 @@
 		A9660CA226E5B76800CB98B6 /* Objc.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9660CA126E5B76800CB98B6 /* Objc.swift */; };
 		A9660CAA26E5BCBD00CB98B6 /* AlphaOcTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A9660CA926E5BCBD00CB98B6 /* AlphaOcTests.m */; };
 		A9660CAC26E5BCBD00CB98B6 /* Alpha.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A93271E926AFB4A4009107CA /* Alpha.framework */; };
+		A96D081F26F1C44000E16361 /* VModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = A96D081E26F1C44000E16361 /* VModule.swift */; };
 		A9A11D7826DE2990000D3F6C /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A11D7726DE2990000D3F6C /* Model.swift */; };
 		A9A11D7A26DE2D26000D3F6C /* modelTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A11D7926DE2D26000D3F6C /* modelTest.swift */; };
 		A9D1C98826B1CEDD00F4421B /* Pool.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D1C98726B1CEDD00F4421B /* Pool.swift */; };
@@ -57,6 +58,7 @@
 		A9660CA926E5BCBD00CB98B6 /* AlphaOcTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AlphaOcTests.m; sourceTree = "<group>"; };
 		A9660CAB26E5BCBD00CB98B6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A96A862126CCBC090057A16B /* mob.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = mob.xcconfig; sourceTree = "<group>"; };
+		A96D081E26F1C44000E16361 /* VModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VModule.swift; sourceTree = "<group>"; };
 		A96E090526C518CF0034568D /* OtherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OtherTests.swift; sourceTree = "<group>"; };
 		A974BFCD26CB6D44000F7FC2 /* HeapTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeapTest.swift; sourceTree = "<group>"; };
 		A9A11D7726DE2990000D3F6C /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
@@ -128,6 +130,7 @@
 				A9580AF326B1381F00530397 /* Function.swift */,
 				A9D1C98726B1CEDD00F4421B /* Pool.swift */,
 				A91CF2E426E28682007FB3B3 /* Condition.swift */,
+				A96D081E26F1C44000E16361 /* VModule.swift */,
 			);
 			path = Alpha;
 			sourceTree = "<group>";
@@ -321,6 +324,7 @@
 				A925326526AFB7520080E72D /* Database.swift in Sources */,
 				A9A11D7826DE2990000D3F6C /* Model.swift in Sources */,
 				A925326926AFB7520080E72D /* Map.swift in Sources */,
+				A96D081F26F1C44000E16361 /* VModule.swift in Sources */,
 				A9D1C98826B1CEDD00F4421B /* Pool.swift in Sources */,
 				A9F6AEBC26E9AA4200177E3C /* Object.swift in Sources */,
 				A91CF2E526E28682007FB3B3 /* Condition.swift in Sources */,
