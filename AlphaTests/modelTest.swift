@@ -91,8 +91,7 @@ class modelTest: XCTestCase {
 //        try vt.loadModule(db: db)
 //        try db.exec(sql: "PRAGMA table_info(ak)")
         let db = try Database()
-        var json:JSON = ["dsds":"asdasd","a":["dd":"ddddd"]]
-        let jsons = json.jsonString
+        let json:JSON = ["dsds":"asdasd","a":["dd":"ddddd"]]
         try db.insert(jsonName: "a", json: json)
         try db.exec(sql: "select * from a")
         

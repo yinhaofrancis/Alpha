@@ -93,9 +93,6 @@ public struct JSON:CustomStringConvertible,
         }
         self.init(data)
     }
-    public init(content:String){
-        self.content = content
-    }
     public subscript(dynamicMember dynamicMember:String)->JSON{
         get{
             self.keyValue(dynamicMember: dynamicMember) ?? JSON(nil)
