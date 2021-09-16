@@ -110,11 +110,12 @@ public class VModule:VirtualTableInterface{
         module.xEof = xeof(cur:)
         module.xColumn = xColumn(cur:ctx:i:)
         module.xRowid = xrowid(cur:prowId:)
-        self.module.assign(repeating: module, count: 1)
+        
         if self.isXCreate{
             module.xCreate = create(db:pAux:argc:argv:ppVtab:perror:)
         }
         module.iVersion = 0
+        memcpy(self.module, &module, MemoryLayout<sqlite3_module>.size)
         let rs = sqlite3_create_module(db.sqlite, self.name, self.module,Unmanaged.passUnretained(self).toOpaque())
         if rs != SQLITE_OK{
             throw NSError(domain:"create module", code: 0, userInfo: nil)
@@ -128,10 +129,10 @@ public class VModule:VirtualTableInterface{
         
     }
     public func create(arg:[String],tab:inout VTab,error:inout String?){
-        
+        sqlite3_declare_vtab(tab.module.db?.sqlite, "CREATE TABLE x(a,b)")
     }
     public func open(tab:VTab)->VTabCursor?{
-        return nil
+        return VTabCursor(base: sqlite3_vtab_cursor(), rowid: 1, table: tab)
     }
     public func close(cursor:VTabCursor){
         
@@ -139,20 +140,25 @@ public class VModule:VirtualTableInterface{
     public func filter(cursor:VTabCursor,indexNum:Int32,str:String?,valueCount:Int32,ctx:SQLContext)->Int32{
         return SQLITE_OK
     }
-    public func next(cursor:VTabCursor)->Int32{
+    public func next(cursor:inout VTabCursor)->Int32{
+        cursor.rowid += 1
         return SQLITE_OK
     }
     
     public func bestIndex(tab:VTab,index:inout sqlite3_index_info?)->Int32{
+        index?.estimatedRows = 1
+        index?.estimatedCost = 1
+        index?.idxNum = 1
         return SQLITE_OK
     }
-    public func eof(cursor:VTabCursor)->Int32{
-        return SQLITE_OK
+    public func eof(cursor:VTabCursor)->Bool{
+        return cursor.rowid > 10
     }
     public func row(cursor:VTabCursor)->sqlite3_int64{
-        return 0
+        return sqlite3_int64(cursor.rowid)
     }
     public func colume(cur:VTabCursor,ctx:SQLContext,index:Int32)->Int32{
+        ctx.ret(v: "ok")
         return SQLITE_OK
     }
     deinit {
@@ -238,10 +244,14 @@ func xdisconnect(table:UnsafeMutablePointer<sqlite3_vtab>?)->Int32{
 }
 func xopen(table:UnsafeMutablePointer<sqlite3_vtab>?, cursor:UnsafeMutablePointer<UnsafeMutablePointer<sqlite3_vtab_cursor>?>?) -> Int32{
     let a = unsafeBitCast(table, to: UnsafeMutablePointer<VModule.VTab>.self)
-    let pointer = sqlite3_malloc64(sqlite3_uint64(MemoryLayout<VModule.VTabCursor>.size)).assumingMemoryBound(to: VModule.VTabCursor.self)
-    pointer.pointee = VModule.VTabCursor(base: sqlite3_vtab_cursor(), rowid: 0, table: a.pointee)
-    cursor?.pointee = unsafeBitCast(cursor, to: UnsafeMutablePointer<sqlite3_vtab_cursor>.self)
-    return (a.pointee.module.open(tab: a.pointee) != nil) ? SQLITE_OK : SQLITE_ERROR
+    let pointer = sqlite3_malloc64(sqlite3_uint64(MemoryLayout<VModule.VTabCursor>.size))
+    var tc = a.pointee.module.open(tab: a.pointee)
+    if tc == nil{
+        return SQLITE_ERROR
+    }
+    memcpy(pointer, &tc, MemoryLayout<VModule.VTabCursor>.size);
+    cursor?.pointee = unsafeBitCast(pointer, to: UnsafeMutablePointer<sqlite3_vtab_cursor>.self)
+    return SQLITE_OK
 }
 func xclose(cursor:UnsafeMutablePointer<sqlite3_vtab_cursor>?) -> Int32{
     let cur = unsafeBitCast(cursor, to: UnsafeMutablePointer<VModule.VTabCursor>.self)
@@ -258,11 +268,11 @@ func xfilter(pVtabCursor:UnsafeMutablePointer<sqlite3_vtab_cursor>?, idxNum:Int3
 }
 func xnext(cur:UnsafeMutablePointer<sqlite3_vtab_cursor>?) -> Int32{
     let cursor = unsafeBitCast(cur, to: UnsafeMutablePointer<VModule.VTabCursor>.self)
-    return cursor.pointee.table.module.next(cursor: cursor.pointee)
+    return cursor.pointee.table.module.next(cursor: &cursor.pointee)
 }
 func xeof(cur:UnsafeMutablePointer<sqlite3_vtab_cursor>?) -> Int32{
     let cursor = unsafeBitCast(cur, to: UnsafeMutablePointer<VModule.VTabCursor>.self)
-    return cursor.pointee.table.module.eof(cursor: cursor.pointee)
+    return cursor.pointee.table.module.eof(cursor: cursor.pointee) ?  1 : 0
 }
 func xrowid(cur:UnsafeMutablePointer<sqlite3_vtab_cursor>?, prowId:UnsafeMutablePointer<sqlite3_int64>?) -> Int32{
     let cursor = unsafeBitCast(cur, to: UnsafeMutablePointer<VModule.VTabCursor>.self)

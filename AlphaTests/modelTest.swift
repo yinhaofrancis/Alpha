@@ -90,12 +90,10 @@ class modelTest: XCTestCase {
     }
     
     public func testVT() throws{
-        let vt = VModule(name: "ak")
-//        vt.isXCreate = true
-        try vt.loadModule(db: db)
+//        try vt.loadModule(db: db)
 //        try db.exec(sql: "PRAGMA table_info(ak)")
-//        try db.exec(sql: "CREATE VIRTUAL TABLE a USING ak(main);")
-        try db.exec(sql: "select * from ak;")
+        try db.exec(sql: "CREATE VIRTUAL TABLE enrondata1 USING fts3(content TEXT)")
+   
     }
 }
 struct A {
