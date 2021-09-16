@@ -87,6 +87,9 @@ public struct ConditionKey:ExpressibleByStringLiteral {
     public init(key:String) {
         self.key = key
     }
+    public init(json:String,key:String){
+        self.key = "json_extract(\(json)," + "'\(key)')"
+    }
     public init(stringLiteral string:String) {
         self.key = "\(string)"
     }

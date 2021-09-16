@@ -6,7 +6,7 @@
 //
 //
 import Foundation
-
+import SQLite3
 
 @dynamicMemberLookup
 public struct JSON:CustomStringConvertible,
@@ -138,6 +138,14 @@ public struct JSON:CustomStringConvertible,
             self.setKeyValue(dynamicMember: dynamicMember, json: JSON(newValue))
         }
     }
+    public subscript(dynamicMember dynamicMember:String)->UInt64{
+        get{
+            self.keyValue(dynamicMember: dynamicMember)?.uint64() ?? 0
+        }
+        set{
+            self.setKeyValue(dynamicMember: dynamicMember, json: JSON(newValue))
+        }
+    }
     public subscript(dynamicMember dynamicMember:String)->Double{
         get{
             self.keyValue(dynamicMember: dynamicMember)?.double() ?? 0
@@ -220,9 +228,12 @@ public struct JSON:CustomStringConvertible,
         return nil
     }
     public mutating func setKeyValue(dynamicMember:String,json:JSON?){
+        
         var dic = self.content as? Dictionary<String,JSON>
-        dic?[dynamicMember] = json
-        self.content = dic
+        if dic != nil{
+            dic?[dynamicMember] = json
+            self.content = dic
+        }
     }
     public func int()->Int{
         if let str = self.content as? String{
@@ -253,6 +264,38 @@ public struct JSON:CustomStringConvertible,
             return Int(db)
         }else if let db = self.content as? Double{
             return Int(db)
+        }
+        return 0
+    }
+    public func uint64()->UInt64{
+        if let str = self.content as? String{
+            return UInt64(str) ?? 0
+        }else if let db = self.content as? Int{
+            return UInt64(db)
+        }else if let db = self.content as? NSNumber{
+            return db.uint64Value
+        }else if let db = self.content as? Int8{
+            return UInt64(db)
+        }else if let db = self.content as? Int16{
+            return UInt64(db)
+        }else if let db = self.content as? Int32{
+            return UInt64(db)
+        }else if let db = self.content as? Int64{
+            return UInt64(db)
+        }else if let db = self.content as? UInt{
+            return UInt64(db)
+        }else if let db = self.content as? UInt8{
+            return UInt64(db)
+        }else if let db = self.content as? UInt16{
+            return UInt64(db)
+        }else if let db = self.content as? UInt32{
+            return UInt64(db)
+        }else if let db = self.content as? UInt64{
+            return db
+        }else if let db = self.content as? Float{
+            return UInt64(db)
+        }else if let db = self.content as? Double{
+            return UInt64(db)
         }
         return 0
     }
@@ -385,149 +428,119 @@ public struct JSON:CustomStringConvertible,
     }
     public static var dateFormat:String = "yyyy-MM-dd HH:mm:ss.SSS"
 }
+
+extension Database.ResultSet.Bind{
+    public func bind(value:T) where T == JSON{
+        let jsonStr = value.jsonString
+        guard let c = jsonStr.cString(using: .utf8) else {
+            sqlite3_bind_null(self.stmt, index)
+            return
+        }
+        let p = UnsafeMutablePointer<CChar>.allocate(capacity: jsonStr.utf8.count)
+        memcpy(p, c, jsonStr.utf8.count)
+        sqlite3_bind_text(self.stmt, index, p, Int32(jsonStr.utf8.count)) { p in
+            p?.deallocate()
+        }
+    }
+}
+extension Database.ResultSet.Column{
+    public func value()->T where T == JSON{
+        let string = String(cString: sqlite3_column_text(self.stmt, self.index)).data(using: .utf8)!
+        return JSON(string)
+    }
+}
+
+
 extension Database{
-    func insert(_ dic: [String : JSON], _ name: String) throws {
+
+    public func insert(jsonName:String,json:JSON) throws {
         do {
-            let keys = dic.keys.joined(separator: ",")
-            let place = dic.keys.map({"@"+$0}).joined(separator: ",")
-            let sql  = "insert into \(name) (\(keys)) values (\(place)"
-            let r = try self.query(sql: sql)
-            for i in dic {
-                r.bind(name: i.key)?.bind(value: i.value.jsonString)
-            }
-            try r.step()
-            r.close()
+            let sql = "insert into \(jsonName) values (?)"
+            let rs = try self.query(sql: sql)
+            rs.bind(index: 1).bind(value: self.cleanJSON(json: json))
+            try rs.step()
+            rs.close()
         } catch {
-            try self.create(name, dic)
-            let keys = dic.keys.joined(separator: ",")
-            let place = dic.keys.map({"@"+$0}).joined(separator: ",")
-            let sql  = "insert into \(name) (\(keys)) values (\(place))"
-            let r = try self.query(sql: sql)
-            for i in dic {
-                r.bind(name: "@"+i.key)?.bind(value: i.value.jsonString)
-            }
-            try r.step()
-            r.close()
+            print(error)
+            try self.create(jsonName: jsonName)
+            try self.insert(jsonName: jsonName, json: json)
         }
-        
     }
-    
-    public func insert(_ name: String, _ json: JSON) throws {
-        if let dic = json.content as? Dictionary<String,JSON>{
-            try insert(dic, name)
-        }else if let dic = json.content as? Array<Dictionary<String,JSON>>{
-            for i in dic {
-                try insert(i, name)
-            }
+    public func save(jsonName:String,json:JSON) throws{
+        let id:Int = json.rowid
+        if id > 0{
+            try self.update(jsonName: jsonName, json: json)
         }else{
-            throw NSError(domain: "JSON is not object", code: 0, userInfo: nil)
+            try self.insert(jsonName: jsonName, json: json)
         }
     }
-    func update(_ name:String,_ rowid:Int,_ json: [String : JSON]) throws {
-        let set:[String] = json.reduce(into: []) { r, c in
-            if c.key != "rowid"{
-                r.append("\(c.key)=@\(c.key)")
-            }
+    public func update(jsonName:String,json:JSON) throws {
+        try self.update(jsonName: jsonName, current: json, patch: json)
+    }
+    public func insert(jsonName:String,json:JSON,patch:JSON) throws {
+        do {
+            let sql = "insert into \(jsonName) values (json_patch(?,?))"
+            let rs = try self.query(sql: sql)
+            rs.bind(index: 1).bind(value: self.cleanJSON(json: json))
+            rs.bind(index: 2).bind(value: self.cleanJSON(json: patch))
+            try rs.step()
+            rs.close()
+        } catch {
+            try self.create(jsonName: jsonName)
+            try self.insert(jsonName: jsonName, json: json)
         }
-        let sql = "update \(name) set \(set.joined(separator: ",")) where `rowid`=@rowid"
+    }
+    public func update(jsonName:String,current:JSON,patch:JSON) throws{
+        let id:Int = current.rowid;
+        if id > 0{
+            let sql = "update \(jsonName) set json = json_patch(\(jsonName).json,?) where ROWID = ?"
+            let rs = try self.query(sql: sql)
+            rs.bind(index: 1).bind(value: self.cleanJSON(json: patch))
+            rs.bind(index: 2).bind(value: id)
+            try rs.step()
+            rs.close()
+        }else{
+           try self.insert(jsonName: jsonName, json: current, patch: patch)
+        }
+    }
+    public func delete(jsonName:String,current:JSON) throws{
+        let id:UInt64 = current.rowid
+        try self.delete(jsonName: jsonName, rowid: id)
+    }
+    public func delete(jsonName:String,rowid:UInt64) throws{
+        let sql = "delete from \(jsonName) where rowid=\(rowid)"
+        try self.exec(sql: sql)
+    }
+    public func create(jsonName:String) throws{
+        let sql = "create table if not exists \(jsonName) (json JSON)"
+        try self.exec(sql: sql)
+    }
+    private func cleanJSON(json:JSON)->JSON{
+        var vjson = json
+        vjson.content = json.content
+        vjson.setKeyValue(dynamicMember: "rowid", json: nil)
+        return vjson
+    }
+    public func jsonConditionKey(key:String)->ConditionKey{
+        ConditionKey(json: "json", key: key)
+    }
+    public func query(jsonName:String,condition:Condition? = nil,values:[JSON] = []) throws ->[JSON]{
+        try self.query(jsonName: jsonName, conditionStr: condition?.conditionCode, values: values)
+    }
+    public func query(jsonName:String,conditionStr:String?,values:[JSON]) throws ->[JSON]{
+        let c = conditionStr == nil ? "where json_valid(json) = 1" : "where \(conditionStr!) and json_valid(json) = 1"
+        let sql = "select json_set(json,'$.rowid',rowid) from \(jsonName) " + c
         let rs = try self.query(sql: sql)
-        for i in json {
-            if (i.key != "rowid"){
-                
-                rs.bind(name: "@"+i.key)?.bind(value: i.value.jsonString)
-            }else{
-                print(i.key,i.value.int())
-                rs.bind(name: "@"+i.key)?.bind(value: i.value.int())
+        if values.count > 0{
+            for i in 1 ..< values.count + 1 {
+                rs.bind(index: Int32(i)).bind(value: values[i - 1])
             }
         }
-        try rs.step()
-        rs.close()
-    }
-    public func update(_ name:String,_ rowid:Int,_ json: JSON) throws {
-        if let dic = json.content as? Dictionary<String,JSON>{
-            try self.update(name,rowid, dic)
-            return
-        }
-        if let dic = json.content as? Array<Dictionary<String,JSON>>{
-            for i in dic {
-                try self.update(name, rowid, i)
-            }
-            return
-        }
-        throw NSError(domain: "update json", code: 0, userInfo: nil)
-    }
-    public func save(_ name:String,_ json: JSON) throws {
-        if json.rowid == 0{
-            try self.insert(name, json)
-        }else{
-            try self.update(name, json.rowid, json)
-        }
-    }
-    func query(name:String,conditionString:String?,value:[String:String] = [:]) throws ->[JSON]{
-        let sql = "select *,ROWID from \(name)" + ((conditionString?.count ?? 0) > 0 ? " where " + conditionString! : "")
         var result:[JSON] = []
-        let rs = try self.query(sql: sql)
-        for i in value {
-            rs.bind(name: i.value)?.bind(value: i.value)
-        }
-        while try rs.step() {
-            var js:Dictionary<String,JSON> = Dictionary()
-            for i in 0 ..< rs.columnCount{
-                let name = rs.columnName(index: i)
-                let value = rs.column(index: Int32(i), type: String.self).value()
-                if let data = value.data(using: .utf8){
-                    do {
-                        let jm = try JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed)
-                        if jm is Array<Any>{
-                            js[name] = JSON(jm as! Array<Any>)
-                        }else if jm is Dictionary<String,Any>{
-                            js[name] = JSON(jm as! Dictionary<String,Any>)
-                        }else{
-                            js[name] = JSON(content: value)
-                        }
-                    } catch {
-                        js[name] = JSON(content: value)
-                    }
-                    
-                }else{
-                    js[name] = JSON(content: value)
-                }
-            }
-            result.append(JSON(content: js))
+        while(try rs.step()){
+            result.append(rs.column(index: 0, type: JSON.self).value())
         }
         rs.close()
         return result
-    }
-    
-    public func query(name:String,condition:Condition? = nil,value:[String:String] = [:]) throws ->[JSON]{
-        try self.query(name: name, conditionString: condition?.conditionCode ?? "", value: value)
-    }
-    public func delete(name:String,rowid:Int) throws {
-        let sql = "delete from \(name) where `rowid`=\(rowid)"
-        try self.exec(sql: sql)
-    }
-    
-    public func create(name:String,json:JSON) throws{
-        if let dic = json.json as? Dictionary<String,Any>{
-            try self.create(name, dic)
-        }
-        if let dic = (json.json as? Array<Dictionary<String,Any>>)?.first{
-            try self.create(name, dic)
-        }
-        throw NSError(domain: "json is no object", code: 0, userInfo: nil)
-    }
-    public func create(_ name: String, _ dic: [String : Any]) throws {
-        if try self.tableExists(name: name) == false{
-            let col = dic.keys.map({$0 + " TEXT"}).joined(separator: ",")
-            let sql = "CREATE TABLE IF NOT EXISTS  `\(name)` (\(col))"
-            try self.exec(sql: sql)
-        }else{
-            let infos = try self.tableInfo(name: name)
-            for i in dic.keys {
-                if !infos.keys.contains(i){
-                    try self.addColumn(name: name, columeName: i, typedef: "TEXT")
-                }
-            }
-        }
     }
 }

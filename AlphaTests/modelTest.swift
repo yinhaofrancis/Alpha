@@ -13,38 +13,37 @@ class modelTest: XCTestCase {
 
     }
     
-    var db = try! Database()
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
-
+    let context = try! Context(name: "pool")
     func testExample() throws {
         
-        let context = try Context(name: "pool")
+        
         
         context.pool.write { db in
             for _ in 0 ..< 10{
                 let j:JSON = ["sdada":"dasdasd","cc":3.0,"dd":arc4random() % 100,"dsdsd":["dd","d"],"sad":"dasdasd","k":["a":1]]
-                try db.insert("aaa", j)
+                try db.insert(jsonName: "aaa", json: j)
             }
 
         }
-        context.pool.writeSync { b in
-            var j = try b.query(name: "aaa")
-            for i in j{
-                XCTAssert(i.sdada == "dasdasd")
-                XCTAssert(i.dsdsd[1] == "d")
-                XCTAssert(i.dsdsd[0] == "dd")
-                XCTAssert(i.sad == "dasdasd")
-                XCTAssert(i.k.a == 1)
-            }
-            for i in 0 ..< j.count{
-                var t = j[i]
-                t.dd = i
-                try b.save("a", t)
-            }
-            j = try b.query(name: "a")
-        }
+//        context.pool.writeSync { b in
+//            var j = try b.query(name: "aaa")
+//            for i in j{
+//                XCTAssert(i.sdada == "dasdasd")
+//                XCTAssert(i.dsdsd[1] == "d")
+//                XCTAssert(i.dsdsd[0] == "dd")
+//                XCTAssert(i.sad == "dasdasd")
+//                XCTAssert(i.k.a == 1)
+//            }
+//            for i in 0 ..< j.count{
+//                var t = j[i]
+//                t.dd = i
+//                try b.save("a", t)
+//            }
+//            j = try b.query(name: "a")
+//        }
     }
 
     func testPerformanceExample() throws {
@@ -55,7 +54,6 @@ class modelTest: XCTestCase {
     }
 
     func testObject() throws{
-        let context = try Context(name: "pool")
         context.pool.writeSync { db in
             try db.drop(name: "c")
             try db.drop(name: "a")
@@ -92,8 +90,40 @@ class modelTest: XCTestCase {
     public func testVT() throws{
 //        try vt.loadModule(db: db)
 //        try db.exec(sql: "PRAGMA table_info(ak)")
-        try db.exec(sql: "CREATE VIRTUAL TABLE enrondata1 USING fts3(content TEXT)")
-   
+        let db = try Database()
+        var json:JSON = ["dsds":"asdasd","a":["dd":"ddddd"]]
+        let jsons = json.jsonString
+        try db.insert(jsonName: "a", json: json)
+        try db.exec(sql: "select * from a")
+        
+        let a = try db.query(jsonName: "a")
+        XCTAssert(a.first?.dsds.str() == "asdasd")
+        XCTAssert(a.first?.a.dd.str() == "ddddd")
+        var aa = a.first
+        aa?.dsds = "aaa"
+        try db.save(jsonName: "a", json: aa!)
+        let ar = try db.query(jsonName: "a")
+        XCTAssert(ar.count == 1)
+        XCTAssert(ar.first?.dsds.str() == "aaa")
+        let r = try db.query(jsonName: "a", condition: db.jsonConditionKey(key: "$.a.dd") == "?", values: ["ddddd"])
+        XCTAssert(r.count == 1)
+        XCTAssert(r.first?.dsds.str() == "aaa")
+        try db.update(jsonName: "a", current: r.first!, patch: json)
+        
+        let rr = try db.query(jsonName: "a", condition: db.jsonConditionKey(key: "$.a.dd") == "?", values: ["ddddd"])
+        XCTAssert(rr.count == 1)
+        XCTAssert(rr.first?.dsds.str() == "asdasd")
+        
+        
+        let patch:JSON = ["pp":"pp"]
+        try db.update(jsonName: "a", current: rr.first!, patch: patch)
+        let rrr = try db.query(jsonName: "a", condition: db.jsonConditionKey(key: "$.a.dd") == "?", values: ["ddddd"])
+        print(rrr)
+        XCTAssert(rrr.count == 1)
+        XCTAssert(rrr.first?.pp.str() == "pp")
+        
+        try db.delete(jsonName: "a", current: rrr.first!)
+        XCTAssert(try db.query(jsonName: "a", condition: db.jsonConditionKey(key: "$.a.dd") == "?", values: ["ddddd"]).count == 0)
     }
 }
 struct A {

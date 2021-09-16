@@ -43,7 +43,7 @@ class OtherTests: XCTestCase {
                 b.dddd = i
                 b.aaaa = "\(Double(i * i) * 1.1) end"
                 b.ddd = Date()
-                try db.insert("a", b)
+                try db.insert(jsonName: "a", json: b)
             }
         }
         self.poor.readSync { db in
@@ -65,7 +65,7 @@ class OtherTests: XCTestCase {
             }))
             try db.exec(sql: "select * , count(*),cc(c),Cou(dddd) as A from a")
             
-            let r = try db.query(name: "a", conditionString: nil)
+            let r = try db.query(jsonName: "a")
             for i in r{
                 print(i.aaaa)
                 print(i.ddd)

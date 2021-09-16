@@ -343,9 +343,7 @@ extension Database{
             return ResultSet(stmt: s, db: self)
         }
     }
-    public func setEnableExtension(onoff:Bool){
-        SQLITE_DBCONFIG_ENABLE_LOAD_EXTENSION
-    }
+
     public func addColumn(name:String,columeName:String, typedef:String ,notnull:Bool = false ,defaultValue:String = "") throws {
         let sql = "ALTER TABLE \(name) ADD COLUMN \(columeName) \(typedef) \(notnull ? "default `\(defaultValue)`" : "" )"
         try self.exec(sql: sql)

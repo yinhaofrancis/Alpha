@@ -14,13 +14,16 @@ import Foundation
     }
     public func save(name:String,obj:[String:Any]){
         self.pool.writeSync { db in
-            try db.save(name, JSON(obj))
+            try db.save(jsonName: name, json: JSON(obj))
         }
     }
-    public func query(name:String,condition:String?,value:[String:String]?)->[[String:Any]]{
+    public func query(name:String,condition:String?,value:[String]?)->[[String:Any]]{
         var result:[[String:Any]] = []
         self.pool.readSync { db in
-            let json = try db.query(name: name, conditionString: condition, value: value ?? [:])
+            let a = (value ?? []).map { s in
+                JSON(content: s)
+            }
+            let json = try db.query(jsonName: name, conditionStr: condition, values: a)
             result = json.filter { m in
                 m.json is Dictionary<String,Any>
             }.map { m in
@@ -31,7 +34,7 @@ import Foundation
     }
     public func delete(name:String,rowid:Int){
         self.pool.writeSync { db in
-            try db.delete(name: name, rowid: rowid)
+            try db.delete(jsonName: name, rowid: UInt64(rowid))
         }
     }
 }
