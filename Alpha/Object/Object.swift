@@ -363,7 +363,6 @@ public struct NullableCol<T:DataType>:ColDef{
         let kv = self.keyCol
         for i in 0 ..< rs.columnCount{
             let name = rs.columnName(index: i)
-            print(name)
             if rs.type(index: Int32(i)) == .Null{
                 self.setValue(nil, forKey: name)
                 continue
@@ -405,7 +404,6 @@ public struct NullableCol<T:DataType>:ColDef{
 
     public func bind(rs:Database.ResultSet){
         for i in self.keyCol {
-            print("bind",i.key)
             i.value.define.bind(rs: rs, key: "@" + i.key)
         }
     }
@@ -424,7 +422,8 @@ public struct NullableCol<T:DataType>:ColDef{
         try rs.step()
         rs.close()
     }
-    public func queryModel<T:Object>(db:Database,sql:String,type:T.Type) throws ->[T] {
+    public func queryModel<T:Object>(db:Database,type:T.Type,con:Condition? = nil) throws ->[T] {
+        let sql = "select * from \(T.init().name)" + (con == nil ? "" : " where \(con!.conditionCode)")
         let rs = try db.query(sql: sql)
         self.bind(rs: rs)
         var res:[T] = []
@@ -445,17 +444,21 @@ public struct NullableCol<T:DataType>:ColDef{
         rs.close()
     }
     public func insert(db:Database) throws{
-        try self.writeDataCode(db: db, sql: self.insertCode)
-        for i in self.objectKeyCol{
-            guard let q = i.value.define as? Object else { throw NSError(domain: "\(self) \(i.key) save error", code: 0, userInfo: nil)}
-            try q.save(db: db)
+        try autoreleasepool {
+            try self.writeDataCode(db: db, sql: self.insertCode)
+            for i in self.objectKeyCol{
+                guard let q = i.value.define as? Object else { throw NSError(domain: "\(self) \(i.key) save error", code: 0, userInfo: nil)}
+                try q.save(db: db)
+            }
         }
     }
     public func update(db:Database) throws{
-        try self.writeDataCode(db: db, sql: self.updateCode)
-        for i in self.objectKeyCol{
-            let q = self.value(forKey: i.key) as! Object
-            try q.save(db: db)
+        try autoreleasepool {
+            try self.writeDataCode(db: db, sql: self.updateCode)
+            for i in self.objectKeyCol{
+                let q = self.value(forKey: i.key) as! Object
+                try q.save(db: db)
+            }
         }
     }
     public func save(db:Database) throws{
@@ -466,34 +469,42 @@ public struct NullableCol<T:DataType>:ColDef{
         }
     }
     public func delete(db:Database) throws{
-        try self.writeDataCode(db: db, sql: self.deleteCode)
+        try autoreleasepool {
+            try self.writeDataCode(db: db, sql: self.deleteCode)
+        }
     }
     public func query(db:Database) throws{
-        var a = self
-        try self.readDataModel(db: db, sql: self.selectCode, object: &a)
+        try autoreleasepool {
+            var a = self
+            try self.readDataModel(db: db, sql: self.selectCode, object: &a)
+        }
     }
     public func queryObject(db:Database) throws{
-        var a = self
-        try self.readDataModel(db: db, sql: self.selectCode, object: &a)
+        try autoreleasepool {
+            var a = self
+            try self.readDataModel(db: db, sql: self.selectCode, object: &a)
+        }
     }
     public func create(db:Database) throws{
-        if try db.tableExists(name: self.name) == false{
-            try db.exec(sql: self.createCode)
-            return
+        try autoreleasepool {
+            if try db.tableExists(name: self.name) == false{
+                try db.exec(sql: self.createCode)
+                return
+            }
+            for i in try self.newkey(db: db){
+                guard let def = self.keyCol[i]?.defineCode else { continue }
+                try db.addColumn(name: self.name, columeName: i, typedef: def)
+            }
+        
+            if try self.oldKey(db: db).count > 0{
+                try db.alterTableName(name: self.name, newName: self.name + "_tmp")
+                try db.exec(sql: self.createCode)
+                let tmps = try db.tableInfo(name: self.name + "_tmp").keys
+                let new = self.keyCol.keys
+                let copyCol = tmps.filter({new.contains($0)})
+                try db.copyTable(to: self.name, from: self.name + "_tmp", keys:copyCol)
+                try db.drop(name:self.name + "_tmp")
         }
-        for i in try self.newkey(db: db){
-            guard let def = self.keyCol[i]?.defineCode else { continue }
-            try db.addColumn(name: self.name, columeName: i, typedef: def)
-        }
-    
-        if try self.oldKey(db: db).count > 0{
-            try db.alterTableName(name: self.name, newName: self.name + "_tmp")
-            try db.exec(sql: self.createCode)
-            let tmps = try db.tableInfo(name: self.name + "_tmp").keys
-            let new = self.keyCol.keys
-            let copyCol = tmps.filter({new.contains($0)})
-            try db.copyTable(to: self.name, from: self.name + "_tmp", keys:copyCol)
-            try db.drop(name:self.name + "_tmp")
         }
     }
     public func newkey(db:Database) throws ->[String]{

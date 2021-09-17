@@ -9,7 +9,7 @@ import XCTest
 @testable import Alpha
 
 class OtherTests: XCTestCase {
-    var poor:DataBasePool = try! DataBasePool(name: "mm")
+    
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
@@ -17,7 +17,7 @@ class OtherTests: XCTestCase {
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
-
+    let poor:DataBasePool = try! DataBasePool(name: "mm")
     func testCondition() throws{
         let a = (ConditionKey(key: "aa") == ConditionKey(key: "20")) ||
                 (ConditionKey(key: "bb") > ConditionKey(key: "20")) &&
@@ -35,7 +35,7 @@ class OtherTests: XCTestCase {
     }
     func testFuction(){
         
-        self.poor.write { db in
+        poor.write { db in
             let a:JSON = ["a":"dasdasd","b":1,"c":1.3]
             try db.drop(name: "a")
             for i in 0 ..< 10{
@@ -46,7 +46,7 @@ class OtherTests: XCTestCase {
                 try db.insert(jsonName: "a", json: b)
             }
         }
-        self.poor.readSync { db in
+        poor.readSync { db in
             struct save {
                 var sum:Double
                 var count:Int
@@ -73,8 +73,46 @@ class OtherTests: XCTestCase {
         }
     }
     
-    func testVTab(){
+    func testVTab() throws{
+        let poor:DataBasePool = try! DataBasePool(name: "mdm")
         
+        poor.write { db in
+            let a:JSON = ["a":"dasdasd","b":1,"c":1.3]
+            try db.insert(jsonName: "a", json: a)
+        }
+        try poor.loadMode(mode: .WAL)
+        measure {
+            let wa = XCTestExpectation(description: "dsdd")
+            poor.write { db in
+                for i in 0 ..< 10000{
+                    try db.exec(sql: "insert into a values('asdadsdadasd')")
+                }
+            }
+            poor.write { db in
+                for i in 0 ..< 10000{
+                    try db.exec(sql: "insert into a values('asdadsdadasd')")
+                }
+            }
+            poor.write { db in
+                for i in 0 ..< 10000{
+                    try db.exec(sql: "insert into a values('asdadsdadasd')")
+                }
+            }
+            poor.write { db in
+                for i in 0 ..< 10000{
+                    try db.exec(sql: "insert into a values('asdadsdadasd')")
+                }
+            }
+            poor.write { db in
+                for i in 0 ..< 10000{
+                    try db.exec(sql: "insert into a values('asdadsdadasd')")
+                }
+            }
+            poor.barrier { _ in
+                wa.fulfill()
+            }
+            wait(for: [wa], timeout: TimeInterval.infinity)
+        }
     }
 }
 

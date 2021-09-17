@@ -48,6 +48,7 @@ public class DataBasePool{
     private var dbName:String
     private var thread:Thread?
     private var timer:Timer?
+    private var multiWrite:Bool = false
     public init(name:String) throws {
         
         self.wdb = try DataBasePool.createExtraDb(name: name)
@@ -83,14 +84,17 @@ public class DataBasePool{
         try self.queue.sync {
             switch mode {
             case .ACP:
+                self.multiWrite = true
                 try self.wdb.synchronous(mode: .NORMAL)
                 try self.wdb.setJournalMode(.WAL)
                 try self.wdb.checkpoint(type: .passive, log: 100, total: 300)
             case .WAL:
                 try self.wdb.synchronous(mode: .FULL)
                 try self.wdb.setJournalMode(.WAL)
+                self.multiWrite = false
                 try self.wdb.checkpoint(type: .passive, log: 100, total: 300)
             case .DELETE:
+                self.multiWrite = false
                 try self.wdb.synchronous(mode: .FULL)
                 try self.wdb.setJournalMode(.DELETE)
             }
@@ -115,7 +119,6 @@ public class DataBasePool{
                 }
                 
                 let db = try self.createReadOnly()
-                db.foreignKey = true
                 try callback(db)
                 self.read.append(element: db)
             }catch{
@@ -133,7 +136,6 @@ public class DataBasePool{
                 }
                 
                 let db = try self.createReadOnly()
-                db.foreignKey = true
                 try callback(db)
                 self.read.append(element: db)
             }catch{
@@ -158,7 +160,7 @@ public class DataBasePool{
         }))
     }
     public func transactionSync(callback:@escaping (Database) throws ->Bool){
-        self.queue.sync(execute: DispatchWorkItem(flags: .barrier, block: {
+        self.queue.sync(execute: DispatchWorkItem(flags: self.multiWrite ? .barrier : .inheritQoS, block: {
             let db = self.wdb
             do {
                 try db.begin()
@@ -174,7 +176,17 @@ public class DataBasePool{
         }))
     }
     public func perform(callback:@escaping (Database) throws ->Void){
-        self.queue.sync(execute: DispatchWorkItem(flags: .barrier, block: {
+        self.queue.sync(execute: DispatchWorkItem(flags: self.multiWrite ? .barrier : .inheritQoS, block: {
+            let db = self.wdb
+            do {
+                try callback(db)
+            }catch{
+                print(error)
+            }
+        }))
+    }
+    public func barrier(callback:@escaping (Database) throws ->Void){
+        self.queue.sync(execute: DispatchWorkItem(flags:.barrier, block: {
             let db = self.wdb
             do {
                 try callback(db)
@@ -206,11 +218,16 @@ public class DataBasePool{
         let ur = try DataBasePool.checkDir().appendingPathComponent(name)
         DispatchQueue.global().sync {
             do{
-                try FileManager.default.removeItem(at: ur)
+                #if DEBUG
+                print("restore \(name)")
+                #endif
+                if FileManager.default.fileExists(atPath: ur.path){
+                    try FileManager.default.removeItem(at: ur)
+                }
                 let source = try Database(url: u, readOnly: true)
                 try BackupDatabase(url: ur, source: source).backup()
             }catch{
-                print("restore fail")
+                print("restore fail \(error)")
             }
         }
     }

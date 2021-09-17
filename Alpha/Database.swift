@@ -60,7 +60,7 @@ public class Database:Hashable{
     public var sqlite:OpaquePointer?
     public init(url:URL,readOnly:Bool = false) throws{
         self.url = url
-        let r = readOnly ? SQLITE_OPEN_READONLY | SQLITE_OPEN_NOMUTEX  : (SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX)
+        let r = readOnly ? SQLITE_OPEN_READONLY | SQLITE_OPEN_NOMUTEX  : (SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX)
         sqlite3_open_v2(url.path, &self.sqlite, r , nil)
         if(self.sqlite == nil){
             throw NSError(domain: "create sqlite3 fail", code: 0, userInfo: ["url":url])

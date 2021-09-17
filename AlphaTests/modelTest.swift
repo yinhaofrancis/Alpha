@@ -19,16 +19,16 @@ class modelTest: XCTestCase {
     let context = try! Context(name: "pool")
     func testExample() throws {
         
-        
-        
-        context.pool.write { db in
-            for _ in 0 ..< 10{
-                let j:JSON = ["sdada":"dasdasd","cc":3.0,"dd":arc4random() % 100,"dsdsd":["dd","d"],"sad":"dasdasd","k":["a":1]]
-                try db.insert(jsonName: "aaa", json: j)
-            }
-
+        context.pool.write { b in
+            try b.drop(name: "a")
         }
-//        context.pool.writeSync { b in
+        try context.pool.loadMode(mode: .ACP)
+        measure {
+            runR()
+        }
+        
+        
+        
 //            var j = try b.query(name: "aaa")
 //            for i in j{
 //                XCTAssert(i.sdada == "dasdasd")
@@ -46,6 +46,51 @@ class modelTest: XCTestCase {
 //        }
     }
 
+    func runR(){
+        let wa = XCTestExpectation(description: "dsdd")
+        for i in 0 ..< 10{
+            context.pool.write { db in
+                for _ in 0 ..< 10{
+                    let j:JSON = ["sdada":"dasdasd","cc":3.0,"dd":arc4random() % 100,"dsdsd":["dd","d"],"sad":"dasdasd","k":["a":1]]
+                    try db.insert(jsonName: "aaa", json: j)
+                }
+                try a().create(db: db)
+                for i in 0 ..< 10{
+                    let aa = a()
+                    aa.string = "\(i)"
+                    aa.stringw = "\(i + 11)"
+                    aa.a = i
+                    try aa.save(db: db)
+                }
+            }
+            context.pool.read { db in
+                let pp = try a().queryModel(db: db, type: a.self)
+                print(pp)
+            }
+            context.pool.write { db in
+                for _ in 0 ..< 10{
+                    let j:JSON = ["sdada":"dasdasd","cc":3.0,"dd":arc4random() % 100,"dsdsd":["dd","d"],"sad":"dasdasd","k":["a":1]]
+                    try db.insert(jsonName: "aaa", json: j)
+                }
+                try a().create(db: db)
+                for i in 0 ..< 10{
+                    let aa = a()
+                    aa.string = "\(i)"
+                    aa.stringw = "\(i + 11)"
+                    aa.a = i
+                    try aa.save(db: db)
+                }
+            }
+            context.pool.read { db in
+                let pp = try a().queryModel(db: db, type: a.self)
+                print(pp)
+            }
+        }
+        context.pool.barrier { db in
+            wa.fulfill()
+        }
+        wait(for: [wa], timeout: 100)
+    }
     func testPerformanceExample() throws {
         // This is an example of a performance test case.
         self.measure {
