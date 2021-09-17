@@ -86,27 +86,27 @@ class OtherTests: XCTestCase {
             let wa = XCTestExpectation(description: "dsdd")
             poor.write { db in
                 for i in 0 ..< 10000{
-                    try db.exec(sql: "insert into a values('asdadsdadasd')")
+                    try db.exec(sql: "insert into a values('asdadsdadasd\(i)')")
                 }
             }
             poor.write { db in
                 for i in 0 ..< 10000{
-                    try db.exec(sql: "insert into a values('asdadsdadasd')")
+                    try db.exec(sql: "insert into a values('asdadsdadasd\(i)')")
                 }
             }
             poor.write { db in
                 for i in 0 ..< 10000{
-                    try db.exec(sql: "insert into a values('asdadsdadasd')")
+                    try db.exec(sql: "insert into a values('asdadsdadasd\(i)')")
                 }
             }
             poor.write { db in
                 for i in 0 ..< 10000{
-                    try db.exec(sql: "insert into a values('asdadsdadasd')")
+                    try db.exec(sql: "insert into a values('asdadsdadasd\(i)')")
                 }
             }
             poor.write { db in
                 for i in 0 ..< 10000{
-                    try db.exec(sql: "insert into a values('asdadsdadasd')")
+                    try db.exec(sql: "insert into a values('asdadsdadasd\(i)')")
                 }
             }
             poor.barrier { _ in
