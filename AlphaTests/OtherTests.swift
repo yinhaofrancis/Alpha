@@ -125,7 +125,7 @@ class OtherTests: XCTestCase {
 //        try db.exec(sql: "PRAGMA module_list;")
 //        try db.exec(sql: "PRAGMA database_list;")
 //        try db.exec(sql: "create virtual table aa using aa(a,b)")
-        try db.exec(sql: "select * from aa(1);")
+        try db.exec(sql: "select * from aa(1,'a');")
         
     }
 }
