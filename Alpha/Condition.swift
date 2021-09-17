@@ -52,9 +52,9 @@ public class Condition:Equatable{
     public static func match(lk:ConditionKey,rk:ConditionKey)->Condition{
         Condition(l: lk, relate: " MATCH ", r: rk)
     }
-//    public static func exists(lk:ConditionKey,rk:ConditionKey)->Condition{
-//        Condition(l: lk, relate: " EXISTS ", r: rk)
-//    }
+    public static func exists(lk:ConditionKey,rk:ConditionKey)->Condition{
+        Condition(l: lk, relate: " EXISTS ", r: rk)
+    }
     public static func between(lk:ConditionKey,s:ConditionKey,e:ConditionKey)->Condition{
         Condition(l: lk, relate: " BETWEEN ", r: ConditionKey(key: s.key + " AND " + e.key))
     }

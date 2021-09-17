@@ -95,6 +95,10 @@ public class VModule:VirtualTableInterface{
         public var base: sqlite3_vtab_cursor
         public var rowid:sqlite_uint64
         public var table:VTab
+        public var ctx:SQLContext?
+        public var argc:Int = 0
+        public var idNum:Int = 0
+        public var idStr:String?
     }
     public func loadModule(db:Database) throws{
         self.db = db
@@ -113,23 +117,26 @@ public class VModule:VirtualTableInterface{
         
         if self.isXCreate{
             module.xCreate = create(db:pAux:argc:argv:ppVtab:perror:)
+        }else{
+            module.xCreate = connect(db:pAux:argc:argv:ppVtab:perror:)
         }
         module.iVersion = 0
         memcpy(self.module, &module, MemoryLayout<sqlite3_module>.size)
-        let rs = sqlite3_create_module(db.sqlite, self.name, self.module,Unmanaged.passUnretained(self).toOpaque())
+        let rs = sqlite3_create_module(db.sqlite, self.name, self.module,Unmanaged.passRetained(self).toOpaque())
         if rs != SQLITE_OK{
             throw NSError(domain:"create module", code: 0, userInfo: nil)
         }
     }
     
     public func connect(arg:[String],tab:inout VTab,error:inout String?){
-        sqlite3_declare_vtab(tab.module.db?.sqlite, "CREATE TABLE x(a,b)")
+        print(arg)
+        sqlite3_declare_vtab(tab.module.db?.sqlite, "CREATE TABLE x(i,a HIDDEN,b HIDDEN)")
     }
     public func disconnect(tab:VTab){
         
     }
     public func create(arg:[String],tab:inout VTab,error:inout String?){
-        sqlite3_declare_vtab(tab.module.db?.sqlite, "CREATE TABLE x(a,b)")
+        sqlite3_declare_vtab(tab.module.db?.sqlite, "CREATE TABLE x(i,a HIDDEN,b HIDDEN)")
     }
     public func open(tab:VTab)->VTabCursor?{
         return VTabCursor(base: sqlite3_vtab_cursor(), rowid: 1, table: tab)
@@ -137,7 +144,11 @@ public class VModule:VirtualTableInterface{
     public func close(cursor:VTabCursor){
         
     }
-    public func filter(cursor:VTabCursor,indexNum:Int32,str:String?,valueCount:Int32,ctx:SQLContext)->Int32{
+    public func filter(cursor:VTabCursor,valueCount:Int32)->Int32{
+        for i in 0 ..< valueCount{
+            print(cursor.ctx?.valueType(index: Int(i)))
+        }
+  
         return SQLITE_OK
     }
     public func next(cursor:inout VTabCursor)->Int32{
@@ -157,8 +168,9 @@ public class VModule:VirtualTableInterface{
     public func row(cursor:VTabCursor)->sqlite3_int64{
         return sqlite3_int64(cursor.rowid)
     }
-    public func colume(cur:VTabCursor,ctx:SQLContext,index:Int32)->Int32{
-        ctx.ret(v: "ok")
+    public func colume(cur:VTabCursor,index:Int32)->Int32{
+        
+        cur.ctx?.ret(v: "\(cur.argc)")
         return SQLITE_OK
     }
     deinit {
@@ -263,8 +275,12 @@ func xfilter(pVtabCursor:UnsafeMutablePointer<sqlite3_vtab_cursor>?, idxNum:Int3
     let cur = unsafeBitCast(pVtabCursor, to: UnsafeMutablePointer<VModule.VTabCursor>.self)
     let s = idxStr == nil ? nil : String(cString: idxStr!)
     let c = SQLContext()
+    cur.pointee.ctx = c
     c.values = argv
-    return cur.pointee.table.module.filter(cursor: cur.pointee, indexNum: idxNum, str: s, valueCount: argc, ctx: c)
+    cur.pointee.argc = Int(argc)
+    cur.pointee.idNum = Int(idxNum)
+    cur.pointee.idStr = s
+    return cur.pointee.table.module.filter(cursor: cur.pointee, valueCount: argc)
 }
 func xnext(cur:UnsafeMutablePointer<sqlite3_vtab_cursor>?) -> Int32{
     let cursor = unsafeBitCast(cur, to: UnsafeMutablePointer<VModule.VTabCursor>.self)
@@ -282,7 +298,6 @@ func xrowid(cur:UnsafeMutablePointer<sqlite3_vtab_cursor>?, prowId:UnsafeMutable
 }
 func xColumn(cur:UnsafeMutablePointer<sqlite3_vtab_cursor>?, ctx:OpaquePointer?, i:Int32) -> Int32{
     let cursor = unsafeBitCast(cur, to: UnsafeMutablePointer<VModule.VTabCursor>.self)
-    let context = SQLContext()
-    context.ctx = ctx
-    return cursor.pointee.table.module.colume(cur: cursor.pointee, ctx: context, index: i)
+    cursor.pointee.ctx?.ctx = ctx
+    return cursor.pointee.table.module.colume(cur: cursor.pointee, index: i)
 }

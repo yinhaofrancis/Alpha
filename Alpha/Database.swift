@@ -199,6 +199,9 @@ public class Database:Hashable{
                     p?.deallocate()
                 }
             }
+            public func reset(){
+                sqlite3_reset(self.stmt)
+            }
             public func bind(value:T) where T == Data{
                 let pointer = sqlite3_malloc(Int32(value.count))
                 let buffer = UnsafeMutableRawBufferPointer(start: pointer, count: value.count)
@@ -304,7 +307,7 @@ extension Database{
         print("SQL:"+sql)
         #endif
         var error:UnsafeMutablePointer<CChar>?
-        let rs = sqlite3_exec(self.sqlite, sql, { arg, len, v,col in
+        sqlite3_exec(self.sqlite, sql, { arg, len, v,col in
             #if DEBUG
             print("<<<<<<<<<<<<")
             for i in 0 ..< len{
@@ -318,7 +321,7 @@ extension Database{
         }, nil, &error)
         if let e = error{
             
-            print(String(cString: sqlite3_errmsg(self.sqlite)),String(cString: sqlite3_errstr(rs)))
+            print(String(cString: sqlite3_errmsg(self.sqlite)))
             let data = Data(bytes: e, count: strlen(e))
             sqlite3_free(error)
             throw NSError(domain: String(data: data, encoding: .utf8) ?? "unknow error", code: 0, userInfo: ["sql":sql])
@@ -523,6 +526,7 @@ extension Database{
             try? self.exec(sql: "PRAGMA foreign_keys = \(newValue ? "ON" : "OFF")")
         }
     }
+    
     public func close(){
         sqlite3_close(self.sqlite)
     }
