@@ -48,6 +48,12 @@ public protocol VirtualTableInterface{
     var isXRollbackTo:Bool { get }
     var isXShadowName:Bool { get }
 }
+public enum updateMethod{
+    case delete
+    case insert
+    case update
+    case updateWithRowId
+}
 
 public class VModule:VirtualTableInterface{
     
@@ -112,7 +118,7 @@ public class VModule:VirtualTableInterface{
         module.xEof = xeof(cur:)
         module.xColumn = xColumn(cur:ctx:i:)
         module.xRowid = xrowid(cur:prowId:)
-        
+        module.xDestroy = xdestroy(table:)
         if self.isXCreate{
             module.xCreate = create(db:pAux:argc:argv:ppVtab:perror:)
         }else{
@@ -134,6 +140,9 @@ public class VModule:VirtualTableInterface{
         sqlite3_declare_vtab(tab.module.db?.sqlite, "CREATE TABLE x(i,a HIDDEN,b HIDDEN)")
     }
     public func disconnect(tab:VTab){
+        
+    }
+    public func destroy(tab:VTab){
         
     }
     public func create(arg:[String],tab:inout VTab,error:inout String?){
@@ -182,8 +191,18 @@ public class VModule:VirtualTableInterface{
         
         return SQLITE_OK
     }
-    public func update(table:VTab,ctx:SQLContext,rowId:inout sqlite_int64)->Int32{
-        
+    public func update(table:VTab,ctx:SQLContext,method:updateMethod,rowId:inout sqlite_int64)->Int32{
+        for i in 0 ..< ctx.argc {
+            if ctx.valueType(index: Int(i)) == .Int{
+                let s:Int = ctx.value(index: Int(i))
+                print(s)
+            }
+            if ctx.valueType(index: Int(i)) == .Text{
+                let s:String = ctx.value(index: Int(i))
+                print(s)
+            }
+            
+        }
         return SQLITE_OK
     }
     deinit {
@@ -320,7 +339,31 @@ func xupdate(table:UnsafeMutablePointer<sqlite3_vtab>?, argc:Int32, argv:UnsafeM
     sqlcontext.argc = argc
     sqlcontext.values = argv
     var rowid:sqlite_int64 = 0
-    let rs = a.pointee.module.update(table: a.pointee, ctx: sqlcontext, rowId: &rowid)
+    var method = updateMethod.delete
+    var isOk:Bool = false
+    if argc == 1{
+        method = .delete
+        isOk = true
+    }else if (argc > 1 && sqlcontext.valueType(index: 0) == .Null){
+        method = .insert
+        isOk = true
+    }else if (argc > 1 && sqlcontext.valueType(index: 0) != .Null && sqlcontext.valueInt(index: 0) == sqlcontext.valueInt(index: 1)){
+        method = .update
+        isOk = true
+    }else if (argc > 1 && sqlcontext.valueType(index: 0) != .Null && sqlcontext.valueInt(index: 0) != sqlcontext.valueInt(index: 1)){
+        method = .updateWithRowId
+        isOk = true
+    }
+    if !isOk{
+        return SQLITE_ERROR
+    }
+    let rs = a.pointee.module.update(table: a.pointee, ctx: sqlcontext,method: method, rowId: &rowid)
     prowId?.pointee = rowid
     return rs
+}
+func xdestroy(table:UnsafeMutablePointer<sqlite3_vtab>?) -> Int32{
+    let a = unsafeBitCast(table, to: UnsafeMutablePointer<VModule.VTab>.self)
+    a.pointee.module.destroy(tab: a.pointee)
+    sqlite3_free(table)
+    return SQLITE_OK
 }

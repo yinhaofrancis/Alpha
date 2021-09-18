@@ -134,6 +134,10 @@ public class SQLContext{
         guard let p = self.valuePointer(index: index) else { return ""}
         return String(cString: sqlite3_value_text(p))
     }
+    public func valueInt(index:Int)->Int{
+        guard let p = self.valuePointer(index: index) else { return 0}
+        return Int(sqlite3_value_int64(p))
+    }
     public func valueType(index:Int)->ContextValueType{
         guard let p = self.valuePointer(index: index) else { return .Null}
         let type = sqlite3_value_type(p)
