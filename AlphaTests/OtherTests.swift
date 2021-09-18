@@ -116,13 +116,24 @@ class OtherTests: XCTestCase {
         }
     }
     func testPragame() throws{
-        let db = try Database()
-        let vm = VModule(name: "aa")
-        vm.isXCreate = true
+        let db = try Database(url: try! DataBasePool.checkDir().appendingPathComponent("aaaa"))
+        let vm = VModule(name: "aa") { v in
+            return "create table \(v[0])(i,j,a hidden,b hidden)"
+        }
         vm.isXUpdate = true
         try vm.loadModule(db: db)
-        try db.exec(sql: "create virtual table aa using aa(1,2)")
-        try db.exec(sql: "insert into aa values(111)")
+        try db.exec(sql: "create virtual table if not exists aap using aa(1,2)")
+        try db.exec(sql: "insert into aap values(\(arc4random()),222)")
+        try db.exec(sql: "select * from aap where (i = 10 or j > 100 and i > 1000)")
+//        try db.exec(sql: "select * from aap")
+//        try db.exec(sql: "select * from aap where i > 100")
+//        let json = try db.query(sql: "select * from aap where (i < 10 or j < 0)")
+//        while try json.step() {
+//            print(json.column(index: 0, type: String.self).value(),
+//                  json.column(index: 1, type: String.self).value())
+//        }
+//        json.close()
+//        try db.exec(sql: "update aa set i = 10 where j > 0")
     }
 }
 

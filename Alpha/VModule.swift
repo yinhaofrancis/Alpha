@@ -35,18 +35,18 @@ import SQLite3.Ext
 
 public protocol VirtualTableInterface{
     var isXCreate:Bool { get }
-    var isXDestroy:Bool { get }
+//    var isXDestroy:Bool { get }
     var isXUpdate:Bool { get }
-    var isXBegin:Bool { get }
-    var isXSync:Bool { get }
-    var isXCommit:Bool { get }
-    var isXRollback:Bool { get }
-    var isXFindMethod:Bool { get }
-    var isXRename:Bool { get }
-    var isXSavepoint:Bool { get }
-    var isXRelease:Bool { get }
-    var isXRollbackTo:Bool { get }
-    var isXShadowName:Bool { get }
+//    var isXBegin:Bool { get }
+//    var isXSync:Bool { get }
+//    var isXCommit:Bool { get }
+//    var isXRollback:Bool { get }
+//    var isXFindMethod:Bool { get }
+//    var isXRename:Bool { get }
+//    var isXSavepoint:Bool { get }
+//    var isXRelease:Bool { get }
+//    var isXRollbackTo:Bool { get }
+//    var isXShadowName:Bool { get }
 }
 public enum updateMethod{
     case delete
@@ -59,29 +59,29 @@ public class VModule:VirtualTableInterface{
     
     public var isXCreate: Bool = false
     
-    public var isXDestroy: Bool = false
+//    public var isXDestroy: Bool = false
     
     public var isXUpdate: Bool = false
     
-    public var isXBegin: Bool = false
-    
-    public var isXSync: Bool = false
-    
-    public var isXCommit: Bool = false
-    
-    public var isXRollback: Bool = false
-    
-    public var isXFindMethod: Bool = false
-    
-    public var isXRename: Bool = false
-    
-    public var isXSavepoint: Bool = false
-    
-    public var isXRelease: Bool = false
-    
-    public var isXRollbackTo: Bool = false
-     
-    public var isXShadowName: Bool = false
+//    public var isXBegin: Bool = false
+//
+//    public var isXSync: Bool = false
+//
+//    public var isXCommit: Bool = false
+//
+//    public var isXRollback: Bool = false
+//
+//    public var isXFindMethod: Bool = false
+//
+//    public var isXRename: Bool = false
+//
+//    public var isXSavepoint: Bool = false
+//
+//    public var isXRelease: Bool = false
+//
+//    public var isXRollbackTo: Bool = false
+//
+//    public var isXShadowName: Bool = false
     
     public var module = UnsafeMutablePointer<sqlite3_module>.allocate(capacity: 1)
     
@@ -89,13 +89,24 @@ public class VModule:VirtualTableInterface{
     
     public weak var db:Database?
     
-    public init(name:String){
+    public var tabFunctionDeclare:String?
+    
+    public var tabDeclare:([String])->String = { i in return "" }
+    
+    public init(name:String,tabFunctionDeclare:String){
         self.name = name
-        
+        self.tabFunctionDeclare = tabFunctionDeclare
+        self.isXCreate = false
+    }
+    public init(name:String,tabDeclare:@escaping ([String])->String){
+        self.name = name
+        self.tabDeclare = tabDeclare
+        self.isXCreate = true
     }
     public struct VTab{
         public var base:sqlite3_vtab
         public var module:VModule
+        public var constaintCount:Int
     }
     public struct VTabCursor{
         public var base: sqlite3_vtab_cursor
@@ -119,6 +130,7 @@ public class VModule:VirtualTableInterface{
         module.xColumn = xColumn(cur:ctx:i:)
         module.xRowid = xrowid(cur:prowId:)
         module.xDestroy = xdestroy(table:)
+        module.xFindFunction = xFindFunction(tab:nArg:zName:pxFunc:ppArg:)
         if self.isXCreate{
             module.xCreate = create(db:pAux:argc:argv:ppVtab:perror:)
         }else{
@@ -127,6 +139,7 @@ public class VModule:VirtualTableInterface{
         if self.isXUpdate{
             module.xUpdate = xupdate(table:argc:argv:prowId:)
         }
+        
         module.iVersion = 0
         memcpy(self.module, &module, MemoryLayout<sqlite3_module>.size)
         let rs = sqlite3_create_module(db.sqlite, self.name, self.module,Unmanaged.passRetained(self).toOpaque())
@@ -136,8 +149,12 @@ public class VModule:VirtualTableInterface{
     }
     
     public func connect(arg:[String],tab:inout VTab,error:inout String?){
-        print(arg)
-        sqlite3_declare_vtab(tab.module.db?.sqlite, "CREATE TABLE x(i,a HIDDEN,b HIDDEN)")
+        if let f = self.tabFunctionDeclare{
+            sqlite3_declare_vtab(tab.module.db?.sqlite, f)
+        }else{
+            sqlite3_declare_vtab(tab.module.db?.sqlite, self.tabDeclare(arg))
+        }
+        
     }
     public func disconnect(tab:VTab){
         
@@ -146,7 +163,7 @@ public class VModule:VirtualTableInterface{
         
     }
     public func create(arg:[String],tab:inout VTab,error:inout String?){
-        sqlite3_declare_vtab(tab.module.db?.sqlite, "CREATE TABLE x(i,a HIDDEN,b HIDDEN)")
+        sqlite3_declare_vtab(tab.module.db?.sqlite, self.tabDeclare(arg))
     }
     public func open(tab:VTab)->VTabCursor?{
         return VTabCursor(base: sqlite3_vtab_cursor(), rowid: 1, table: tab)
@@ -167,17 +184,24 @@ public class VModule:VirtualTableInterface{
         return SQLITE_OK
     }
     
-    public func bestIndex(tab:VTab,index:inout sqlite3_index_info?)->Int32{
-        index?.estimatedRows = 1000
-        index?.estimatedCost = 1000
-        index?.idxNum = 0
-        for i in 0..<index!.nConstraint{
-          
-            index?.aConstraintUsage[Int(i)].argvIndex = i + 1
-            index?.aConstraintUsage[Int(i)].omit = 1
+    public func bestIndex(tab:inout VTab,index:inout sqlite3_index_info?)->Int32{
+        index?.estimatedCost = 400
+        index?.idxNum = 1
+        for i in 0 ..< index!.nOrderBy{
+            print(index!.aOrderBy[Int(i)].iColumn,index!.aOrderBy[Int(i)].desc)
+        }
+        for i in 0 ..< index!.nConstraint{
+            print(index?.aConstraint[Int(i)].iColumn,index?.aConstraint[Int(i)].op,index?.aConstraint[Int(i)].iTermOffset,index?.aConstraint[Int(i)].usable)
         }
         
+        
+        for i in 0 ..< index!.nConstraint{
+            index?.aConstraintUsage[Int(i)].argvIndex = Int32(i + 1)
+            index?.aConstraintUsage[Int(i)].omit = 1
+        }
+        tab.constaintCount += Int(index!.nConstraint)
         return SQLITE_OK
+        
     }
     public func eof(cursor:VTabCursor)->Bool{
         return cursor.rowid > 4
@@ -187,6 +211,7 @@ public class VModule:VirtualTableInterface{
     }
     public func colume(cur:VTabCursor,ctx:SQLContext,index:Int32)->Int32{
         
+        print("\(index)")
         ctx.ret(v: "\(index)-|-")
         
         return SQLITE_OK
@@ -220,7 +245,7 @@ func connect(db:OpaquePointer?,
         }
     }
     var error:String?
-    var vtm = VModule.VTab(base: sqlite3_vtab(), module: vt)
+    var vtm = VModule.VTab(base: sqlite3_vtab(), module: vt, constaintCount: 0)
     vt.connect(arg: str, tab: &vtm, error: &error)
     if let er = error {
         if let c = er.cString(using: .utf8){
@@ -250,7 +275,7 @@ func create(db:OpaquePointer?, pAux:UnsafeMutableRawPointer?, argc:Int32, argv:U
         }
     }
     var error:String?
-    var vtm = VModule.VTab(base: sqlite3_vtab(), module: vt)
+    var vtm = VModule.VTab(base: sqlite3_vtab(), module: vt, constaintCount: 0)
     vt.create(arg: str, tab: &vtm, error: &error)
     if let er = error {
         if let c = er.cString(using: .utf8){
@@ -273,11 +298,13 @@ func create(db:OpaquePointer?, pAux:UnsafeMutableRawPointer?, argc:Int32, argv:U
 }
 
 func bestIndex(table:UnsafeMutablePointer<sqlite3_vtab>?, index:UnsafeMutablePointer<sqlite3_index_info>?) -> Int32 {
+    print("bestIndex")
     let a = unsafeBitCast(table, to: UnsafeMutablePointer<VModule.VTab>.self)
     var info = index?.pointee
-    let ret = a.pointee.module.bestIndex(tab: a.pointee, index: &info)
+    let ret = a.pointee.module.bestIndex(tab: &a.pointee, index: &info)
     guard let inf = info else { return SQLITE_NOMEM }
     index?.pointee = inf
+    
     return ret
 }
 func xdisconnect(table:UnsafeMutablePointer<sqlite3_vtab>?)->Int32{
@@ -287,6 +314,7 @@ func xdisconnect(table:UnsafeMutablePointer<sqlite3_vtab>?)->Int32{
     return SQLITE_OK
 }
 func xopen(table:UnsafeMutablePointer<sqlite3_vtab>?, cursor:UnsafeMutablePointer<UnsafeMutablePointer<sqlite3_vtab_cursor>?>?) -> Int32{
+    print("open")
     let a = unsafeBitCast(table, to: UnsafeMutablePointer<VModule.VTab>.self)
     let pointer = sqlite3_malloc64(sqlite3_uint64(MemoryLayout<VModule.VTabCursor>.size))
     var tc = a.pointee.module.open(tab: a.pointee)
@@ -304,6 +332,7 @@ func xclose(cursor:UnsafeMutablePointer<sqlite3_vtab_cursor>?) -> Int32{
     return SQLITE_OK
 }
 func xfilter(pVtabCursor:UnsafeMutablePointer<sqlite3_vtab_cursor>?, idxNum:Int32, idxStr:UnsafePointer<CChar>?, argc:Int32, argv:UnsafeMutablePointer<OpaquePointer?>?) -> Int32{
+    print("filter")
     let cur = unsafeBitCast(pVtabCursor, to: UnsafeMutablePointer<VModule.VTabCursor>.self)
     let s = idxStr == nil ? nil : String(cString: idxStr!)
     let c = SQLContext()
@@ -311,6 +340,7 @@ func xfilter(pVtabCursor:UnsafeMutablePointer<sqlite3_vtab_cursor>?, idxNum:Int3
     c.values = argv
     cur.pointee.idNum = Int(idxNum)
     cur.pointee.idStr = s
+    cur.pointee.rowid = 0;
     return cur.pointee.table.module.filter(cursor: cur.pointee,ctx: c, valueCount: argc)
 }
 func xnext(cur:UnsafeMutablePointer<sqlite3_vtab_cursor>?) -> Int32{
@@ -328,6 +358,7 @@ func xrowid(cur:UnsafeMutablePointer<sqlite3_vtab_cursor>?, prowId:UnsafeMutable
     return SQLITE_OK
 }
 func xColumn(cur:UnsafeMutablePointer<sqlite3_vtab_cursor>?, ctx:OpaquePointer?, i:Int32) -> Int32{
+    print("xColumn")
     let cursor = unsafeBitCast(cur, to: UnsafeMutablePointer<VModule.VTabCursor>.self)
     let sqlctx = SQLContext()
     sqlctx.ctx = ctx
@@ -361,9 +392,14 @@ func xupdate(table:UnsafeMutablePointer<sqlite3_vtab>?, argc:Int32, argv:UnsafeM
     prowId?.pointee = rowid
     return rs
 }
+
 func xdestroy(table:UnsafeMutablePointer<sqlite3_vtab>?) -> Int32{
     let a = unsafeBitCast(table, to: UnsafeMutablePointer<VModule.VTab>.self)
     a.pointee.module.destroy(tab: a.pointee)
     sqlite3_free(table)
+    return SQLITE_OK
+}
+
+func xFindFunction(tab:UnsafeMutablePointer<sqlite3_vtab>?, nArg:Int32, zName:UnsafePointer<CChar>?, pxFunc:UnsafeMutablePointer<(@convention(c) (OpaquePointer?, Int32, UnsafeMutablePointer<OpaquePointer?>?) -> Void)?>?, ppArg:UnsafeMutablePointer<UnsafeMutableRawPointer?>?) -> Int32{
     return SQLITE_OK
 }

@@ -80,7 +80,19 @@ infix operator <> : ComparisonPrecedence
 
 
 
-public struct ConditionKey:ExpressibleByStringLiteral {
+public struct ConditionKey:ExpressibleByStringLiteral,ExpressibleByIntegerLiteral,ExpressibleByFloatLiteral {
+    public init(integerLiteral value: Int) {
+        self.key = "\(value)"
+    }
+    
+    public init(floatLiteral value: Double) {
+        self.key = "\(value)"
+    }
+    
+    public typealias IntegerLiteralType = Int
+    
+    public typealias FloatLiteralType = Double
+    
     public typealias StringLiteralType = String
     
     var key:String
