@@ -22,6 +22,7 @@ public typealias FinalFunction<T:Function> = (T)->Void
 public class SQLContext{
     public var ctx:OpaquePointer?
     public var values:UnsafeMutablePointer<OpaquePointer?>?
+    public var argc:Int32 = 0
     public func ret(v:Int){
         guard let c = ctx else {
             return

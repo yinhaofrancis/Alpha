@@ -95,7 +95,6 @@ public class VModule:VirtualTableInterface{
         public var base: sqlite3_vtab_cursor
         public var rowid:sqlite_uint64
         public var table:VTab
-        public var argc:Int = 0
         public var idNum:Int = 0
         public var idStr:String?
     }
@@ -118,6 +117,9 @@ public class VModule:VirtualTableInterface{
             module.xCreate = create(db:pAux:argc:argv:ppVtab:perror:)
         }else{
             module.xCreate = connect(db:pAux:argc:argv:ppVtab:perror:)
+        }
+        if self.isXUpdate{
+            module.xUpdate = xupdate(table:argc:argv:prowId:)
         }
         module.iVersion = 0
         memcpy(self.module, &module, MemoryLayout<sqlite3_module>.size)
@@ -177,6 +179,10 @@ public class VModule:VirtualTableInterface{
     public func colume(cur:VTabCursor,ctx:SQLContext,index:Int32)->Int32{
         
         ctx.ret(v: "\(index)-|-")
+        
+        return SQLITE_OK
+    }
+    public func update(table:VTab,ctx:SQLContext,rowId:inout sqlite_int64)->Int32{
         
         return SQLITE_OK
     }
@@ -282,8 +288,8 @@ func xfilter(pVtabCursor:UnsafeMutablePointer<sqlite3_vtab_cursor>?, idxNum:Int3
     let cur = unsafeBitCast(pVtabCursor, to: UnsafeMutablePointer<VModule.VTabCursor>.self)
     let s = idxStr == nil ? nil : String(cString: idxStr!)
     let c = SQLContext()
+    c.argc = argc
     c.values = argv
-    cur.pointee.argc = Int(argc)
     cur.pointee.idNum = Int(idxNum)
     cur.pointee.idStr = s
     return cur.pointee.table.module.filter(cursor: cur.pointee,ctx: c, valueCount: argc)
@@ -307,4 +313,14 @@ func xColumn(cur:UnsafeMutablePointer<sqlite3_vtab_cursor>?, ctx:OpaquePointer?,
     let sqlctx = SQLContext()
     sqlctx.ctx = ctx
     return cursor.pointee.table.module.colume(cur: cursor.pointee,ctx: sqlctx, index: i)
+}
+func xupdate(table:UnsafeMutablePointer<sqlite3_vtab>?, argc:Int32, argv:UnsafeMutablePointer<OpaquePointer?>?, prowId:UnsafeMutablePointer<sqlite3_int64>?) -> Int32{
+    let a = unsafeBitCast(table, to: UnsafeMutablePointer<VModule.VTab>.self)
+    let sqlcontext = SQLContext()
+    sqlcontext.argc = argc
+    sqlcontext.values = argv
+    var rowid:sqlite_int64 = 0
+    let rs = a.pointee.module.update(table: a.pointee, ctx: sqlcontext, rowId: &rowid)
+    prowId?.pointee = rowid
+    return rs
 }

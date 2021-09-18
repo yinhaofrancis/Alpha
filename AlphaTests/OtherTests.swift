@@ -118,14 +118,15 @@ class OtherTests: XCTestCase {
     func testPragame() throws{
         let db = try Database()
         let vm = VModule(name: "aa")
-//        vm.isXCreate = true
+        vm.isXCreate = true
+        vm.isXUpdate = true
         try vm.loadModule(db: db)
 //        let a:JSON = ["a":"dasdasd","b":1,"c":1.3]
 //        try db.insert(jsonName: "a", json: a)
 //        try db.exec(sql: "PRAGMA module_list;")
 //        try db.exec(sql: "PRAGMA database_list;")
-//        try db.exec(sql: "create virtual table aa using aa(a,b)")
-        try db.exec(sql: "select * from aa(1,'a');")
+        try db.exec(sql: "create virtual table aa using aa(1,2)")
+//        try db.exec(sql: "select * from aa(1,'a');")
         
     }
 }
