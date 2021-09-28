@@ -149,25 +149,25 @@ class modelTest: XCTestCase {
         let ar = try db.query(jsonName: "a")
         XCTAssert(ar.count == 1)
         XCTAssert(ar.first?.dsds.str() == "aaa")
-        let r = try db.query(jsonName: "a", condition: db.jsonConditionKey(key: "$.a.dd") == "?", values: ["ddddd"])
+        let r = try db.query(jsonName: "a", condition: ConditionKey.jsonConditionKey(key: "$.a.dd") == "?", values: ["ddddd"])
         XCTAssert(r.count == 1)
         XCTAssert(r.first?.dsds.str() == "aaa")
         try db.update(jsonName: "a", current: r.first!, patch: json)
         
-        let rr = try db.query(jsonName: "a", condition: db.jsonConditionKey(key: "$.a.dd") == "?", values: ["ddddd"])
+        let rr = try db.query(jsonName: "a", condition: ConditionKey.jsonConditionKey(key: "$.a.dd") == "?", values: ["ddddd"])
         XCTAssert(rr.count == 1)
         XCTAssert(rr.first?.dsds.str() == "asdasd")
         
         
         let patch:JSON = ["pp":"pp"]
         try db.update(jsonName: "a", current: rr.first!, patch: patch)
-        let rrr = try db.query(jsonName: "a", condition: db.jsonConditionKey(key: "$.a.dd") == "?", values: ["ddddd"])
+        let rrr = try db.query(jsonName: "a", condition: ConditionKey.jsonConditionKey(key: "$.a.dd") == "?", values: ["ddddd"])
         print(rrr)
         XCTAssert(rrr.count == 1)
         XCTAssert(rrr.first?.pp.str() == "pp")
         
         try db.delete(jsonName: "a", current: rrr.first!)
-        XCTAssert(try db.query(jsonName: "a", condition: db.jsonConditionKey(key: "$.a.dd") == "?", values: ["ddddd"]).count == 0)
+        XCTAssert(try db.query(jsonName: "a", condition: ConditionKey.jsonConditionKey(key: "$.a.dd") == "?", values: ["ddddd"]).count == 0)
     }
 }
 struct A {

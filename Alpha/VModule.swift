@@ -191,11 +191,6 @@ public class VModule:VirtualTableInterface{
             print(index!.aOrderBy[Int(i)].iColumn,index!.aOrderBy[Int(i)].desc)
         }
         for i in 0 ..< index!.nConstraint{
-            print(index?.aConstraint[Int(i)].iColumn,index?.aConstraint[Int(i)].op,index?.aConstraint[Int(i)].iTermOffset,index?.aConstraint[Int(i)].usable)
-        }
-        
-        
-        for i in 0 ..< index!.nConstraint{
             index?.aConstraintUsage[Int(i)].argvIndex = Int32(i + 1)
             index?.aConstraintUsage[Int(i)].omit = 1
         }

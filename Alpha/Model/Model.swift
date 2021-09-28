@@ -161,27 +161,59 @@ public struct JSON:CustomStringConvertible,
         }
     }
     public subscript(_ index:Int)->JSON{
-        if let dic = self.content as? Array<JSON>{
-            if dic.count > index{
-                return dic[index]
+        get{
+            if let dic = self.content as? Array<JSON>{
+                if dic.count > index{
+                    return dic[index]
+                }
             }
+            return JSON(nil)
         }
-        return JSON(nil)
+        set{
+            var dic = self.content as? Array<JSON>
+            dic?[index] = newValue
+            self.content = dic
+        }
     }
     public subscript(_ index:Int)->String{
-        self[index].str()
+        get{
+            self[index].str()
+        }
+        set{
+            self[index] = JSON(newValue)
+        }
     }
     public subscript(_ index:Int)->Int{
-        self[index].int()
+        get{
+            self[index].int()
+        }
+        set{
+            self[index] = JSON(newValue)
+        }
     }
     public subscript(_ index:Int)->Double{
-        self[index].double()
+        get{
+            self[index].double()
+        }
+        set{
+            self[index] = JSON(newValue)
+        }
     }
     public subscript(_ index:Int)->Bool{
-        self[index].bool()
+        get{
+            self[index].bool()
+        }
+        set{
+            self[index] = JSON(newValue)
+        }
     }
     public subscript(_ index:Int)->Date{
-        self[index].date()
+        get{
+            self[index].date()
+        }
+        set{
+            self[index] = JSON(newValue)
+        }
     }
     public func str()->String{
         if let str = self.content as? String{
@@ -517,9 +549,6 @@ extension Database{
         vjson.content = json.content
         vjson.setKeyValue(dynamicMember: "rowid", json: nil)
         return vjson
-    }
-    public func jsonConditionKey(key:String)->ConditionKey{
-        ConditionKey(json: "json", key: key)
     }
     public func query(jsonName:String,condition:Condition? = nil,values:[JSON] = []) throws ->[JSON]{
         try self.query(jsonName: jsonName, conditionStr: condition?.conditionCode, values: values)
