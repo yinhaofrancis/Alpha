@@ -20,27 +20,28 @@ class testJson: XCTestCase {
     }
 
     func testJsonSave() throws {
-        let json:JSON = ["sds":1,"a":2,"b":"sada","p":["a",["c","d"],"b"],"q":["cc":1,"aa":"a"]]
+        let json:JSON = ["sds":1,"a":2,"b":"true","p":["a",["c","d"],"b"],"q":["cc":1.9,"aa":"a"]]
         self.pool.writeSync { db in
             try db.save(jsonName: "test", json: json)
             let a = try db.query(jsonName: "test", condition: ConditionKey.jsonConditionKey(key: "$.sds") == 1, values: [])
             XCTAssert(a.count == 1)
             XCTAssert(a[0].sds == 1)
             XCTAssert(a[0].a == 2)
-            XCTAssert(a[0].b == "sada")
+            XCTAssert(a[0].b == true)
             XCTAssert(a[0].p[0] == "a")
-            XCTAssert(a[0].q.cc == 1)
+            XCTAssert(a[0].q.cc == 1.9)
             var jj = a[0]
             jj.a = 4
+            jj.b = false
             jj.p[0] = "aaaa";
             try db.save(jsonName: "test", json: jj)
             let b = try db.query(jsonName: "test", condition: ConditionKey.jsonConditionKey(key: "$.sds") == 1, values: [])
             XCTAssert(b.count == 1)
             XCTAssert(b[0].sds == 1)
             XCTAssert(b[0].a == 4)
-            XCTAssert(b[0].b == "sada")
+            XCTAssert(b[0].b == false)
             XCTAssert(b[0].p[0] == "aaaa")
-            XCTAssert(b[0].q.cc == 1)
+            XCTAssert(b[0].q.cc == 1.9)
             try db.delete(jsonName: "test", current: jj)
             try db.drop(name: "test")
         }
