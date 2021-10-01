@@ -27,25 +27,7 @@ class modelTest: XCTestCase {
             runR()
         }
         
-        
-        
-//            var j = try b.query(name: "aaa")
-//            for i in j{
-//                XCTAssert(i.sdada == "dasdasd")
-//                XCTAssert(i.dsdsd[1] == "d")
-//                XCTAssert(i.dsdsd[0] == "dd")
-//                XCTAssert(i.sad == "dasdasd")
-//                XCTAssert(i.k.a == 1)
-//            }
-//            for i in 0 ..< j.count{
-//                var t = j[i]
-//                t.dd = i
-//                try b.save("a", t)
-//            }
-//            j = try b.query(name: "a")
-//        }
     }
-
     func runR(){
         let wa = XCTestExpectation(description: "dsdd")
         for i in 0 ..< 10{

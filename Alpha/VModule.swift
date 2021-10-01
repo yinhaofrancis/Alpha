@@ -172,10 +172,7 @@ public class VModule:VirtualTableInterface{
         
     }
     public func filter(cursor:VTabCursor,ctx:SQLContext,valueCount:Int32)->Int32{
-        for i in 0 ..< valueCount{
-            let s:String? = ctx.value(index: Int(i))
-            print(ctx.valueType(index: Int(i)),s)
-        }
+
   
         return SQLITE_OK
     }

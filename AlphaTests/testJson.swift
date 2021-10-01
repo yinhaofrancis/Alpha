@@ -43,6 +43,17 @@ class testJson: XCTestCase {
             XCTAssert(b[0].p[0] == "aaaa")
             XCTAssert(b[0].q.cc == 1.9)
             try db.delete(jsonName: "test", current: jj)
+            try db.insert(jsonName: "test", json: jj, patch: ["qq":"qq"])
+            let nue = try db.query(jsonName: "test", condition: ConditionKey.jsonConditionKey(key: "$.sds") == 1, values: [])
+            XCTAssert(nue[0].qq == "qq")
+            XCTAssert(nue.count == 1)
+            XCTAssert(nue[0].sds == 1)
+            XCTAssert(nue[0].a == 4)
+            XCTAssert(nue[0].b == false)
+            XCTAssert(nue[0].p[0] == "aaaa")
+            XCTAssert(nue[0].q.cc == 1.9)
+            try db.drop(name: "test")
+            try db.insert(jsonName: "test", json: jj, patch: ["qq":"qq"])
             try db.drop(name: "test")
         }
     }
