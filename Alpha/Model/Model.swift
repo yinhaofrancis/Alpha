@@ -553,6 +553,9 @@ extension Database{
     public func query(jsonName:String,condition:Condition? = nil,values:[JSON] = []) throws ->[JSON]{
         try self.query(jsonName: jsonName, conditionStr: condition?.conditionCode, values: values)
     }
+    public func query(jsonName:String,keypath:String,condition:Condition? = nil,values:[JSON] = []) throws ->[JSON]{
+        try self.query(jsonName: jsonName,keypath: keypath, conditionStr: condition?.conditionCode, values: values)
+    }
     public func query(jsonName:String,conditionStr:String?,values:[JSON]) throws ->[JSON]{
         let c = conditionStr == nil ? "where json_valid(json) = 1" : "where \(conditionStr!) and json_valid(json) = 1"
         let sql = "select json_set(json,'$.rowid',rowid) from \(jsonName) " + c
@@ -569,4 +572,172 @@ extension Database{
         rs.close()
         return result
     }
+    public func query(jsonName:String,keypath:String,conditionStr:String?,values:[JSON]) throws ->[JSON]{
+        let c = conditionStr == nil ? "where json_valid(json) = 1" : "where \(conditionStr!) and json_valid(json) = 1"
+        let sql = "select json_extract(json,'$.\(keypath)') from \(jsonName) " + c
+        let rs = try self.query(sql: sql)
+        if values.count > 0{
+            for i in 1 ..< values.count + 1 {
+                rs.bind(index: Int32(i)).bind(value: values[i - 1])
+            }
+        }
+        var result:[JSON] = []
+        while(try rs.step()){
+            result.append(rs.column(index: 0, type: JSON.self).value())
+        }
+        rs.close()
+        return result
+    }
+    
+}
+
+
+@propertyWrapper
+public struct SettingIntKey{
+    public var name:String
+    public var keys:String
+    public var wrappedValue:Int?{
+        get {
+            var value:Int?
+            Setting.db.readSync { [self] db in
+                let json = try db.query(jsonName: self.name, keypath: self.keys).first
+                value = json?.int()
+            }
+            return value
+        }
+    }
+    public init(name:String,keys:String){
+        self.name = name
+        self.keys = keys
+    }
+}
+@propertyWrapper
+public struct SettingStringKey{
+    public var name:String
+    public var keys:String
+    public var wrappedValue:String?{
+        get {
+            var value:String?
+            Setting.db.readSync { [self] db in
+                let json = try db.query(jsonName: self.name, keypath: self.keys).first
+                value = json?.str()
+            }
+            return value
+        }
+    }
+    public init(name:String,keys:String){
+        self.name = name
+        self.keys = keys
+    }
+}
+@propertyWrapper
+public struct SettingDoubleKey{
+    public var name:String
+    public var keys:String
+    public var wrappedValue:Double?{
+        get {
+            var value:Double?
+            Setting.db.readSync { [self] db in
+                let json = try db.query(jsonName: self.name, keypath: self.keys).first
+                value = json?.double()
+            }
+            return value
+        }
+    }
+    public init(name:String,keys:String){
+        self.name = name
+        self.keys = keys
+    }
+}
+@propertyWrapper
+public struct SettingBoolKey{
+    public var name:String
+    public var keys:String
+    public var wrappedValue:Bool?{
+        get {
+            var value:Bool?
+            Setting.db.readSync { [self] db in
+                let json = try db.query(jsonName: self.name, keypath: self.keys).first
+                value = json?.bool()
+            }
+            return value
+        }
+    }
+    public init(name:String,keys:String){
+        self.name = name
+        self.keys = keys
+    }
+}
+@propertyWrapper
+public struct SettingDateKey{
+    public var name:String
+    public var keys:String
+    public var wrappedValue:Date?{
+        get {
+            var value:Date?
+            Setting.db.readSync { [self] db in
+                let json = try db.query(jsonName: self.name, keypath: self.keys).first
+                value = json?.date()
+            }
+            return value
+        }
+    }
+    public init(name:String,keys:String){
+        self.name = name
+        self.keys = keys
+    }
+}
+
+
+@propertyWrapper
+public struct Setting{
+    public var name:String
+    public static var db:DataBasePool = try! DataBasePool(name: "Setting")
+    public var wrappedValue:JSON?{
+        get{
+            self.query(name: name)
+        }
+        set{
+            if let js = Setting.keySetting[self.name], let newjs = newValue{
+                // update
+                var newv = newjs
+                let rowid:Int = js.rowid
+                newv.rowid = rowid
+                Setting.db.write { [self] db in
+                    try db.save(jsonName: self.name, json: newv)
+                }
+            }else{
+                // insert
+                let name:String = self.name
+                Setting.db.write { [self] db in
+                    if newValue == nil{
+                        try db.drop(name: name)
+                    }else{
+                        try db.insert(jsonName: self.name, json: newValue!)
+                    }
+                }
+            }
+        }
+    }
+    public func query(name:String)->JSON?{
+        if (Setting.keySetting[self.name] != nil){
+            return Setting.keySetting[self.name]
+        }else{
+            var json:JSON?
+            Setting.db.readSync { db in
+                json = try db.query(jsonName: self.name).first
+            }
+            return json
+        }
+    }
+    public init(name:String) {
+        self.name = name
+        if Setting.keySetting[name] == nil{
+            Setting.db.writeSync { db in
+                try db.create(jsonName: name)
+            }
+            Setting.keySetting[name] = self.query(name: name)
+        }
+    }
+    public static var keySetting:Map = Map<String,JSON>()
 }
