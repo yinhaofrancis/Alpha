@@ -19,7 +19,7 @@ class swfconcurrentcy: XCTestCase {
 
     func testExample() throws {
         pQueue().sync {
-            self.json = ["ab":"asda","o":123,"dd":Date().timeIntervalSince1970]
+            self.json = ["ab":"asda","o":["qq":123],"dd":Date().timeIntervalSince1970]
             XCTAssert(self.a == "asda")
             
             XCTAssert(self.b == 123)
@@ -36,7 +36,7 @@ class swfconcurrentcy: XCTestCase {
     @SettingStringKey(name:"ddd",keys:"ab")
     var a:String?
     
-    @SettingIntKey(name:"ddd",keys:"o")
+    @SettingIntKey(name:"ddd",keys:"o.qq")
     var b:Int?
     
     @SettingDateKey(name:"ddd",keys:"dd")
