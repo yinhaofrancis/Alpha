@@ -19,11 +19,20 @@ class swfconcurrentcy: XCTestCase {
 
     func testExample() throws {
         pQueue().sync {
-            self.json = ["ab":"asda","o":["qq":123],"dd":Date().timeIntervalSince1970]
-            XCTAssert(self.a == "asda")
+            self.json = ["ab":"asda","o":["qq":123,"pp":123.5,"k":true],"a":["a","b",["test":"dsds"]],"dd":"1988-08-09 12:22:33.123"]
+            XCTAssert(self.a == "dsds")
+            let df = DateFormatter()
+            df.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
             
             XCTAssert(self.b == 123)
-            print(self.d)
+            XCTAssert(self.json?.o.pp == 123.5)
+            XCTAssert(self.d == df.date(from: "1988-08-09 12:22:33.123"))
+            XCTAssert(self.bo == true)
+            XCTAssert(self.arr?[0].str() == "a")
+            XCTAssert(self.arr?[1].str() == "b")
+            XCTAssert(self.jso?.qq == 123)
+            XCTAssert(self.jso?.pp == 123.5)
+            XCTAssert(self.jso?.k == true)
             Setting.db.writeSync { db in
                 
             }
@@ -33,7 +42,7 @@ class swfconcurrentcy: XCTestCase {
     @Setting(name: "ddd")
     var json:JSON?
     
-    @SettingStringKey(name:"ddd",keys:"ab")
+    @SettingStringKey(name:"ddd",keys:"a[2].test")
     var a:String?
     
     @SettingIntKey(name:"ddd",keys:"o.qq")
@@ -41,6 +50,15 @@ class swfconcurrentcy: XCTestCase {
     
     @SettingDateKey(name:"ddd",keys:"dd")
     var d:Date?
+
+    @SettingBoolKey(name:"ddd",keys:"o.k")
+    var bo:Bool?
+    
+    @SettingArrayKey(name:"ddd",keys:"a")
+    var arr:[JSON]?
+    
+    @SettingObjectKey(name:"ddd",keys:"o")
+    var jso:JSON?
 }
 
 public struct pQueue{

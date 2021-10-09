@@ -392,6 +392,13 @@ public struct JSON:CustomStringConvertible,
         }
         return false
     }
+    public func array()->[JSON]{
+        if let str = self.content as? Array<JSON>{
+            return str
+        }else{
+            return []
+        }
+    }
     public func date()->Date{
         if let str = self.content as? String{
             let a = DateFormatter()
@@ -621,6 +628,44 @@ public struct SettingStringKey{
             Setting.db.readSync { [self] db in
                 let json = try db.query(jsonName: self.name, keypath: self.keys).first
                 value = json?.str()
+            }
+            return value
+        }
+    }
+    public init(name:String,keys:String){
+        self.name = name
+        self.keys = keys
+    }
+}
+@propertyWrapper
+public struct SettingArrayKey{
+    public var name:String
+    public var keys:String
+    public var wrappedValue:[JSON]?{
+        get {
+            var value:[JSON]?
+            Setting.db.readSync { [self] db in
+                let json = try db.query(jsonName: self.name, keypath: self.keys).first
+                value = json?.array()
+            }
+            return value
+        }
+    }
+    public init(name:String,keys:String){
+        self.name = name
+        self.keys = keys
+    }
+}
+@propertyWrapper
+public struct SettingObjectKey{
+    public var name:String
+    public var keys:String
+    public var wrappedValue:JSON?{
+        get {
+            var value:JSON?
+            Setting.db.readSync { [self] db in
+                value = try db.query(jsonName: self.name, keypath: self.keys).first
+                
             }
             return value
         }
