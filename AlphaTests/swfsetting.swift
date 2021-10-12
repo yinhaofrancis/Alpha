@@ -34,7 +34,14 @@ class swfsetting: XCTestCase {
             XCTAssert(self.jso?.pp == 123.5)
             XCTAssert(self.jso?.k == true)
             Setting.db.writeSync { db in
-                
+                let fc = Function(name: "make", nArg: 1) { fuc, argc in
+                    fuc.ret(v: fuc.valueJSON(index: 0)?.jsonString ?? "null")
+                }
+                db.addFunction(function: fc)
+                var a = self.json
+                a?.setKeyValue(dynamicMember: "rowid", json: nil)
+                try db.save(jsonName: "sss", json: a!)
+                try db.exec(sql: "select make(JSON) from sss")
             }
             
         }

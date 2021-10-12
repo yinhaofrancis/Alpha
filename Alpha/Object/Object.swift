@@ -583,7 +583,7 @@ public class ObjectRequest<T:Object>{
 
 @propertyWrapper
 public struct Request<T:Object>{
-    public var pool:DataBasePool = datapool
+    public var pool:DataBasePool = DataBasePool.default
     public var valueMap:[String:DataType]
     public var request:ObjectRequest<T>
     public var wrappedValue:[T]{
@@ -604,7 +604,7 @@ public struct Request<T:Object>{
 
 @propertyWrapper
 public struct JSONRequest{
-    public var pool:DataBasePool = datapool
+    public var pool:DataBasePool = DataBasePool.default
     public var keypath:String?
     public var key:String
     public var wrappedValue:[JSON]{

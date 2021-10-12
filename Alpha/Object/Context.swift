@@ -8,10 +8,12 @@
 import Foundation
 
 public class Context{
-    public let pool:DataBasePool
+    public var pool:DataBasePool = DataBasePool.default
     public var cache:[String:[String:Object]] = [:]
-    public init(name:String) throws {
-        self.pool = try DataBasePool(name: name)
+    public init(name:String = "") throws {
+        if name.count > 0{
+            self.pool = try DataBasePool(name: name)
+        }
     }
     public func request<T:Object>(request:ObjectRequest<T>,keyMap:[String:DataType] = [:])->[T]{
         var results:[T] = []
@@ -23,6 +25,7 @@ public class Context{
         }
         return results
     }
+    
     public func query<T:Object>(objct:T){
         if (objct.objectId.count > 0){
             self.pool.readSync { db in

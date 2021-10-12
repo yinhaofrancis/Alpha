@@ -249,6 +249,7 @@ public class DataBasePool{
         self.thread?.cancel()
         self.timer?.invalidate()
     }
+    public static let `default` = try! DataBasePool(name: "AlphaDB")
 }
 
-public let datapool = try! DataBasePool(name: "Alpha")
+

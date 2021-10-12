@@ -40,6 +40,9 @@ public class SQLContext{
         }
         sqlite3_result_int(c, Int32(v))
     }
+    public func ret(v:JSON){
+        self.ret(v: v.jsonString)
+    }
     public func ret(v:Int64){
         guard let c = ctx else {
             return
@@ -137,6 +140,15 @@ public class SQLContext{
     public func valueInt(index:Int)->Int{
         guard let p = self.valuePointer(index: index) else { return 0}
         return Int(sqlite3_value_int64(p))
+    }
+    public func valueJSON(index:Int)->JSON?{
+        let json = self.valueString(index: index)
+        let js = JSON(stringLiteral: json)
+        return js
+    }
+    public func valueString(index:Int)->String{
+        let str:String = self.value(index: index)
+        return str
     }
     public func valueType(index:Int)->ContextValueType{
         guard let p = self.valuePointer(index: index) else { return .Null}
