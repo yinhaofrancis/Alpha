@@ -238,6 +238,9 @@ public class DataBasePool{
         let db = try Database(url: self.url, readOnly: true)
         return db
     }
+    public var readDatabase:Database{
+        try! self.createReadOnly()
+    }
     deinit {
         self.wdb.close()
         for i in 0 ..< self.read.count {
@@ -247,3 +250,5 @@ public class DataBasePool{
         self.timer?.invalidate()
     }
 }
+
+public let datapool = try! DataBasePool(name: "Alpha")

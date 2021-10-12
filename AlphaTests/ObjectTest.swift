@@ -9,7 +9,6 @@ import XCTest
 @testable import Alpha
 class ObjectTest: XCTestCase {
 
-    let poor:DataBasePool = try! DataBasePool(name: "m")
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
@@ -22,7 +21,7 @@ class ObjectTest: XCTestCase {
         a.string = "dadad"
         a.stringw = "asdadasd"
         a.a = Int(arc4random())
-        self.poor.writeSync { db in
+        self.$aaa.writeSync{ db in
             try a.create(db: db)
             try a.insert(db: db)
             let pp = try ObjectRequest<a>(table: "a").query(db: db)
@@ -30,7 +29,12 @@ class ObjectTest: XCTestCase {
             print(pp)
             
         }
+        XCTAssert(self.aaa.first?.string == "dadad")
+        XCTAssert(self.aaa.first?.stringw == "asdadasd")
+        
     }
+    @Request(request: ObjectRequest(table: "a"))
+    var aaa:[a]
 }
 class a:Object{
     

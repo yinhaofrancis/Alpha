@@ -504,6 +504,9 @@ extension Database{
     }
     public func save(jsonName:String,json:JSON) throws{
         let id:Int = json.rowid
+        if try self.tableExists(name: jsonName) == false {
+            try self.create(jsonName: jsonName)
+        }
         if id > 0{
             try self.update(jsonName: jsonName, json: json)
         }else{

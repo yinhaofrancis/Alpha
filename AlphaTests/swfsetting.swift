@@ -39,6 +39,16 @@ class swfsetting: XCTestCase {
             
         }
     }
+    func testEx() throws {
+        pQueue().sync {
+            let jj:JSON = ["ab":"asda","o":["qq":123,"pp":123.5,"k":true],"a":["a","b",["test":"dsds"]],"dd":"1988-08-09 12:22:33.123"]
+            self.$j.writeSync { db in
+                try db.save(jsonName: "aaa", json: jj)
+            }
+            print(self.j)
+        }
+    }
+    
     @Setting(name: "ddd")
     var json:JSON?
     
@@ -59,6 +69,9 @@ class swfsetting: XCTestCase {
     
     @SettingObjectKey(name:"ddd",keys:"o")
     var jso:JSON?
+    
+    @JSONRequest(key: "aaa")
+    var j:[JSON]
 }
 
 public struct pQueue{
