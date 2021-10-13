@@ -19,10 +19,13 @@ public typealias FinalFunction<T:Function> = (T)->Void
 
 
 
+/// SQL 上下文
 public class SQLContext{
     public var ctx:OpaquePointer?
     public var values:UnsafeMutablePointer<OpaquePointer?>?
     public var argc:Int32 = 0
+    /// 返回
+    /// - Parameter v: 整数
     public func ret(v:Int){
         guard let c = ctx else {
             return
@@ -34,21 +37,29 @@ public class SQLContext{
         }
         
     }
+    /// 返回
+    /// - Parameter v: 整数
     public func ret(v:Int32){
         guard let c = ctx else {
             return
         }
         sqlite3_result_int(c, Int32(v))
     }
+    /// 返回
+    /// - Parameter v: JSON
     public func ret(v:JSON){
         self.ret(v: v.jsonString)
     }
+    /// 返回
+    /// - Parameter v: 整数
     public func ret(v:Int64){
         guard let c = ctx else {
             return
         }
         sqlite3_result_int64(c, Int64(v))
     }
+    /// 返回
+    /// - Parameter v: 字符串
     public func ret(v:String){
         guard let sc = ctx else {
             return
@@ -63,6 +74,8 @@ public class SQLContext{
             p?.deallocate()
         }
     }
+    /// 返回
+    /// - Parameter v: data
     public func ret(v:Data){
         guard let sc = ctx else {
             return
@@ -74,24 +87,34 @@ public class SQLContext{
             sqlite3_free(p)
         }
     }
+    /// 返回
+    /// - Parameter v: 浮点数
     public func ret(v:Float){
         guard let sc = ctx else {
             return
         }
         sqlite3_result_double(sc, Double(v))
     }
+    /// 返回
+    /// - Parameter v: 浮点数
     public func ret(v:Double){
         guard let sc = ctx else {
             return
         }
         sqlite3_result_double(sc, v)
     }
+    /// 返回
+    ///
     public func ret(){
         guard let sc = ctx else {
             return
         }
         sqlite3_result_null(sc)
     }
+    /// 返回错误
+    /// - Parameters:
+    ///   - error: 错误文本
+    ///   - code: 错误码
     public func ret(error:String,code:Int32){
         guard let sc = ctx else {
             return
@@ -99,6 +122,9 @@ public class SQLContext{
         sqlite3_result_error(sc, error, Int32(error.utf8.count))
         sqlite3_result_error_code(sc, code)
     }
+    /// 调用参数
+    /// - Parameter index: 参数index
+    /// - Returns: 参数
     public func value(index:Int)->Int{
         guard let p = self.valuePointer(index: index) else { return 0}
         if MemoryLayout<Int>.size == 4{
@@ -107,6 +133,9 @@ public class SQLContext{
             return Int(sqlite3_value_int64(p))
         }
     }
+    /// 调用参数
+    /// - Parameter index: 参数index
+    /// - Returns: 参数
     public func valuePointer(index:Int)->OpaquePointer?{
         guard let vs = self.values else { return nil }
         guard let p = vs.advanced(by: index).pointee else { return nil }
@@ -117,39 +146,66 @@ public class SQLContext{
         guard let p = self.valuePointer(index: index) else { return }
         sqlite3_value_nochange(p)
     }
+    /// 调用参数
+    /// - Parameter index: 参数index
+    /// - Returns: 参数
     public func value(index:Int)->Int32{
         guard let p = self.valuePointer(index: index) else { return 0}
         return sqlite3_value_int(p)
     }
+    /// 调用参数
+    /// - Parameter index: 参数index
+    /// - Returns: 参数
     public func value(index:Int)->Int64{
         guard let p = self.valuePointer(index: index) else { return 0}
         return sqlite3_value_int64(p)
     }
+    /// 调用参数
+    /// - Parameter index: 参数index
+    /// - Returns: 参数
     public func value(index:Int)->Double{
         guard let p = self.valuePointer(index: index) else { return 0}
         return sqlite3_value_double(p)
     }
+    /// 调用参数
+    /// - Parameter index: 参数index
+    /// - Returns: 参数
     public func value(index:Int)->Float{
         guard let p = self.valuePointer(index: index) else { return 0}
         return Float(sqlite3_value_double(p))
     }
+    /// 调用参数
+    /// - Parameter index: 参数index
+    /// - Returns: 参数
     public func value(index:Int)->String{
         guard let p = self.valuePointer(index: index) else { return ""}
         return String(cString: sqlite3_value_text(p))
     }
+    /// 调用参数
+    /// - Parameter index: 参数index
+    /// - Returns: 参数
     public func valueInt(index:Int)->Int{
         guard let p = self.valuePointer(index: index) else { return 0}
         return Int(sqlite3_value_int64(p))
     }
+    /// 调用参数
+    /// - Parameter index: 参数index
+    /// - Returns: 参数
     public func valueJSON(index:Int)->JSON?{
         let json = self.valueString(index: index)
         let js = JSON(stringLiteral: json)
         return js
     }
+    /// 调用参数
+    /// - Parameter index: 参数index
+    /// - Returns: 参数
     public func valueString(index:Int)->String{
         let str:String = self.value(index: index)
         return str
     }
+    /// 调用参数类型
+    /// - Parameter index: 参数index
+    /// - Returns: 参数类型
     public func valueType(index:Int)->ContextValueType{
         guard let p = self.valuePointer(index: index) else { return .Null}
         let type = sqlite3_value_type(p)
@@ -184,9 +240,15 @@ public class Function:SQLContext{
     public weak var db:Database?
     public let call:CallFunction<Function>
     
+    /// 函数类型
     public var funtionType:FunctionType{
         .scalar
     }
+    /// 创建函数
+    /// - Parameters:
+    ///   - name: 函数名
+    ///   - nArg: 参数个数
+    ///   - handle: 函数block
     public init(name:String,nArg:Int32,handle:@escaping CallFunction<Function>) {
         self.name = name
         self.nArg = nArg
@@ -198,6 +260,12 @@ public class Function:SQLContext{
 public class AggregateFunction:Function{
     public let final:FinalFunction<AggregateFunction>
     public let step:CallFunction<AggregateFunction>
+    /// 创建函数
+    /// - Parameters:
+    ///   - name: 函数名
+    ///   - nArg: 参数个数
+    ///   - step: 迭代函数体
+    ///   - final: 结果函数体
     public init(name:String,nArg:Int32,step:@escaping CallFunction<AggregateFunction>,final:@escaping FinalFunction<AggregateFunction>) {
         self.final = final
         self.step = step
@@ -205,13 +273,18 @@ public class AggregateFunction:Function{
             
         }
     }
+    /// 函数类型
     public override var funtionType: FunctionType{
         return .aggregate
     }
+    /// 函数上下文创建
+    /// - Returns: 上下问对象
     public func aggregateContext<T:AnyObject>(type:T.Type)->T {
         let p = sqlite3_aggregate_context(self.ctx!, Int32(MemoryLayout<T>.size))
         return Unmanaged<T>.fromOpaque(p!).takeUnretainedValue()
     }
+    /// 函数上下文创建
+    /// - Returns: 上下问对象
     public func aggregateContext<T>(type:T.Type)->UnsafeMutablePointer<T> {
         let p = sqlite3_aggregate_context(self.ctx!, Int32(MemoryLayout<T>.size))
         let struc = (p?.assumingMemoryBound(to: type))!
@@ -219,6 +292,8 @@ public class AggregateFunction:Function{
     }
 }
 extension Database{
+    /// 函数时注册
+    /// - Parameter function: 函数
     public func addFunction(function:Function){
         function.db = self
         if function.funtionType == .aggregate{

@@ -17,6 +17,8 @@ public class DataBasePool{
     }
     
     
+    /// 数据库地址
+    /// - Returns: url
     static public func checkDir() throws->URL{
         let name = Bundle.main.bundleIdentifier ?? "main" + ".Database"
         let url = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true).appendingPathComponent(name)
@@ -27,6 +29,8 @@ public class DataBasePool{
         }
         return url
     }
+    /// 数据库备份地址
+    /// - Returns: url
     static public func checkBackUpDir() throws->URL{
         let name = (Bundle.main.bundleIdentifier ?? "main" + ".Database") + ".back"
         let url = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true).appendingPathComponent(name)
@@ -49,13 +53,15 @@ public class DataBasePool{
     private var thread:Thread?
     private var timer:Timer?
     private var multiWrite:Bool = false
+    /// 数据库创建
+    /// - Parameter name: 数据库名
     public init(name:String) throws {
         
-        self.wdb = try DataBasePool.createExtraDb(name: name)
+        self.wdb = try DataBasePool.createDb(name: name)
         if try wdb.integrityCheck() == false{
             self.wdb.close()
             try? DataBasePool.restore(name: name)
-            self.wdb = try DataBasePool.createExtraDb(name: name)
+            self.wdb = try DataBasePool.createDb(name: name)
         }
         self.dbName = name
         self.wdb.foreignKey = true
@@ -68,7 +74,10 @@ public class DataBasePool{
         self.thread?.start()
         
     }
-    public static func createExtraDb(name:String) throws ->Database{
+    /// 创建数据库
+    /// - Parameter name: 数据名
+    /// - Returns: DB
+    public static func createDb(name:String) throws ->Database{
         let url = try DataBasePool.checkDir().appendingPathComponent(name)
         let back = try DataBasePool.checkBackUpDir().appendingPathComponent(name)
         
@@ -80,6 +89,8 @@ public class DataBasePool{
         
         return try Database(url: url)
     }
+    /// 数据写入模式
+    /// - Parameter mode: 模式
     public func loadMode(mode:Mode) throws {
         try self.queue.sync {
             switch mode {
@@ -100,6 +111,8 @@ public class DataBasePool{
             }
         }
     }
+    /// 数据库配置
+    /// - Parameter callback: 操作
     public func config(callback:@escaping (Database) throws->Void){
         self.queue.sync(execute: DispatchWorkItem(flags: .barrier, block: {
             do{
@@ -109,6 +122,8 @@ public class DataBasePool{
             }
         }))
     }
+    /// 只读
+    /// - Parameter callback: 事务
     public func read(callback:@escaping (Database) throws->Void){
         self.queue.async {
             do {
@@ -126,6 +141,8 @@ public class DataBasePool{
             }
         }
     }
+    /// 只读
+    /// - Parameter callback: 事务
     public func readSync(callback:@escaping (Database) throws->Void){
         self.queue.sync {
             do {
@@ -143,8 +160,10 @@ public class DataBasePool{
             }
         }
     }
+    /// 事务
+    /// - Parameter callback: 事务
     public func transaction(callback:@escaping (Database) throws ->Bool){
-        self.queue.async(execute: DispatchWorkItem(flags: .barrier, block: {
+        self.queue.async(execute: DispatchWorkItem(flags: self.multiWrite ? .inheritQoS : .barrier, block: {
             let db = self.wdb
             do {
                 try db.begin()
@@ -159,8 +178,10 @@ public class DataBasePool{
             }
         }))
     }
+    /// 事务
+    /// - Parameter callback: 事务
     public func transactionSync(callback:@escaping (Database) throws ->Bool){
-        self.queue.sync(execute: DispatchWorkItem(flags: self.multiWrite ? .barrier : .inheritQoS, block: {
+        self.queue.sync(execute: DispatchWorkItem(flags: self.multiWrite ? .inheritQoS : .barrier, block: {
             let db = self.wdb
             do {
                 try db.begin()
@@ -176,7 +197,7 @@ public class DataBasePool{
         }))
     }
     public func perform(callback:@escaping (Database) throws ->Void){
-        self.queue.sync(execute: DispatchWorkItem(flags: self.multiWrite ? .barrier : .inheritQoS, block: {
+        self.queue.sync(execute: DispatchWorkItem(flags:.inheritQoS, block: {
             let db = self.wdb
             do {
                 try callback(db)
@@ -195,18 +216,23 @@ public class DataBasePool{
             }
         }))
     }
+    /// 读写
+    /// - Parameter callback: 读写事物
     public func write(callback:@escaping (Database) throws ->Void){
         self.transaction(callback: { db in
             try callback(db)
             return true
         })
     }
+    /// 读写
+    /// - Parameter callback: 读写事物
     public func writeSync(callback:@escaping (Database) throws ->Void){
         self.transactionSync(callback: { db in
             try callback(db)
             return true
         })
     }
+    ///  备份
     public func backup(){
         self.read { db in
             let u = try DataBasePool.checkBackUpDir().appendingPathComponent(self.dbName)
