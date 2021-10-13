@@ -65,9 +65,18 @@ public class Database:Hashable{
     /// - Parameters:
     ///   - url: 数据库地址
     ///   - readOnly: 只读
-    public init(url:URL,readOnly:Bool = false) throws{
+//    public convenience init(url:URL,readOnly:Bool = false) throws{
+//        try self.init(url: url, readOnly: readOnly, writeLock: true)
+//    }
+    ///
+    /// 创建Sqlite3 数据库
+    /// - Parameters:
+    ///   - url: 数据库地址
+    ///   - readOnly: 只读
+    ///   - writeLock: 写锁
+    init(url:URL,readOnly:Bool,writeLock:Bool) throws{
         self.url = url
-        let r = readOnly ? SQLITE_OPEN_READONLY | SQLITE_OPEN_NOMUTEX  : (SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX)
+        let r = readOnly ? SQLITE_OPEN_READONLY | SQLITE_OPEN_NOMUTEX  : (SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | (writeLock ? SQLITE_OPEN_FULLMUTEX: SQLITE_OPEN_NOMUTEX))
         sqlite3_open_v2(url.path, &self.sqlite, r , nil)
         if(self.sqlite == nil){
             throw NSError(domain: "create sqlite3 fail", code: 0, userInfo: ["url":url])

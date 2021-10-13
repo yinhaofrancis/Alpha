@@ -72,68 +72,23 @@ class OtherTests: XCTestCase {
             }
         }
     }
-    
-    func testVTab() throws{
-        let poor:DataBasePool = try! DataBasePool(name: "mdm")
+    func testMulti() throws{
+        let que = DispatchQueue.global()
         
-        poor.write { db in
-            let a:JSON = ["a":"dasdasd","b":1,"c":1.3]
-            try db.insert(jsonName: "a", json: a)
-            try db.exec(sql: "PRAGMA database_list;")
+        let a = try Database(url: try DataBasePool.checkDir().appendingPathComponent("dd"))
+        try a.setJournalMode(.WAL)
+        try a.synchronous(mode: .NORMAL)
+        try a.create(jsonName: "a")
+        for i in 0 ..< 100{
+            
+            que.async {
+                try! a.begin()
+                try! a.save(jsonName: "a", json: ["dsds":"dadasd\(i)","dasda":"dasd"])
+                try! a.commit()
+            }
+            
         }
-        try poor.loadMode(mode: .WAL)
-        measure {
-            let wa = XCTestExpectation(description: "dsdd")
-            poor.write { db in
-                for i in 0 ..< 10000{
-                    try db.exec(sql: "insert into a values('asdadsdadasd\(i)')")
-                }
-            }
-            poor.write { db in
-                for i in 0 ..< 10000{
-                    try db.exec(sql: "insert into a values('asdadsdadasd\(i)')")
-                }
-            }
-            poor.write { db in
-                for i in 0 ..< 10000{
-                    try db.exec(sql: "insert into a values('asdadsdadasd\(i)')")
-                }
-            }
-            poor.write { db in
-                for i in 0 ..< 10000{
-                    try db.exec(sql: "insert into a values('asdadsdadasd\(i)')")
-                }
-            }
-            poor.write { db in
-                for i in 0 ..< 10000{
-                    try db.exec(sql: "insert into a values('asdadsdadasd\(i)')")
-                }
-            }
-            poor.barrier { _ in
-                wa.fulfill()
-            }
-            wait(for: [wa], timeout: TimeInterval.infinity)
-        }
+        RunLoop.main.run()
     }
-//    func testPragame() throws{
-//        let db = try Database(url: try! DataBasePool.checkDir().appendingPathComponent("aaaa"))
-//        let vm = VModule(name: "aa") { v in
-//            return "create table \(v[0])(i,j,a hidden,b hidden)"
-//        }
-//        vm.isXUpdate = true
-//        try vm.loadModule(db: db)
-//        try db.exec(sql: "create virtual table if not exists aap using aa(1,2)")
-//        try db.exec(sql: "insert into aap values(\(arc4random()),222)")
-//        try db.exec(sql: "select * from aap where (i = 10 or j > 100 and i > 1000)")
-//        try db.exec(sql: "select * from aap")
-//        try db.exec(sql: "select * from aap where i > 100")
-//        let json = try db.query(sql: "select * from aap where (i < 10 or j < 0)")
-//        while try json.step() {
-//            print(json.column(index: 0, type: String.self).value(),
-//                  json.column(index: 1, type: String.self).value())
-//        }
-//        json.close()
-//        try db.exec(sql: "update aa set i = 10 where j > 0")
-//    }
 }
 

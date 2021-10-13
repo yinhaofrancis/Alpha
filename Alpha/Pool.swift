@@ -52,7 +52,6 @@ public class DataBasePool{
     private var dbName:String
     private var thread:Thread?
     private var timer:Timer?
-    private var multiWrite:Bool = false
     /// 数据库创建
     /// - Parameter name: 数据库名
     public init(name:String) throws {
@@ -77,7 +76,7 @@ public class DataBasePool{
     /// 创建数据库
     /// - Parameter name: 数据名
     /// - Returns: DB
-    public static func createDb(name:String) throws ->Database{
+    public static func createDb(name:String,readOnly: Bool = false,writeLock: Bool = true) throws ->Database{
         let url = try DataBasePool.checkDir().appendingPathComponent(name)
         let back = try DataBasePool.checkBackUpDir().appendingPathComponent(name)
         
@@ -87,7 +86,7 @@ public class DataBasePool{
             try? DataBasePool.restore(name: name)
         }
         
-        return try Database(url: url)
+        return try Database(url: url,readOnly: readOnly,writeLock: writeLock)
     }
     /// 数据写入模式
     /// - Parameter mode: 模式
@@ -95,17 +94,14 @@ public class DataBasePool{
         try self.queue.sync {
             switch mode {
             case .ACP:
-                self.multiWrite = true
                 try self.wdb.synchronous(mode: .NORMAL)
                 try self.wdb.setJournalMode(.WAL)
                 try self.wdb.checkpoint(type: .passive, log: 100, total: 300)
             case .WAL:
                 try self.wdb.synchronous(mode: .FULL)
                 try self.wdb.setJournalMode(.WAL)
-                self.multiWrite = false
                 try self.wdb.checkpoint(type: .passive, log: 100, total: 300)
             case .DELETE:
-                self.multiWrite = false
                 try self.wdb.synchronous(mode: .FULL)
                 try self.wdb.setJournalMode(.DELETE)
             }
@@ -163,7 +159,7 @@ public class DataBasePool{
     /// 事务
     /// - Parameter callback: 事务
     public func transaction(callback:@escaping (Database) throws ->Bool){
-        self.queue.async(execute: DispatchWorkItem(flags: self.multiWrite ? .inheritQoS : .barrier, block: {
+        self.queue.async(execute: DispatchWorkItem(flags: .barrier, block: {
             let db = self.wdb
             do {
                 try db.begin()
@@ -181,7 +177,7 @@ public class DataBasePool{
     /// 事务
     /// - Parameter callback: 事务
     public func transactionSync(callback:@escaping (Database) throws ->Bool){
-        self.queue.sync(execute: DispatchWorkItem(flags: self.multiWrite ? .inheritQoS : .barrier, block: {
+        self.queue.sync(execute: DispatchWorkItem(flags: .barrier, block: {
             let db = self.wdb
             do {
                 try db.begin()
@@ -250,7 +246,7 @@ public class DataBasePool{
                 if FileManager.default.fileExists(atPath: ur.path){
                     try FileManager.default.removeItem(at: ur)
                 }
-                let source = try Database(url: u, readOnly: true)
+                let source = try Database(url: u, readOnly: true, writeLock: true)
                 try BackupDatabase(url: ur, source: source).backup()
             }catch{
                 print("restore fail \(error)")
@@ -261,7 +257,7 @@ public class DataBasePool{
         if let db = self.read.removeFirst(){
             return db
         }
-        let db = try Database(url: self.url, readOnly: true)
+        let db = try Database(url: self.url, readOnly: true, writeLock: true)
         return db
     }
     public var readDatabase:Database{
