@@ -82,13 +82,12 @@ class OtherTests: XCTestCase {
         for i in 0 ..< 100{
             
             que.async {
-                try! a.begin()
+//                try! a.begin()
                 try! a.save(jsonName: "a", json: ["dsds":"dadasd\(i)","dasda":"dasd"])
-                try! a.commit()
+//                try! a.commit()
             }
             
         }
-        RunLoop.main.run()
     }
 }
 

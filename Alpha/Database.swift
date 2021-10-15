@@ -65,9 +65,9 @@ public class Database:Hashable{
     /// - Parameters:
     ///   - url: 数据库地址
     ///   - readOnly: 只读
-//    public convenience init(url:URL,readOnly:Bool = false) throws{
-//        try self.init(url: url, readOnly: readOnly, writeLock: true)
-//    }
+    public convenience init(url:URL,readOnly:Bool = false) throws{
+        try self.init(url: url, readOnly: readOnly, writeLock: true)
+    }
     ///
     /// 创建Sqlite3 数据库
     /// - Parameters:
