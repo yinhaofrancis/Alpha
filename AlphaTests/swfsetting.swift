@@ -20,6 +20,7 @@ class swfsetting: XCTestCase {
     func testExample() throws {
         pQueue().sync {
             self.json = ["ab":"asda","o":["qq":123,"pp":123.5,"k":true],"a":["a","b",["test":"dsds"]],"dd":"1988-08-09 12:22:33.123"]
+            
             XCTAssert(self.a == "dsds")
             let df = DateFormatter()
             df.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
@@ -33,17 +34,15 @@ class swfsetting: XCTestCase {
             XCTAssert(self.jso?.qq == 123)
             XCTAssert(self.jso?.pp == 123.5)
             XCTAssert(self.jso?.k == true)
-            Setting.db.writeSync { db in
-                let fc = Function(name: "make", nArg: 1) { fuc, argc in
-                    fuc.ret(v: fuc.valueJSON(index: 0)?.jsonString ?? "null")
-                }
-                db.addFunction(function: fc)
-                var a = self.json
-                a?.setKeyValue(dynamicMember: "rowid", json: nil)
-                try db.save(jsonName: "sss", json: a!)
-                try db.exec(sql: "select make(JSON) from sss")
+            var a = self.json
+            let db = Setting.db
+            let fc = Function(name: "make", nArg: 1) { fuc, argc in
+                fuc.ret(v: fuc.valueJSON(index: 0)?.jsonString ?? "null")
             }
-            
+            db.addFunction(function: fc)
+            a?.setKeyValue(dynamicMember: "rowid", json: nil)
+            try? db.save(jsonName: "sss", json: a!)
+            try? db.exec(sql: "select make(JSON) from sss")
         }
     }
     func testEx() throws {

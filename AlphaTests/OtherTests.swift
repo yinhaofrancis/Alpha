@@ -76,8 +76,6 @@ class OtherTests: XCTestCase {
         let que = DispatchQueue.global()
         
         let a = try Database(url: try DataBasePool.checkDir().appendingPathComponent("dd"))
-        try a.setJournalMode(.WAL)
-        try a.synchronous(mode: .NORMAL)
         try a.create(jsonName: "a")
         for i in 0 ..< 100{
             

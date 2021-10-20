@@ -608,12 +608,7 @@ public struct SettingIntKey{
     public var keys:String
     public var wrappedValue:Int?{
         get {
-            var value:Int?
-            Setting.db.readSync { [self] db in
-                let json = try db.query(jsonName: self.name, keypath: self.keys).first
-                value = json?.int()
-            }
-            return value
+            return try? Setting.db.query(jsonName: self.name, keypath: self.keys).first?.int()
         }
     }
     public init(name:String,keys:String){
@@ -627,12 +622,7 @@ public struct SettingStringKey{
     public var keys:String
     public var wrappedValue:String?{
         get {
-            var value:String?
-            Setting.db.readSync { [self] db in
-                let json = try db.query(jsonName: self.name, keypath: self.keys).first
-                value = json?.str()
-            }
-            return value
+            return try? Setting.db.query(jsonName: self.name, keypath: self.keys).first?.str()
         }
     }
     public init(name:String,keys:String){
@@ -646,12 +636,7 @@ public struct SettingArrayKey{
     public var keys:String
     public var wrappedValue:[JSON]?{
         get {
-            var value:[JSON]?
-            Setting.db.readSync { [self] db in
-                let json = try db.query(jsonName: self.name, keypath: self.keys).first
-                value = json?.array()
-            }
-            return value
+            return try? Setting.db.query(jsonName: self.name, keypath: self.keys).first?.array()
         }
     }
     public init(name:String,keys:String){
@@ -665,12 +650,7 @@ public struct SettingObjectKey{
     public var keys:String
     public var wrappedValue:JSON?{
         get {
-            var value:JSON?
-            Setting.db.readSync { [self] db in
-                value = try db.query(jsonName: self.name, keypath: self.keys).first
-                
-            }
-            return value
+            return try? Setting.db.query(jsonName: self.name, keypath: self.keys).first
         }
     }
     public init(name:String,keys:String){
@@ -684,12 +664,7 @@ public struct SettingDoubleKey{
     public var keys:String
     public var wrappedValue:Double?{
         get {
-            var value:Double?
-            Setting.db.readSync { [self] db in
-                let json = try db.query(jsonName: self.name, keypath: self.keys).first
-                value = json?.double()
-            }
-            return value
+            return try? Setting.db.query(jsonName: self.name, keypath: self.keys).first?.double()
         }
     }
     public init(name:String,keys:String){
@@ -703,12 +678,7 @@ public struct SettingBoolKey{
     public var keys:String
     public var wrappedValue:Bool?{
         get {
-            var value:Bool?
-            Setting.db.readSync { [self] db in
-                let json = try db.query(jsonName: self.name, keypath: self.keys).first
-                value = json?.bool()
-            }
-            return value
+            return try? Setting.db.query(jsonName: self.name, keypath: self.keys).first?.bool()
         }
     }
     public init(name:String,keys:String){
@@ -722,12 +692,7 @@ public struct SettingDateKey{
     public var keys:String
     public var wrappedValue:Date?{
         get {
-            var value:Date?
-            Setting.db.readSync { [self] db in
-                let json = try db.query(jsonName: self.name, keypath: self.keys).first
-                value = json?.date()
-            }
-            return value
+            return try? Setting.db.query(jsonName: self.name, keypath: self.keys).first?.date()
         }
     }
     public init(name:String,keys:String){
@@ -740,7 +705,7 @@ public struct SettingDateKey{
 @propertyWrapper
 public struct Setting{
     public var name:String
-    public static var db:DataBasePool = try! DataBasePool(name: "Setting")
+    public static var db:Database = try! DataBasePool.createDb(name: "setting")
     public var wrappedValue:JSON?{
         get{
             self.query(name: name)
@@ -751,18 +716,14 @@ public struct Setting{
                 var newv = newjs
                 let rowid:Int = js.rowid
                 newv.rowid = rowid
-                Setting.db.write { [self] db in
-                    try db.save(jsonName: self.name, json: newv)
-                }
+                try? Setting.db.save(jsonName: self.name, json: newv)
             }else{
                 // insert
                 let name:String = self.name
-                Setting.db.write { [self] db in
-                    if newValue == nil{
-                        try db.drop(name: name)
-                    }else{
-                        try db.insert(jsonName: self.name, json: newValue!)
-                    }
+                if newValue == nil{
+                    try? Setting.db.drop(name: name)
+                }else{
+                    try? Setting.db.insert(jsonName: self.name, json: newValue!)
                 }
             }
         }
@@ -771,19 +732,13 @@ public struct Setting{
         if (Setting.keySetting[self.name] != nil){
             return Setting.keySetting[self.name]
         }else{
-            var json:JSON?
-            Setting.db.readSync { db in
-                json = try db.query(jsonName: self.name).first
-            }
-            return json
+            return try? Setting.db.query(jsonName: self.name).first
         }
     }
     public init(name:String) {
         self.name = name
         if Setting.keySetting[name] == nil{
-            Setting.db.writeSync { db in
-                try db.create(jsonName: name)
-            }
+            try? Setting.db.create(jsonName: name)
             Setting.keySetting[name] = self.query(name: name)
         }
     }
