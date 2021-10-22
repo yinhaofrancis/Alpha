@@ -8,11 +8,9 @@
 import Foundation
 
 public class Context{
-    private var pool:DataBasePool = DataBasePool.default
-    public init(name:String = "") throws {
-        if name.count > 0{
-            self.pool = try DataBasePool(name: name)
-        }
+    private var pool:DataBasePool
+    public init(name:String = "context") throws {
+        self.pool = try DataBasePool(name: name)
     }
     public func request<T:Object>(request:ObjectRequest<T>,keyMap:[String:DataType] = [:])->[T]{
         var results:[T] = []
