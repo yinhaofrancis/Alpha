@@ -8,8 +8,7 @@
 import Foundation
 
 public class Context{
-    public var pool:DataBasePool = DataBasePool.default
-    public var cache:[String:[String:Object]] = [:]
+    private var pool:DataBasePool = DataBasePool.default
     public init(name:String = "") throws {
         if name.count > 0{
             self.pool = try DataBasePool(name: name)
