@@ -583,48 +583,52 @@ public class ObjectRequest<T:Object>{
 
 @propertyWrapper
 public struct Request<T:Object>{
-    public var pool:DataBasePool = DataBasePool.default
+    private var db:Database = try! DataBasePool.createDb(name: "db")
     public var valueMap:[String:DataType]
     public var request:ObjectRequest<T>
     public var wrappedValue:[T]{
         var w:[T] = []
-        self.pool.readSync { db in
+        do {
             w = try request.query(db: db, valueMap: self.valueMap)
+        } catch  {
+            return []
         }
+        
         return w
     }
     public init(vm:[String:DataType] = [:],request:ObjectRequest<T>){
         self.request = request
         self.valueMap = vm
     }
-    public var projectedValue:DataBasePool{
-        return self.pool
+    public var projectedValue:Database{
+        return self.db
     }
 }
 
 @propertyWrapper
 public struct JSONRequest{
-    public var pool:DataBasePool = DataBasePool.default
+    private var db:Database = try! DataBasePool.createDb(name: "db")
     public var keypath:String?
     public var key:String
     public var wrappedValue:[JSON]{
-        
         var json:[JSON] = []
-        self.pool.readSync { db in
+        do {
             if let ky = self.keypath{
                 json = try db.query(jsonName: self.key, keypath: ky)
             }else{
                 json = try db.query(jsonName: self.key)
             }
-            
+        } catch  {
+            return []
         }
+        
         return json
     }
     public init(key:String,keypath:String? = nil){
         self.key = key
         self.keypath = keypath
     }
-    public var projectedValue:DataBasePool{
-        return self.pool
+    public var projectedValue:Database{
+        return self.db
     }
 }
