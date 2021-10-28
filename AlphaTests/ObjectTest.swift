@@ -7,6 +7,7 @@
 
 import XCTest
 @testable import Alpha
+import zlib
 class ObjectTest: XCTestCase {
 
     override func setUpWithError() throws {
@@ -28,7 +29,6 @@ class ObjectTest: XCTestCase {
         print(pp)
         XCTAssert(self.aaa.first?.string == "dadad")
         XCTAssert(self.aaa.first?.stringw == "asdadasd")
-        
     }
     @Request(request: ObjectRequest(table: "a"))
     var aaa:[a]

@@ -8,7 +8,7 @@
 import Foundation
 
 public class Context{
-    private var pool:DataBasePool
+    public private(set) var pool:DataBasePool
     public init(name:String = "context") throws {
         self.pool = try DataBasePool(name: name)
     }
