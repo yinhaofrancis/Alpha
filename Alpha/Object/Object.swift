@@ -588,12 +588,13 @@ public struct Request<T:Object>{
     public var request:ObjectRequest<T>
     public var wrappedValue:[T]{
         var w:[T] = []
-        do {
-            w = try request.query(db: db, valueMap: self.valueMap)
-        } catch  {
-            return []
+        JSONRequest.queue.sync {
+            do {
+                w = try request.query(db: db, valueMap: self.valueMap)
+            } catch  {
+                w = []
+            }
         }
-        
         return w
     }
     public init(vm:[String:DataType] = [:],request:ObjectRequest<T>){
@@ -608,20 +609,22 @@ public struct Request<T:Object>{
 @propertyWrapper
 public struct JSONRequest{
     private var db:Database = try! DataBasePool.createDb(name: "db")
+    fileprivate static var queue:DispatchQueue = DispatchQueue(label: "request", qos: .background, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil)
     public var keypath:String?
     public var key:String
     public var wrappedValue:[JSON]{
         var json:[JSON] = []
-        do {
-            if let ky = self.keypath{
-                json = try db.query(jsonName: self.key, keypath: ky)
-            }else{
-                json = try db.query(jsonName: self.key)
+        JSONRequest.queue.sync {
+            do {
+                if let ky = self.keypath{
+                    json = try db.query(jsonName: self.key, keypath: ky)
+                }else{
+                    json = try db.query(jsonName: self.key)
+                }
+            } catch  {
+                json = []
             }
-        } catch  {
-            return []
         }
-        
         return json
     }
     public init(key:String,keypath:String? = nil){

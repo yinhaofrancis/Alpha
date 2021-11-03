@@ -706,25 +706,32 @@ public struct SettingDateKey{
 public struct Setting{
     public var name:String
     public static var db:Database = try! DataBasePool.createDb(name: "setting")
+    public static var queue:DispatchQueue = DispatchQueue(label: "setting")
+    fileprivate func setValue(_ newValue: JSON?) {
+        if let js = Setting.keySetting[self.name], let newjs = newValue{
+            // update
+            var newv = newjs
+            let rowid:Int = js.rowid
+            newv.rowid = rowid
+            try? Setting.db.save(jsonName: self.name, json: newv)
+        }else{
+            // insert
+            let name:String = self.name
+            if newValue == nil{
+                try? Setting.db.drop(name: name)
+            }else{
+                try? Setting.db.insert(jsonName: self.name, json: newValue!)
+            }
+        }
+    }
+    
     public var wrappedValue:JSON?{
         get{
             self.query(name: name)
         }
         set{
-            if let js = Setting.keySetting[self.name], let newjs = newValue{
-                // update
-                var newv = newjs
-                let rowid:Int = js.rowid
-                newv.rowid = rowid
-                try? Setting.db.save(jsonName: self.name, json: newv)
-            }else{
-                // insert
-                let name:String = self.name
-                if newValue == nil{
-                    try? Setting.db.drop(name: name)
-                }else{
-                    try? Setting.db.insert(jsonName: self.name, json: newValue!)
-                }
+            Setting.queue.sync {
+                setValue(newValue)
             }
         }
     }
