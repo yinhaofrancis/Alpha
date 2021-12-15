@@ -87,5 +87,27 @@ class OtherTests: XCTestCase {
             
         }
     }
+    func testModelInJson() throws{
+        let mm = mlll()
+        mm.json = JSONType(json: ["dadasd":"123"])
+        self.poor.writeSync { db in
+            try mm.create(db: db)
+            try mm.save(db: db)
+            var a = try ObjectRequest<mlll>(table: "mlll", key: .all, condition: ConditionKey.jsonConditionKey(key: "$.dadasd") == ConditionKey(Stringkey: "123"), page: nil, order: []).query(db: db)
+            for i in a{
+                i.json = JSONType(json: ["dada":"ooooo"]);
+                try i.update(db: db)
+            }
+            
+            
+        }
+    }
 }
 
+public class mlll:Object{
+    
+    @Col
+    var json:JSONType = JSONType(json: JSON(nil))
+    
+    var text:String = ""
+}

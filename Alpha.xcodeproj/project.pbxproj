@@ -64,6 +64,7 @@
 		A96A862126CCBC090057A16B /* mob.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = mob.xcconfig; sourceTree = "<group>"; };
 		A96E090526C518CF0034568D /* OtherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OtherTests.swift; sourceTree = "<group>"; };
 		A974BFCD26CB6D44000F7FC2 /* ObjectTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectTest.swift; sourceTree = "<group>"; };
+		A98CF1E72769B905005922B6 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		A98E4A9226FB2E2D00D7EC4F /* swfsetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = swfsetting.swift; sourceTree = "<group>"; };
 		A9A11D7726DE2990000D3F6C /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		A9A11D7926DE2D26000D3F6C /* modelTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = modelTest.swift; sourceTree = "<group>"; };
@@ -135,6 +136,7 @@
 				A9580AF326B1381F00530397 /* Function.swift */,
 				A9D1C98726B1CEDD00F4421B /* Pool.swift */,
 				A91CF2E426E28682007FB3B3 /* Condition.swift */,
+				A98CF1E72769B905005922B6 /* README.md */,
 			);
 			path = Alpha;
 			sourceTree = "<group>";

@@ -24,6 +24,7 @@ public enum DataTypeDef {
     case text
     case blob
     case object
+    case json
     case null
     public var define:String{
         switch self {
@@ -38,6 +39,8 @@ public enum DataTypeDef {
             return "BLOB"
         case .object:
             return "TEXT"
+        case .json:
+            return "JSON"
         case .null:
             return "null"
         }
@@ -121,6 +124,42 @@ extension Data:DataType{
     public func bind(rs: Database.ResultSet, key: String) {
         rs.bind(name: key)?.bind(value: self)
     }
+}
+
+public class JSONType:NSObject,DataType{
+    public var json:JSON
+    public init(json:JSON){
+        self.json = json
+        super.init()
+    }
+    public override init(){
+        self.json = JSON(nil)
+        super.init()
+    }
+    public static func define() -> DataTypeDef {
+        .json
+    }
+    
+    public func bind(rs: Database.ResultSet, key: String) {
+        if self.json.content == nil{
+            rs.bindNull(name: key)
+        }else{
+            rs.bind(name: key)?.bind(value: self.json)
+        }
+        
+    }
+    
+    public func bind(rs: Database.ResultSet, index: Int32) {
+        if self.json.content == nil{
+            rs.bindNull(index: index)
+        }else{
+            rs.bind(index: index).bind(value: self.json)
+        }
+    }
+    public init(json:Dictionary<String,Any>){
+        self.json = JSON(json)
+    }
+    
     
 }
 
@@ -398,6 +437,9 @@ public struct NullableCol<T:DataType>:ColDef{
                 break
             case .null:
                 break
+            case .json:
+                let json = rs.column(index: Int32(i), type: String.self).value()
+                self.setValue(JSONType(json: JSON(json)), forKey: name)
             }
         }
     }

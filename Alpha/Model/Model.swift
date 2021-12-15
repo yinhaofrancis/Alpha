@@ -39,7 +39,7 @@ public struct JSON:CustomStringConvertible,
         self.init(temp)
     }
     
-    public init(content:Any?){
+    init(content:Any?){
         self.content = content
     }
     public init (_ json:[String:Any]){

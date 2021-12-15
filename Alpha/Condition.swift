@@ -99,11 +99,17 @@ public struct ConditionKey:ExpressibleByStringLiteral,ExpressibleByIntegerLitera
     public init(key:String) {
         self.key = key
     }
+    public init(Stringkey:String) {
+        self.key = "'\(Stringkey)'"
+    }
     public init(json:String,key:String){
         self.key = "json_extract(\(json)," + "'\(key)')"
     }
     public static func jsonConditionKey(key:String)->ConditionKey{
-        ConditionKey(json: "json", key: key)
+        self.jsonConditionKey(col: "json", key: key)
+    }
+    public static func jsonConditionKey(col:String,key:String)->ConditionKey{
+        ConditionKey(json: col, key: key)
     }
     public init(stringLiteral string:String) {
         self.key = "\(string)"
