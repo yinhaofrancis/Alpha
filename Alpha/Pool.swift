@@ -63,7 +63,6 @@ public class DataBasePool{
             self.wdb = try DataBasePool.createDb(name: name)
         }
         self.dbName = name
-        self.wdb.foreignKey = true
         self.thread = Thread(block: {
             self.timer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true, block: { t in
                 self.backup()
