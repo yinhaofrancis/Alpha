@@ -7,8 +7,8 @@
 1. String
 2. Int
 3. Double
-4.  Data
-5.  object
+4. Data
+5. Object
 6. JSONType
 
 ### 数据模型的声明

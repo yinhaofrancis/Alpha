@@ -624,56 +624,75 @@ public class ObjectRequest<T:Object>{
 }
 
 @propertyWrapper
-public struct Request<T:Object>{
-    private var db:Database = try! DataBasePool.createDb(name: "db")
+public class Request<T:Object>{
+    private var db:DataBasePool = try! DataBasePool(name: "db")
     public var valueMap:[String:DataType]
     public var request:ObjectRequest<T>
+    private var innerValue:[T]?
     public var wrappedValue:[T]{
-        var w:[T] = []
-        JSONRequest.queue.sync {
-            do {
-                w = try request.query(db: db, valueMap: self.valueMap)
-            } catch  {
-                w = []
-            }
+        
+        if let temp = innerValue{
+            return temp
+        }else{
+            self.query()
+            return innerValue ?? []
         }
-        return w
+        
     }
     public init(vm:[String:DataType] = [:],request:ObjectRequest<T>){
         self.request = request
         self.valueMap = vm
     }
-    public var projectedValue:Database{
-        return self.db
+    public var projectedValue:Request{
+        return self
+    }
+    public func add(object:T){
+        self.db.writeSync { db in
+            try object.update(db: db)
+        }
+        self.query()
+    }
+    private func query(){
+        self.db.readSync { db in
+            self.innerValue = try self.request.query(db: db, valueMap: self.valueMap)
+        }
     }
 }
 
 @propertyWrapper
-public struct JSONRequest{
-    private var db:Database = try! DataBasePool.createDb(name: "db")
-    fileprivate static var queue:DispatchQueue = DispatchQueue(label: "request", qos: .background, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil)
+public class JSONRequest{
+    private var db:DataBasePool = try! DataBasePool(name: "db")
     public var keypath:String?
     public var key:String
+    private var inner:[JSON]?
     public var wrappedValue:[JSON]{
-        var json:[JSON] = []
-        JSONRequest.queue.sync {
-            do {
-                if let ky = self.keypath{
-                    json = try db.query(jsonName: self.key, keypath: ky)
-                }else{
-                    json = try db.query(jsonName: self.key)
-                }
-            } catch  {
-                json = []
-            }
+        if let jsons = self.inner{
+            return jsons
         }
-        return json
+        self.query()
+        return inner ?? []
     }
     public init(key:String,keypath:String? = nil){
         self.key = key
         self.keypath = keypath
     }
-    public var projectedValue:Database{
-        return self.db
+    public var projectedValue:JSONRequest{
+        return self
+    }
+    private func query(){
+        self.db.readSync { db in
+            if let ky = self.keypath{
+                self.inner = try db.query(jsonName: self.key, keypath: ky)
+            }else{
+                self.inner = try db.query(jsonName: self.key)
+            }
+        }
+    }
+    public func add(json:JSON){
+        self.db.writeSync { [weak self ]db in
+            guard let ws = self else { return }
+            try db.update(jsonName: ws.key, json: json)
+        }
+        self.query()
     }
 }

@@ -48,7 +48,7 @@ class swfsetting: XCTestCase {
     func testEx() throws {
         pQueue().sync {
             let jj:JSON = ["ab":"asda","o":["qq":123,"pp":123.5,"k":true],"a":["a","b",["test":"dsds"]],"dd":"1988-08-09 12:22:33.123"]
-            try? self.$j.save(jsonName: "aaa", json: jj)
+            self.$j.add(json: jj)
             print(self.j)
         }
     }

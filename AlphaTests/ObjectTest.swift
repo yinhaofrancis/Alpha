@@ -22,11 +22,11 @@ class ObjectTest: XCTestCase {
         a.string = "dadad"
         a.stringw = "asdadasd"
         a.a = Int(arc4random())
-        try a.create(db: self.$aaa)
-        try a.insert(db: self.$aaa)
-        let pp = try? ObjectRequest<a>(table: "a").query(db: self.$aaa)
+
+        self.$aaa.add(object: a)
+
+        print(self.aaa)
         
-        print(pp)
         XCTAssert(self.aaa.first?.string == "dadad")
         XCTAssert(self.aaa.first?.stringw == "asdadasd")
     }
