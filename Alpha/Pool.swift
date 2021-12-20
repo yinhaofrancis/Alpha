@@ -15,8 +15,6 @@ public class DataBasePool{
         case WAL
         case DELETE
     }
-    
-    
     /// 数据库地址
     /// - Returns: url
     static public func checkDir() throws->URL{

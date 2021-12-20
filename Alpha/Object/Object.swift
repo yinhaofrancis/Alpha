@@ -625,7 +625,9 @@ public class ObjectRequest<T:Object>{
 
 @propertyWrapper
 public class Request<T:Object>{
-    private var db:DataBasePool = try! DataBasePool(name: "db")
+    private var db:DataBasePool{
+        return DataBasePool.default
+    }
     public var valueMap:[String:DataType]
     public var request:ObjectRequest<T>
     private var innerValue:[T]?
@@ -648,7 +650,12 @@ public class Request<T:Object>{
     }
     public func add(object:T){
         self.db.writeSync { db in
-            try object.update(db: db)
+            do{
+                try object.save(db: db)
+            }catch{
+                try object.create(db: db)
+                try object.save(db: db)
+            }
         }
         self.query()
     }
@@ -661,7 +668,9 @@ public class Request<T:Object>{
 
 @propertyWrapper
 public class JSONRequest{
-    private var db:DataBasePool = try! DataBasePool(name: "db")
+    private var db:DataBasePool{
+        return DataBasePool.default
+    }
     public var keypath:String?
     public var key:String
     private var inner:[JSON]?
@@ -691,7 +700,8 @@ public class JSONRequest{
     public func add(json:JSON){
         self.db.writeSync { [weak self ]db in
             guard let ws = self else { return }
-            try db.update(jsonName: ws.key, json: json)
+            
+            try db.save(jsonName: ws.key, json: json)
         }
         self.query()
     }
