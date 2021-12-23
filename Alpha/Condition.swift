@@ -105,6 +105,9 @@ public struct ConditionKey:ExpressibleByStringLiteral,ExpressibleByIntegerLitera
     public init(json:String,key:String){
         self.key = "json_extract(\(json)," + "'\(key)')"
     }
+    public init(function:String,conditionKey:ConditionKey){
+        self.key = function + "(\(conditionKey.key)"
+    }
     public static func jsonConditionKey(key:String)->ConditionKey{
         self.jsonConditionKey(col: "json", key: key)
     }

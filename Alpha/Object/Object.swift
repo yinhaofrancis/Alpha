@@ -166,6 +166,7 @@ public class JSONType:NSObject,DataType{
 public protocol ColDef{
     var mode:DataMode { get  }
     var define:DataType { get }
+    var readOnly:Bool { get }
     var typeDef:DataTypeDef { get }
 }
 extension ColDef{
@@ -174,6 +175,8 @@ extension ColDef{
     }
 }
 struct InnerDef:ColDef {
+    var readOnly: Bool
+    
     var typeDef: DataTypeDef
 
     var mode: DataMode
@@ -182,6 +185,8 @@ struct InnerDef:ColDef {
 }
 @propertyWrapper
 public struct Col<T:DataType>:ColDef{
+    public var readOnly: Bool = false
+    
     public var typeDef: DataTypeDef{
         return T.define()
     }
@@ -211,6 +216,9 @@ public struct Col<T:DataType>:ColDef{
 
 @propertyWrapper
 public struct NullableCol<T:DataType>:ColDef{
+    
+    public var readOnly: Bool = false
+    
     public var typeDef: DataTypeDef{
         T.define()
     }
@@ -234,6 +242,36 @@ public struct NullableCol<T:DataType>:ColDef{
         self.inner = wrappedValue
         self.mode = mode
         self.mode.defaultValue = defaultValue
+    }
+}
+@propertyWrapper
+public struct ReadOnlyCol<T:DataType>:ColDef{
+    
+    public var readOnly: Bool = true
+    
+    public var typeDef: DataTypeDef{
+        T.define()
+    }
+    public var define: DataType{
+        return self.inner ?? nil
+    }
+    public var mode:DataMode
+    private var inner:T?
+    public var wrappedValue:T?{
+        get{
+            if let objct = inner as? Object{
+                objct.context?.query(objct: objct)
+            }
+            return self.inner
+        }
+        set{
+            self.inner = newValue
+        }
+    }
+    public init(wrappedValue:T?) {
+        self.inner = wrappedValue
+        self.mode = .none
+        self.mode.defaultValue = nil
     }
 }
 
@@ -285,7 +323,10 @@ public struct NullableCol<T:DataType>:ColDef{
         return NSStringFromClass(self.classForCoder).components(separatedBy: ".").last!
     }
     public var keyCol:[String:ColDef]{
-        return Object.classKeyCol(cls: Self.self,mirror: Mirror(reflecting: self))
+        return Object.classKeyWriteCol(cls: Self.self,mirror: Mirror(reflecting: self))
+    }
+    public var keyQueryCol:[String:ColDef]{
+        return Object.classKeyQueryCol(cls: Self.self,mirror: Mirror(reflecting: self))
     }
     public var primaryKeyCol:[String:ColDef]{
         return Object.classKeyPrimaryCol(cls: Self.self,mirror: Mirror(reflecting: self))
@@ -296,13 +337,13 @@ public struct NullableCol<T:DataType>:ColDef{
     public var objectKeyCol:[String:ColDef]{
         return Object.classKeyObjectCol(cls: Self.self,mirror: Mirror(reflecting: self))
     }
-    public static func classKeyCol(cls:AnyClass,mirror:Mirror)->[String:ColDef]{
+    private static func classKeyCol(cls:AnyClass,mirror:Mirror)->[String:ColDef]{
         var c:UInt32 = 0
         if cls == Self.self{
             guard let v = mirror.children.filter({ i in
                 i.label == "objectId"
             }).first?.value else { return [:]}
-            return ["objectId":InnerDef(typeDef: .text, mode: [.notnull,.unique], define: v as! String)]
+            return ["objectId":InnerDef(readOnly: false, typeDef: .text, mode: [.notnull,.unique], define: v as! String)]
         }
         let propertys = class_copyPropertyList(cls, &c)
         let km = mirror.children.reduce(into: [:]) { r, kv in
@@ -328,13 +369,13 @@ public struct NullableCol<T:DataType>:ColDef{
                 if keymap[name] != nil{
                     if pro == "c" || pro == "s" || pro == "i" || pro == "q" || pro == "C" || pro == "S" || pro == "I" || pro == "Q"{
                         
-                        keymap[name] = InnerDef(typeDef: .integer, mode: .none, define: (self.value(forKey: name) as! NSNumber).intValue)
+                        keymap[name] = InnerDef(readOnly: false, typeDef: .integer, mode: .none, define: (self.value(forKey: name) as! NSNumber).intValue)
                     }else if pro == "f" || pro == "d"{
-                        keymap[name] = InnerDef(typeDef: .double, mode: .none, define: (self.value(forKey: name) as! NSNumber).doubleValue)
+                        keymap[name] = InnerDef(readOnly: false, typeDef: .double, mode: .none, define: (self.value(forKey: name) as! NSNumber).doubleValue)
                     }else if pro == "NSData"{
-                        keymap[name] = InnerDef(typeDef: .object, mode: .none, define:  self.value(forKey: name) as! Data)
+                        keymap[name] = InnerDef(readOnly: false, typeDef: .object, mode: .none, define:  self.value(forKey: name) as! Data)
                     }else{
-                        keymap[name] = InnerDef(typeDef: .object, mode: .none, define: self.value(forKey: name) as! Object)
+                        keymap[name] = InnerDef(readOnly: false, typeDef: .object, mode: .none, define: self.value(forKey: name) as! Object)
                     }
                 }
             }
@@ -348,21 +389,31 @@ public struct NullableCol<T:DataType>:ColDef{
             i.value.mode == .primary
         }
     }
+    
+    public static func classKeyQueryCol(cls:AnyClass,mirror:Mirror)->[String:ColDef]{
+        self.classKeyCol(cls: cls, mirror: mirror).filter { i in
+            return true
+        }
+    }
+    public static func classKeyWriteCol(cls:AnyClass,mirror:Mirror)->[String:ColDef]{
+        self.classKeyCol(cls: cls, mirror: mirror).filter { i in
+            i.value.readOnly == false
+        }
+    }
     public static func classKeyNormalCol(cls:AnyClass,mirror:Mirror)->[String:ColDef]{
         self.classKeyCol(cls: cls, mirror: mirror).filter { i in
-            i.value.mode != .primary
+            i.value.mode != .primary && i.value.readOnly == false
         }
     }
     public static func classKeyObjectCol(cls:AnyClass,mirror:Mirror)->[String:ColDef]{
         self.classKeyCol(cls: cls, mirror: mirror).filter { i in
-            i.value.typeDef == .object
+            i.value.typeDef == .object && i.value.readOnly == false
         }
     }
     public var insertCode:String{
         let keys = self.keyCol.keys
-        let a = "insert into `\(self.name)` (" + keys.joined(separator: ",") + ") values " + "(" + keys.map { i in
-            "@" + i
-        }.joined(separator: ",") + ")"
+        let v = keys.map { i in "@" + i }.joined(separator: ",")
+        let a = "insert into `\(self.name)` (" + keys.joined(separator: ",") + ") values " + "(" + v + ")"
         return a
     }
     public var condition:String{
@@ -399,7 +450,7 @@ public struct NullableCol<T:DataType>:ColDef{
         return "select * from `\(self.name)` where objectId = \(self.objectId)"
     }
     public func result(rs:Database.ResultSet) throws {
-        let kv = self.keyCol
+        let kv = self.keyQueryCol
         for i in 0 ..< rs.columnCount{
             let name = rs.columnName(index: i)
             if rs.type(index: Int32(i)) == .Null{
@@ -587,6 +638,7 @@ public enum FetchKey{
     case count(String)
     case max(String)
     case min(String)
+    case key(ConditionKey)
     case all
     
     public var keyString:String{
@@ -595,12 +647,17 @@ public enum FetchKey{
         case let .count(c):
             return "count(\(c))"
         case let .max(c):
-            return "*,max(\(c))"
+            return "max(\(c))"
         case let .min(c):
-            return "*,min(\(c))"
+            return "min(\(c))"
+        case let .key(ck):
+            return ck.key
         case .all:
             return "*"
         }
+    }
+    public static func +(lk:FetchKey,rk:FetchKey)->FetchKey{
+        .key(ConditionKey(key: lk.keyString + "," + rk.keyString))
     }
 }
 public class ObjectRequest<T:Object>{

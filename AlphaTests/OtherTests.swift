@@ -43,7 +43,7 @@ class OtherTests: XCTestCase {
                 b.dddd = i
                 b.aaaa = "\(Double(i * i) * 1.1) end"
                 b.ddd = Date()
-                try db.insert(jsonName: "a", json: b)
+                try db.save(jsonName: "a", json: b)
             }
         }
         poor.readSync { db in
@@ -63,13 +63,24 @@ class OtherTests: XCTestCase {
                 let c = ctx.aggregateContext(type: save.self)
                 ctx.ret(v: c.pointee.sum / Double(c.pointee.count))
             }))
-            try db.exec(sql: "select * , count(*),cc(c),Cou(dddd) as A from a")
-            
+            try db.exec(sql: "select * , count(*),cc(json_extract(json,'$.c')),Cou(json_extract(json,'$.dddd')) as A from a")
             let r = try db.query(jsonName: "a")
             for i in r{
                 print(i.aaaa)
                 print(i.ddd)
             }
+        }
+    }
+    func testRequestOfObj() throws{
+        self.poor.writeSync { db in
+            for i in 0 ..< 10{
+                let mm = mlll()
+                mm.json = JSONType(json: ["dadasd":"\(i)"])
+                try mm.create(db: db)
+                try mm.save(db: db)
+            }
+            var a = try ObjectRequest<mlll>(table: "mlll", key: .all + .key("json_extract(json,'$.dadasd') as text"), condition: nil, page: nil, order: []).query(db: db)
+            print(a.map({$0.text}))
         }
     }
     func testMulti() throws{
@@ -108,6 +119,8 @@ public class mlll:Object{
     
     @Col
     var json:JSONType = JSONType(json: JSON(nil))
+    @ReadOnlyCol
+    var text:String?
     
-    var text:String = ""
+    var pp:Int = 0
 }
