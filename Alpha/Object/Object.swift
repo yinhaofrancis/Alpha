@@ -114,7 +114,7 @@ extension Double:DataType{
 }
 extension Data:DataType{
     public static func define() -> DataTypeDef {
-        return .double
+        return .blob
     }
 
     public func bind(rs: Database.ResultSet, index: Int32) {
@@ -159,7 +159,9 @@ public class JSONType:NSObject,DataType{
     public init(json:Dictionary<String,Any>){
         self.json = JSON(json)
     }
-    
+    public var JSONString:String{
+        self.json.jsonString
+    }
     
 }
 
