@@ -22,6 +22,7 @@
 		A98E4A9326FB2E2D00D7EC4F /* swfsetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = A98E4A9226FB2E2D00D7EC4F /* swfsetting.swift */; };
 		A9A11D7826DE2990000D3F6C /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A11D7726DE2990000D3F6C /* Model.swift */; };
 		A9A11D7A26DE2D26000D3F6C /* modelTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A11D7926DE2D26000D3F6C /* modelTest.swift */; };
+		A9C47BBE280525DF00DFC556 /* DataBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9C47BBD280525DF00DFC556 /* DataBase.swift */; };
 		A9CF83E0270949E100FE3E21 /* ObjectTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A974BFCD26CB6D44000F7FC2 /* ObjectTest.swift */; };
 		A9D1C98826B1CEDD00F4421B /* Pool.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D1C98726B1CEDD00F4421B /* Pool.swift */; };
 		A9DDE63926EB587B00B4DBF8 /* Context.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9DDE63826EB587B00B4DBF8 /* Context.swift */; };
@@ -70,6 +71,7 @@
 		A98E4A9226FB2E2D00D7EC4F /* swfsetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = swfsetting.swift; sourceTree = "<group>"; };
 		A9A11D7726DE2990000D3F6C /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		A9A11D7926DE2D26000D3F6C /* modelTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = modelTest.swift; sourceTree = "<group>"; };
+		A9C47BBD280525DF00DFC556 /* DataBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBase.swift; sourceTree = "<group>"; };
 		A9D1C98726B1CEDD00F4421B /* Pool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pool.swift; sourceTree = "<group>"; };
 		A9DDE63826EB587B00B4DBF8 /* Context.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Context.swift; sourceTree = "<group>"; };
 		A9ED4B022713254800735220 /* fts5.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = fts5.swift; sourceTree = "<group>"; };
@@ -128,6 +130,7 @@
 		A93271EB26AFB4A5009107CA /* Alpha */ = {
 			isa = PBXGroup;
 			children = (
+				A9C47BBC280525B200DFC556 /* DataBase */,
 				A98647AF27D880960060489D /* Request */,
 				A9F6AEBA26E9AA2600177E3C /* Object */,
 				A9660CA026E5B73800CB98B6 /* Bridge */,
@@ -189,6 +192,14 @@
 				A9A11D7726DE2990000D3F6C /* Model.swift */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		A9C47BBC280525B200DFC556 /* DataBase */ = {
+			isa = PBXGroup;
+			children = (
+				A9C47BBD280525DF00DFC556 /* DataBase.swift */,
+			);
+			path = DataBase;
 			sourceTree = "<group>";
 		};
 		A9F6AEBA26E9AA2600177E3C /* Object */ = {
@@ -347,6 +358,7 @@
 				A925326926AFB7520080E72D /* Map.swift in Sources */,
 				A9D1C98826B1CEDD00F4421B /* Pool.swift in Sources */,
 				A9F6AEBC26E9AA4200177E3C /* Object.swift in Sources */,
+				A9C47BBE280525DF00DFC556 /* DataBase.swift in Sources */,
 				A91CF2E526E28682007FB3B3 /* Condition.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

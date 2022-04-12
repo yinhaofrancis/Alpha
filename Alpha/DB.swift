@@ -135,7 +135,7 @@ public class DB:Hashable{
                 return false
             }
             
-            throw NSError(domain: db.errormsg(pointer: self.db.sqlite!), code: Int(rc), userInfo: ["sql":String(cString: sqlite3_sql(self.stmt))])
+            throw NSError(domain: DB.errormsg(pointer: self.db.sqlite!), code: Int(rc), userInfo: ["sql":String(cString: sqlite3_sql(self.stmt))])
         }
         /// 获取列名
         /// - Parameter index: 列号
