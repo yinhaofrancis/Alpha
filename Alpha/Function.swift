@@ -237,7 +237,7 @@ public class Function:SQLContext{
     public let nArg:Int32
     
     
-    public weak var db:Database?
+    public weak var db:DB?
     public let call:CallFunction<Function>
     
     /// 函数类型
@@ -291,7 +291,7 @@ public class AggregateFunction:Function{
         return struc
     }
 }
-extension Database{
+extension DB{
     /// 函数时注册
     /// - Parameter function: 函数
     public func addFunction(function:Function){

@@ -17,7 +17,7 @@ class OtherTests: XCTestCase {
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
-    let poor:DataBasePool = try! DataBasePool(name: "mm")
+    let poor:Pool = try! Pool(name: "mm")
     func testCondition() throws{
         let a = (ConditionKey(key: "aa") == ConditionKey(key: "20")) ||
                 (ConditionKey(key: "bb") > ConditionKey(key: "20")) &&
@@ -86,7 +86,7 @@ class OtherTests: XCTestCase {
     func testMulti() throws{
         let que = DispatchQueue.global()
         
-        let a = try Database(url: try DataBasePool.checkDir().appendingPathComponent("dd"))
+        let a = try DB(url: try Pool.checkDir().appendingPathComponent("dd"))
         try a.create(jsonName: "a")
         for i in 0 ..< 100{
             

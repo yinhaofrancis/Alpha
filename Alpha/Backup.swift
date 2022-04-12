@@ -10,7 +10,7 @@ import SQLite3
 
 public class BackupDatabase{
     var backUpDb:OpaquePointer?
-    var sourceDB:Database
+    var sourceDB:DB
     var pbackUp:OpaquePointer?
     var backupToEnd = false
     var remaining:Int{
@@ -26,11 +26,11 @@ public class BackupDatabase{
     /// - Parameters:
     ///   - url: 备份列表
     ///   - source: 数据库来源
-    public init(url:URL,source:Database) throws{
+    public init(url:URL,source:DB) throws{
         let r2 = sqlite3_open_v2(url.path, &self.backUpDb, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nil)
         self.sourceDB = source
         if r2 != SQLITE_OK {
-            print(Database.errormsg(pointer: backUpDb))
+            print(DB.errormsg(pointer: backUpDb))
             try FileManager.default.removeItem(at: url)
             let r2 = sqlite3_open_v2(url.path, &self.backUpDb, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nil)
             self.sourceDB = source
@@ -49,7 +49,7 @@ public class BackupDatabase{
         }
         
         if(self.pbackUp == nil){
-            let error = Database.errormsg(pointer: self.pbackUp)
+            let error = DB.errormsg(pointer: self.pbackUp)
             throw NSError(domain:error , code: 0, userInfo: nil)
         }
         repeat{
@@ -61,7 +61,7 @@ public class BackupDatabase{
                 if r == SQLITE_DONE{
                     break
                 }
-                let error = Database.errormsg(pointer: self.pbackUp)
+                let error = DB.errormsg(pointer: self.pbackUp)
                 throw NSError(domain:error , code: 0, userInfo: nil)
             }
         }while (self.remaining != self.pageCount)

@@ -48,14 +48,14 @@ public enum DataTypeDef {
 }
 public protocol DataType{
     static func define()->DataTypeDef
-    func bind(rs:Database.ResultSet,key:String)
-    func bind(rs:Database.ResultSet,index:Int32)
+    func bind(rs:DB.ResultSet,key:String)
+    func bind(rs:DB.ResultSet,index:Int32)
 }
 extension Optional:DataType where Wrapped == DataType {
     public static func define() -> DataTypeDef {
         .null
     }
-    public func bind(rs: Database.ResultSet, key: String) {
+    public func bind(rs: DB.ResultSet, key: String) {
         switch self {
         case .none:
             return rs.bindNull(name: key)
@@ -64,7 +64,7 @@ extension Optional:DataType where Wrapped == DataType {
         }
     }
         
-    public func bind(rs: Database.ResultSet, index: Int32) {
+    public func bind(rs: DB.ResultSet, index: Int32) {
         switch self {
         case .none:
             return rs.bindNull(index: index)
@@ -78,10 +78,10 @@ extension String:DataType{
         return .text
     }
     
-    public func bind(rs: Database.ResultSet, index: Int32) {
+    public func bind(rs: DB.ResultSet, index: Int32) {
         rs.bind(index: index).bind(value: self)
     }
-    public func bind(rs: Database.ResultSet, key: String) {
+    public func bind(rs: DB.ResultSet, key: String) {
         rs.bind(name: key)?.bind(value: self)
     }
 }
@@ -91,10 +91,10 @@ extension Int:DataType{
     }
     
 
-    public func bind(rs: Database.ResultSet, index: Int32) {
+    public func bind(rs: DB.ResultSet, index: Int32) {
         rs.bind(index: index).bind(value: self)
     }
-    public func bind(rs: Database.ResultSet, key: String) {
+    public func bind(rs: DB.ResultSet, key: String) {
         rs.bind(name: key)?.bind(value: self)
     }
 }
@@ -104,11 +104,11 @@ extension Double:DataType{
     }
     
    
-    public func bind(rs: Database.ResultSet, index: Int32) {
+    public func bind(rs: DB.ResultSet, index: Int32) {
         rs.bind(index: index).bind(value: self)
     }
 
-    public func bind(rs: Database.ResultSet, key: String) {
+    public func bind(rs: DB.ResultSet, key: String) {
         rs.bind(name: key)?.bind(value: self)
     }
 }
@@ -117,11 +117,11 @@ extension Data:DataType{
         return .blob
     }
 
-    public func bind(rs: Database.ResultSet, index: Int32) {
+    public func bind(rs: DB.ResultSet, index: Int32) {
         rs.bind(index: index).bind(value: self)
     }
     
-    public func bind(rs: Database.ResultSet, key: String) {
+    public func bind(rs: DB.ResultSet, key: String) {
         rs.bind(name: key)?.bind(value: self)
     }
 }
@@ -140,7 +140,7 @@ public class JSONType:NSObject,DataType{
         .json
     }
     
-    public func bind(rs: Database.ResultSet, key: String) {
+    public func bind(rs: DB.ResultSet, key: String) {
         if self.json.content == nil{
             rs.bindNull(name: key)
         }else{
@@ -149,7 +149,7 @@ public class JSONType:NSObject,DataType{
         
     }
     
-    public func bind(rs: Database.ResultSet, index: Int32) {
+    public func bind(rs: DB.ResultSet, index: Int32) {
         if self.json.content == nil{
             rs.bindNull(index: index)
         }else{
@@ -295,21 +295,21 @@ public struct ReadOnlyCol<T:DataType>:ColDef{
             self.value(forKey: i.key) as? Object
         }
     }
-    public func bind(rs: Database.ResultSet, key: String) {
+    public func bind(rs: DB.ResultSet, key: String) {
         rs.bind(name: key)?.bind(value: self.objectId)
         try? self.queryObject(db: rs.db)
     }
     
-    public func colume(rs: Database.ResultSet, key: String) {
+    public func colume(rs: DB.ResultSet, key: String) {
         let name = rs.index(paramName: key)
         self.objectId = rs.column(index: name, type: String.self).value()
     }
     
-    public func bind(rs: Database.ResultSet, index: Int32) {
+    public func bind(rs: DB.ResultSet, index: Int32) {
         rs.bind(index: index).bind(value: self.objectId)
     }
     
-    public func colume(rs: Database.ResultSet, index: Int32) {
+    public func colume(rs: DB.ResultSet, index: Int32) {
         self.objectId = rs.column(index: index, type: String.self).value()
         try? self.queryObject(db: rs.db)
     }
@@ -451,7 +451,7 @@ public struct ReadOnlyCol<T:DataType>:ColDef{
     public var selectObjectCode:String{
         return "select * from `\(self.name)` where objectId = \(self.objectId)"
     }
-    public func result(rs:Database.ResultSet) throws {
+    public func result(rs:DB.ResultSet) throws {
         let kv = self.keyQueryCol
         for i in 0 ..< rs.columnCount{
             let name = rs.columnName(index: i)
@@ -497,12 +497,12 @@ public struct ReadOnlyCol<T:DataType>:ColDef{
         }
     }
 
-    public func bind(rs:Database.ResultSet){
+    public func bind(rs:DB.ResultSet){
         for i in self.keyCol {
             i.value.define.bind(rs: rs, key: "@" + i.key)
         }
     }
-    public func checkObject(db:Database) throws {
+    public func checkObject(db:DB) throws {
         try self.create(db: db)
         for i in self.objectKeyCol{
             let cls: AnyClass? = self.classOfCollume(name: i.key)
@@ -510,14 +510,14 @@ public struct ReadOnlyCol<T:DataType>:ColDef{
             try inst.create(db: db)
         }
     }
-    func writeDataCode(db:Database,sql:String) throws {
+    func writeDataCode(db:DB,sql:String) throws {
         
         let rs = try db.query(sql: sql)
         self.bind(rs: rs)
         try rs.step()
         rs.close()
     }
-    public func queryModel<T:Object>(db:Database,type:T.Type,con:Condition? = nil) throws ->[T] {
+    public func queryModel<T:Object>(db:DB,type:T.Type,con:Condition? = nil) throws ->[T] {
         let sql = "select * from \(T.init().name)" + (con == nil ? "" : " where \(con!.conditionCode)")
         let rs = try db.query(sql: sql)
         self.bind(rs: rs)
@@ -530,7 +530,7 @@ public struct ReadOnlyCol<T:DataType>:ColDef{
         rs.close()
         return res
     }
-    func readDataModel<T:Object>(db:Database,sql:String,object: inout T) throws {
+    func readDataModel<T:Object>(db:DB,sql:String,object: inout T) throws {
         let rs = try db.query(sql: sql)
         self.bind(rs: rs)
         if try rs.step() {
@@ -538,7 +538,7 @@ public struct ReadOnlyCol<T:DataType>:ColDef{
         }
         rs.close()
     }
-    public func insert(db:Database) throws{
+    public func insert(db:DB) throws{
         try autoreleasepool {
             try self.writeDataCode(db: db, sql: self.insertCode)
             for i in self.objectKeyCol{
@@ -547,7 +547,7 @@ public struct ReadOnlyCol<T:DataType>:ColDef{
             }
         }
     }
-    public func update(db:Database) throws{
+    public func update(db:DB) throws{
         try autoreleasepool {
             try self.writeDataCode(db: db, sql: self.updateCode)
             for i in self.objectKeyCol{
@@ -556,31 +556,31 @@ public struct ReadOnlyCol<T:DataType>:ColDef{
             }
         }
     }
-    public func save(db:Database) throws{
+    public func save(db:DB) throws{
         do {
             try self.insert(db: db)
         }catch{
             try self.update(db: db)
         }
     }
-    public func delete(db:Database) throws{
+    public func delete(db:DB) throws{
         try autoreleasepool {
             try self.writeDataCode(db: db, sql: self.deleteCode)
         }
     }
-    public func query(db:Database) throws{
+    public func query(db:DB) throws{
         try autoreleasepool {
             var a = self
             try self.readDataModel(db: db, sql: self.selectCode, object: &a)
         }
     }
-    public func queryObject(db:Database) throws{
+    public func queryObject(db:DB) throws{
         try autoreleasepool {
             var a = self
             try self.readDataModel(db: db, sql: self.selectCode, object: &a)
         }
     }
-    public func create(db:Database) throws{
+    public func create(db:DB) throws{
         try autoreleasepool {
             if try db.tableExists(name: self.name) == false{
                 try db.exec(sql: self.createCode)
@@ -602,13 +602,13 @@ public struct ReadOnlyCol<T:DataType>:ColDef{
         }
         }
     }
-    public func newkey(db:Database) throws ->[String]{
+    public func newkey(db:DB) throws ->[String]{
         let old = try db.tableInfo(name: self.name).keys
         return self.keyCol.keys.filter { i in
             old.contains(i) == false
         }
     }
-    public func oldKey(db:Database) throws ->[String]{
+    public func oldKey(db:DB) throws ->[String]{
         let old = try db.tableInfo(name: self.name).keys
         let new = self.keyCol.keys
         return old.filter { i in
@@ -667,7 +667,7 @@ public class ObjectRequest<T:Object>{
     public init(table:String,key:FetchKey = .all,condition:Condition? = nil ,page:Page? = nil,order:[Order] = []){
         self.sql = "select \(key.keyString) from `\(table)`" + ((condition?.conditionCode.count ?? 0) > 0 ? (" where " + condition!.conditionCode) : "") + (order.count > 0 ? " order by" + order.map({$0.code}).joined(separator: ",") : "") + (page == nil ? "" : " LIMIT \(page!.limit) OFFSET \(page!.offset)")
     }
-    public func query(db:Database,valueMap:[String:DataType] = [:]) throws ->[T]{
+    public func query(db:DB,valueMap:[String:DataType] = [:]) throws ->[T]{
         let rs = try db.query(sql: sql)
         for i in valueMap {
             i.value.bind(rs: rs, key: i.key)
@@ -684,8 +684,8 @@ public class ObjectRequest<T:Object>{
 
 @propertyWrapper
 public class Request<T:Object>{
-    private var db:DataBasePool{
-        return DataBasePool.default
+    private var db:Pool{
+        return Pool.default
     }
     public var valueMap:[String:DataType]
     public var request:ObjectRequest<T>
@@ -727,8 +727,8 @@ public class Request<T:Object>{
 
 @propertyWrapper
 public class JSONRequest{
-    private var db:DataBasePool{
-        return DataBasePool.default
+    private var db:Pool{
+        return Pool.default
     }
     public var keypath:String?
     public var key:String

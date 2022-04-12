@@ -52,8 +52,8 @@ public enum synchronousMode:String{
     case OFF
 }
 
-public class Database:Hashable{
-    public static func == (lhs: Database, rhs: Database) -> Bool {
+public class DB:Hashable{
+    public static func == (lhs: DB, rhs: DB) -> Bool {
         lhs.hashValue == rhs.hashValue
     }
     public func hash(into hasher: inout Hasher) {
@@ -113,13 +113,13 @@ public class Database:Hashable{
         }
         
         private var stmt:OpaquePointer
-        unowned var db:Database
+        unowned var db:DB
         /// sqlite3 结果集合
         /// - Parameters:
         ///   - stmt:stmt
         ///   - db: 数据库
 
-        public init(stmt:OpaquePointer,db:Database) {
+        public init(stmt:OpaquePointer,db:DB) {
             self.stmt = stmt
             self.db = db
         }
@@ -135,7 +135,7 @@ public class Database:Hashable{
                 return false
             }
             
-            throw NSError(domain: Database.errormsg(pointer: self.db.sqlite!), code: Int(rc), userInfo: ["sql":String(cString: sqlite3_sql(self.stmt))])
+            throw NSError(domain: db.errormsg(pointer: self.db.sqlite!), code: Int(rc), userInfo: ["sql":String(cString: sqlite3_sql(self.stmt))])
         }
         /// 获取列名
         /// - Parameter index: 列号
@@ -389,7 +389,7 @@ public struct TableForeignKeyInfo{
     public let match:String
 }
 
-extension Database{
+extension DB{
     /// 执行SQL
     /// - Parameter sql: sql code
     public func exec(sql:String) throws {
@@ -427,9 +427,9 @@ extension Database{
         var stmt:OpaquePointer?
         let rc = sqlite3_prepare(self.sqlite, sql, Int32(sql.utf8.count), &stmt, nil)
         if rc != SQLITE_OK{
-            throw NSError(domain:  Database.errormsg(pointer: self.sqlite!), code: Int(rc), userInfo: ["sql":sql])
+            throw NSError(domain:  DB.errormsg(pointer: self.sqlite!), code: Int(rc), userInfo: ["sql":sql])
         }
-        guard let s = stmt else { throw NSError(domain: Database.errormsg(pointer: self.sqlite!), code: 0, userInfo: ["sql":sql])}
+        guard let s = stmt else { throw NSError(domain: DB.errormsg(pointer: self.sqlite!), code: 0, userInfo: ["sql":sql])}
         return ResultSet(stmt: s, db: self)
     }
     

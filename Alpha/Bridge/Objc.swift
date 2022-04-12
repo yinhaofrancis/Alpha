@@ -8,9 +8,9 @@
 import Foundation
 
 @objcMembers public class AlphaBridge:NSObject{
-    private var pool:DataBasePool
+    private var pool:Pool
     @objc public init(name:String) throws{
-        self.pool = try DataBasePool(name: name)
+        self.pool = try Pool(name: name)
     }
     public func save(name:String,obj:[String:Any]){
         self.pool.writeSync { db in

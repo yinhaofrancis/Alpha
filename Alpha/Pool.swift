@@ -8,7 +8,7 @@
 import Foundation
 import SQLite3
 
-public class DataBasePool{
+public class Pool{
     
     public enum Mode{
         case ACP
@@ -44,8 +44,8 @@ public class DataBasePool{
     public var url:URL{
         self.wdb.url
     }
-    private var read:List<Database> = List()
-    private var wdb:Database
+    private var read:List<DB> = List()
+    private var wdb:DB
     private var semphone = DispatchSemaphore(value: 3)
     private var dbName:String
     private var thread:Thread?
@@ -54,11 +54,11 @@ public class DataBasePool{
     /// - Parameter name: 数据库名
     public init(name:String) throws {
         
-        self.wdb = try DataBasePool.createDb(name: name)
+        self.wdb = try Pool.createDb(name: name)
         if try wdb.integrityCheck() == false{
             self.wdb.close()
-            try? DataBasePool.restore(name: name)
-            self.wdb = try DataBasePool.createDb(name: name)
+            try? Pool.restore(name: name)
+            self.wdb = try Pool.createDb(name: name)
         }
         self.dbName = name
         self.thread = Thread(block: {
@@ -73,17 +73,17 @@ public class DataBasePool{
     /// 创建数据库
     /// - Parameter name: 数据名
     /// - Returns: DB
-    public static func createDb(name:String,readOnly: Bool = false,writeLock: Bool = true) throws ->Database{
-        let url = try DataBasePool.checkDir().appendingPathComponent(name)
-        let back = try DataBasePool.checkBackUpDir().appendingPathComponent(name)
+    public static func createDb(name:String,readOnly: Bool = false,writeLock: Bool = true) throws ->DB{
+        let url = try Pool.checkDir().appendingPathComponent(name)
+        let back = try Pool.checkBackUpDir().appendingPathComponent(name)
         
         if !FileManager.default.fileExists(atPath: url.path) && !FileManager.default.fileExists(atPath: back.path){
             FileManager.default.createFile(atPath: url.path, contents: nil, attributes: nil)
         }else if !FileManager.default.fileExists(atPath: url.path){
-            try? DataBasePool.restore(name: name)
+            try? Pool.restore(name: name)
         }
         
-        return try Database(url: url,readOnly: readOnly,writeLock: writeLock)
+        return try DB(url: url,readOnly: readOnly,writeLock: writeLock)
     }
     /// 数据写入模式
     /// - Parameter mode: 模式
@@ -106,7 +106,7 @@ public class DataBasePool{
     }
     /// 数据库配置
     /// - Parameter callback: 操作
-    public func config(callback:@escaping (Database) throws->Void){
+    public func config(callback:@escaping (DB) throws->Void){
         self.queue.sync(execute: DispatchWorkItem(flags: .barrier, block: {
             do{
                 try callback(self.wdb)
@@ -117,7 +117,7 @@ public class DataBasePool{
     }
     /// 只读
     /// - Parameter callback: 事务
-    public func read(callback:@escaping (Database) throws->Void){
+    public func read(callback:@escaping (DB) throws->Void){
         self.queue.async {
             do {
                 self.semphone.wait()
@@ -136,7 +136,7 @@ public class DataBasePool{
     }
     /// 只读
     /// - Parameter callback: 事务
-    public func readSync(callback:@escaping (Database) throws->Void){
+    public func readSync(callback:@escaping (DB) throws->Void){
         self.queue.sync {
             do {
                 self.semphone.wait()
@@ -155,7 +155,7 @@ public class DataBasePool{
     }
     /// 事务
     /// - Parameter callback: 事务
-    public func transaction(callback:@escaping (Database) throws ->Bool){
+    public func transaction(callback:@escaping (DB) throws ->Bool){
         self.queue.async(execute: DispatchWorkItem(flags: .barrier, block: {
             let db = self.wdb
             do {
@@ -173,7 +173,7 @@ public class DataBasePool{
     }
     /// 事务
     /// - Parameter callback: 事务
-    public func transactionSync(callback:@escaping (Database) throws ->Bool){
+    public func transactionSync(callback:@escaping (DB) throws ->Bool){
         self.queue.sync(execute: DispatchWorkItem(flags: .barrier, block: {
             let db = self.wdb
             do {
@@ -189,7 +189,7 @@ public class DataBasePool{
             }
         }))
     }
-    public func perform(callback:@escaping (Database) throws ->Void){
+    public func perform(callback:@escaping (DB) throws ->Void){
         self.queue.sync(execute: DispatchWorkItem(flags:.inheritQoS, block: {
             let db = self.wdb
             do {
@@ -199,7 +199,7 @@ public class DataBasePool{
             }
         }))
     }
-    public func barrier(callback:@escaping (Database) throws ->Void){
+    public func barrier(callback:@escaping (DB) throws ->Void){
         self.queue.sync(execute: DispatchWorkItem(flags:.barrier, block: {
             let db = self.wdb
             do {
@@ -211,7 +211,7 @@ public class DataBasePool{
     }
     /// 读写
     /// - Parameter callback: 读写事物
-    public func write(callback:@escaping (Database) throws ->Void){
+    public func write(callback:@escaping (DB) throws ->Void){
         self.transaction(callback: { db in
             try callback(db)
             return true
@@ -219,7 +219,7 @@ public class DataBasePool{
     }
     /// 读写
     /// - Parameter callback: 读写事物
-    public func writeSync(callback:@escaping (Database) throws ->Void){
+    public func writeSync(callback:@escaping (DB) throws ->Void){
         self.transactionSync(callback: { db in
             try callback(db)
             return true
@@ -228,13 +228,13 @@ public class DataBasePool{
     ///  备份
     public func backup(){
         self.read { db in
-            let u = try DataBasePool.checkBackUpDir().appendingPathComponent(self.dbName)
+            let u = try Pool.checkBackUpDir().appendingPathComponent(self.dbName)
             try BackupDatabase(url: u, source: db).backup()
         }
     }
     public static func restore(name:String) throws {
-        let u = try DataBasePool.checkBackUpDir().appendingPathComponent(name)
-        let ur = try DataBasePool.checkDir().appendingPathComponent(name)
+        let u = try Pool.checkBackUpDir().appendingPathComponent(name)
+        let ur = try Pool.checkDir().appendingPathComponent(name)
         DispatchQueue.global().sync {
             do{
                 #if DEBUG
@@ -243,21 +243,21 @@ public class DataBasePool{
                 if FileManager.default.fileExists(atPath: ur.path){
                     try FileManager.default.removeItem(at: ur)
                 }
-                let source = try Database(url: u, readOnly: true, writeLock: true)
+                let source = try DB(url: u, readOnly: true, writeLock: true)
                 try BackupDatabase(url: ur, source: source).backup()
             }catch{
                 print("restore fail \(error)")
             }
         }
     }
-    private func createReadOnly() throws ->Database{
+    private func createReadOnly() throws ->DB{
         if let db = self.read.removeFirst(){
             return db
         }
-        let db = try Database(url: self.url, readOnly: true, writeLock: true)
+        let db = try DB(url: self.url, readOnly: true, writeLock: true)
         return db
     }
-    public var readDatabase:Database{
+    public var readDatabase:DB{
         try! self.createReadOnly()
     }
     deinit {
@@ -268,7 +268,7 @@ public class DataBasePool{
         self.thread?.cancel()
         self.timer?.invalidate()
     }
-    public static let `default` = try! DataBasePool(name: "AlphaDB")
+    public static let `default` = try! Pool(name: "AlphaDB")
 }
 
 

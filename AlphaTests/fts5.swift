@@ -20,8 +20,8 @@ class fts5: XCTestCase {
     }
 
     func testExample() throws {
-        let db = try Database()
-        let url = try DataBasePool.checkBackUpDir().appendingPathComponent("bb")
+        let db = try DB()
+        let url = try Pool.checkBackUpDir().appendingPathComponent("bb")
         let backup = try BackupDatabase(url: url, source: db)
         for i in 0 ..< 100{
             try db.save(jsonName: "dsd", json: ["dsds":"sdsds","dds":i])

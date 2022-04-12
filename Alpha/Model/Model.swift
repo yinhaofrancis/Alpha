@@ -465,7 +465,7 @@ public struct JSON:CustomStringConvertible,
     public static var dateFormat:String = "yyyy-MM-dd HH:mm:ss.SSS"
 }
 
-extension Database.ResultSet.Bind{
+extension DB.ResultSet.Bind{
     public func bind(value:T) where T == JSON{
         let jsonStr = value.jsonString
         guard let c = jsonStr.cString(using: .utf8) else {
@@ -479,7 +479,7 @@ extension Database.ResultSet.Bind{
         }
     }
 }
-extension Database.ResultSet.Column{
+extension DB.ResultSet.Column{
     public func value()->T where T == JSON{
         let string = String(cString: sqlite3_column_text(self.stmt, self.index)).data(using: .utf8)!
         return JSON(string)
@@ -487,7 +487,7 @@ extension Database.ResultSet.Column{
 }
 
 
-extension Database{
+extension DB{
 
     public func insert(jsonName:String,json:JSON) throws {
         do {
@@ -705,7 +705,7 @@ public struct SettingDateKey{
 @propertyWrapper
 public struct Setting{
     public var name:String
-    public static var db:Database = try! DataBasePool.createDb(name: "setting")
+    public static var db:DB = try! Pool.createDb(name: "setting")
     public static var queue:DispatchQueue = DispatchQueue(label: "setting")
     fileprivate func setValue(_ newValue: JSON?) {
         if let js = Setting.keySetting[self.name], let newjs = newValue{

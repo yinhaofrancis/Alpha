@@ -32,9 +32,9 @@ public class Log:Object{
 }
 @objc(RestoreLog)
 public class RestoreLog:NSObject{
-    private var session:DataBasePool
+    private var session:Pool
     @objc public init(name:String) throws{
-        self.session = try DataBasePool(name: name)
+        self.session = try Pool(name: name)
         self.session.writeSync { db in
             let log = Log()
             try log.create(db: db)

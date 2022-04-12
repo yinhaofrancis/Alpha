@@ -10,7 +10,7 @@ import Alpha
 
 class testJson: XCTestCase {
 
-    let pool = try! DataBasePool(name: "json")
+    let pool = try! Pool(name: "json")
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
