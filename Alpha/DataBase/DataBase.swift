@@ -23,6 +23,10 @@ public class DataBase:Hashable{
             throw NSError(domain: "数据库打开失败", code: 0)
         }
     }
+    public convenience init(name:String,readonly:Bool,writeLock:Bool) throws {
+        let url = try DataBase.checkDir().appendingPathComponent(name)
+        try self.init(url: url, readonly: readonly, writeLock: writeLock)
+    }
     public static func == (lhs: DataBase, rhs: DataBase) -> Bool {
         return lhs.url == rhs.url
     }
@@ -97,10 +101,15 @@ public class DataBase:Hashable{
                 throw NSError(domain: String(cString: sqlite3_errmsg(self.sqlite)), code: 4)
             }
         }
-        public func step() throws{
-            if noErr != sqlite3_step(self.stmt){
-                throw NSError(domain: String(cString: sqlite3_errmsg(self.sqlite)), code: 2)
+        public func step() throws ->Bool{
+            let rc = sqlite3_step(self.stmt)
+            if rc == SQLITE_ROW{
+                return true
             }
+            if rc == SQLITE_DONE{
+                return false
+            }
+            throw NSError(domain: String(cString: sqlite3_errmsg(self.sqlite)), code: 2)
         }
         public func columeInt(index:Int32)->Int32{
             sqlite3_column_int(self.stmt, index)
@@ -122,8 +131,55 @@ public class DataBase:Hashable{
             guard let byte = sqlite3_column_blob(self.stmt, index) else { return Data() }
             return Data(bytes: byte, count: Int(len))
         }
+        public func columeType(index:Int32)->CollumnType{
+            if sqlite3_column_type(self.stmt, index) == SQLITE_INTEGER{
+                return .intCollumn
+            }else if sqlite3_column_type(self.stmt, index) == SQLITE_FLOAT{
+                return .doubleCollumn
+            }else if sqlite3_column_type(self.stmt, index) == SQLITE_TEXT{
+                return .textCollumn
+            }else if sqlite3_column_type(self.stmt, index) == SQLITE_BLOB{
+                return .dataCollumn
+            }else{
+                return .nullCollumn
+            }
+        }
+        public func columeDecType(index:Int32)->CollumnDecType?{
+            guard let r = sqlite3_column_decltype(self.stmt, index) else { return nil }
+            return CollumnDecType(rawValue: String(cString: r))
+        }
+        public var columeCount:Int32{
+            sqlite3_column_count(self.stmt)
+        }
         public func close(){
             sqlite3_finalize(self.stmt)
         }
     }
+    static public func checkDir() throws->URL{
+        let name = Bundle.main.bundleIdentifier ?? "main" + ".Database"
+        let url = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true).appendingPathComponent(name)
+        var b:ObjCBool = false
+        let a = FileManager.default.fileExists(atPath: url.path, isDirectory: &b)
+        if !(b.boolValue && a){
+            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
+        }
+        return url
+    }
 }
+
+public enum CollumnType{
+    case nullCollumn
+    case intCollumn
+    case doubleCollumn
+    case textCollumn
+    case dataCollumn
+}
+
+public enum CollumnDecType:String{
+    case intDecType = "INTEGER"
+    case doubleDecType = "FLOAT"
+    case textDecType = "TEXT"
+    case dataDecType = "BLOB"
+    case jsonDecType = "JSON"
+}
+
