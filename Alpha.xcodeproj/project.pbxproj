@@ -15,6 +15,9 @@
 		A925326926AFB7520080E72D /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = A925326226AFB7520080E72D /* Map.swift */; };
 		A925326A26AFB7520080E72D /* Backup.swift in Sources */ = {isa = PBXBuildFile; fileRef = A925326326AFB7520080E72D /* Backup.swift */; };
 		A93271F326AFB4A5009107CA /* Alpha.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A93271E926AFB4A4009107CA /* Alpha.framework */; };
+		A9516324280E80E200B95719 /* Ammo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A951631B280E806500B95719 /* Ammo.framework */; };
+		A9516328280E81C100B95719 /* DatabaseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9516314280E676F00B95719 /* DatabaseModel.swift */; };
+		A9516329280E81C400B95719 /* DataBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9C47BBD280525DF00DFC556 /* DataBase.swift */; };
 		A9580AF426B1381F00530397 /* Function.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9580AF326B1381F00530397 /* Function.swift */; };
 		A9660CA226E5B76800CB98B6 /* Objc.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9660CA126E5B76800CB98B6 /* Objc.swift */; };
 		A9660CAA26E5BCBD00CB98B6 /* AlphaOcTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A9660CA926E5BCBD00CB98B6 /* AlphaOcTests.m */; };
@@ -23,7 +26,6 @@
 		A98E4A9326FB2E2D00D7EC4F /* swfsetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = A98E4A9226FB2E2D00D7EC4F /* swfsetting.swift */; };
 		A9A11D7826DE2990000D3F6C /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A11D7726DE2990000D3F6C /* Model.swift */; };
 		A9A11D7A26DE2D26000D3F6C /* modelTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A11D7926DE2D26000D3F6C /* modelTest.swift */; };
-		A9C47BBE280525DF00DFC556 /* DataBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9C47BBD280525DF00DFC556 /* DataBase.swift */; };
 		A9CF83E0270949E100FE3E21 /* ObjectTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A974BFCD26CB6D44000F7FC2 /* ObjectTest.swift */; };
 		A9D1C98826B1CEDD00F4421B /* Pool.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D1C98726B1CEDD00F4421B /* Pool.swift */; };
 		A9DDE63926EB587B00B4DBF8 /* Context.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9DDE63826EB587B00B4DBF8 /* Context.swift */; };
@@ -38,6 +40,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = A93271E826AFB4A4009107CA;
 			remoteInfo = Alpha;
+		};
+		A9516325280E810B00B95719 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A93271E026AFB4A4009107CA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A951631A280E806400B95719;
+			remoteInfo = Ammo;
 		};
 		A9660CAD26E5BCBD00CB98B6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -59,6 +68,8 @@
 		A93271ED26AFB4A5009107CA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A93271F226AFB4A5009107CA /* AlphaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AlphaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A93271F926AFB4A5009107CA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A9516314280E676F00B95719 /* DatabaseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseModel.swift; sourceTree = "<group>"; };
+		A951631B280E806500B95719 /* Ammo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Ammo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9580AF126B120EA00530397 /* macos.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = macos.xcconfig; sourceTree = "<group>"; };
 		A9580AF326B1381F00530397 /* Function.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Function.swift; sourceTree = "<group>"; };
 		A9660CA126E5B76800CB98B6 /* Objc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Objc.swift; sourceTree = "<group>"; };
@@ -92,7 +103,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A9516324280E80E200B95719 /* Ammo.framework in Frameworks */,
 				A93271F326AFB4A5009107CA /* Alpha.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A9516318280E806400B95719 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -115,7 +134,9 @@
 				A93271EB26AFB4A5009107CA /* Alpha */,
 				A93271F626AFB4A5009107CA /* AlphaTests */,
 				A9660CA826E5BCBD00CB98B6 /* AlphaOcTests */,
+				A951631C280E806500B95719 /* Ammo */,
 				A93271EA26AFB4A4009107CA /* Products */,
+				A9516323280E80E200B95719 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -125,6 +146,7 @@
 				A93271E926AFB4A4009107CA /* Alpha.framework */,
 				A93271F226AFB4A5009107CA /* AlphaTests.xctest */,
 				A9660CA726E5BCBD00CB98B6 /* AlphaOcTests.xctest */,
+				A951631B280E806500B95719 /* Ammo.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -132,7 +154,6 @@
 		A93271EB26AFB4A5009107CA /* Alpha */ = {
 			isa = PBXGroup;
 			children = (
-				A9C47BBC280525B200DFC556 /* DataBase */,
 				A98647AF27D880960060489D /* Request */,
 				A9F6AEBA26E9AA2600177E3C /* Object */,
 				A9660CA026E5B73800CB98B6 /* Bridge */,
@@ -162,6 +183,21 @@
 				A909AD02280D0117000A49DD /* DatabaseTest.swift */,
 			);
 			path = AlphaTests;
+			sourceTree = "<group>";
+		};
+		A951631C280E806500B95719 /* Ammo */ = {
+			isa = PBXGroup;
+			children = (
+				A9C47BBC280525B200DFC556 /* DataBase */,
+			);
+			path = Ammo;
+			sourceTree = "<group>";
+		};
+		A9516323280E80E200B95719 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		A9660CA026E5B73800CB98B6 /* Bridge */ = {
@@ -201,6 +237,7 @@
 			isa = PBXGroup;
 			children = (
 				A9C47BBD280525DF00DFC556 /* DataBase.swift */,
+				A9516314280E676F00B95719 /* DatabaseModel.swift */,
 			);
 			path = DataBase;
 			sourceTree = "<group>";
@@ -218,6 +255,13 @@
 
 /* Begin PBXHeadersBuildPhase section */
 		A93271E426AFB4A4009107CA /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A9516316280E806400B95719 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -256,12 +300,31 @@
 			buildRules = (
 			);
 			dependencies = (
+				A9516326280E810B00B95719 /* PBXTargetDependency */,
 				A93271F526AFB4A5009107CA /* PBXTargetDependency */,
 			);
 			name = AlphaTests;
 			productName = AlphaTests;
 			productReference = A93271F226AFB4A5009107CA /* AlphaTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		A951631A280E806400B95719 /* Ammo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A951631F280E806500B95719 /* Build configuration list for PBXNativeTarget "Ammo" */;
+			buildPhases = (
+				A9516316280E806400B95719 /* Headers */,
+				A9516317280E806400B95719 /* Sources */,
+				A9516318280E806400B95719 /* Frameworks */,
+				A9516319280E806400B95719 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Ammo;
+			productName = Ammo;
+			productReference = A951631B280E806500B95719 /* Ammo.framework */;
+			productType = "com.apple.product-type.framework";
 		};
 		A9660CA626E5BCBD00CB98B6 /* AlphaOcTests */ = {
 			isa = PBXNativeTarget;
@@ -297,6 +360,9 @@
 					A93271F126AFB4A5009107CA = {
 						CreatedOnToolsVersion = 12.5.1;
 					};
+					A951631A280E806400B95719 = {
+						CreatedOnToolsVersion = 13.3.1;
+					};
 					A9660CA626E5BCBD00CB98B6 = {
 						CreatedOnToolsVersion = 12.5.1;
 					};
@@ -318,6 +384,7 @@
 				A93271E826AFB4A4009107CA /* Alpha */,
 				A93271F126AFB4A5009107CA /* AlphaTests */,
 				A9660CA626E5BCBD00CB98B6 /* AlphaOcTests */,
+				A951631A280E806400B95719 /* Ammo */,
 			);
 		};
 /* End PBXProject section */
@@ -331,6 +398,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		A93271F026AFB4A5009107CA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A9516319280E806400B95719 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -361,7 +435,6 @@
 				A925326926AFB7520080E72D /* Map.swift in Sources */,
 				A9D1C98826B1CEDD00F4421B /* Pool.swift in Sources */,
 				A9F6AEBC26E9AA4200177E3C /* Object.swift in Sources */,
-				A9C47BBE280525DF00DFC556 /* DataBase.swift in Sources */,
 				A91CF2E526E28682007FB3B3 /* Condition.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -380,6 +453,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A9516317280E806400B95719 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A9516329280E81C400B95719 /* DataBase.swift in Sources */,
+				A9516328280E81C100B95719 /* DatabaseModel.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A9660CA326E5BCBD00CB98B6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -395,6 +477,11 @@
 			isa = PBXTargetDependency;
 			target = A93271E826AFB4A4009107CA /* Alpha */;
 			targetProxy = A93271F426AFB4A5009107CA /* PBXContainerItemProxy */;
+		};
+		A9516326280E810B00B95719 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A951631A280E806400B95719 /* Ammo */;
+			targetProxy = A9516325280E810B00B95719 /* PBXContainerItemProxy */;
 		};
 		A9660CAE26E5BCBD00CB98B6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -537,7 +624,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 27ZYBRBPV8;
+				DEVELOPMENT_TEAM = JYCHA46QC4;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -565,7 +652,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 27ZYBRBPV8;
+				DEVELOPMENT_TEAM = JYCHA46QC4;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -592,7 +679,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ARCHS = "$(ARCHS_STANDARD)";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 27ZYBRBPV8;
+				DEVELOPMENT_TEAM = JYCHA46QC4;
 				INFOPLIST_FILE = AlphaTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -612,7 +699,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ARCHS = "$(ARCHS_STANDARD)";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 27ZYBRBPV8;
+				DEVELOPMENT_TEAM = JYCHA46QC4;
 				INFOPLIST_FILE = AlphaTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -621,6 +708,98 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.francis.AlphaTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		A9516320280E806500B95719 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A9580AF126B120EA00530397 /* macos.xcconfig */;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = JYCHA46QC4;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.francis.Ammo;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A9516321280E806500B95719 /* mob */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A96A862126CCBC090057A16B /* mob.xcconfig */;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = JYCHA46QC4;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.francis.Ammo;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = mob;
+		};
+		A9516322280E806500B95719 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = JYCHA46QC4;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.francis.Ammo;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -757,7 +936,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 27ZYBRBPV8;
+				DEVELOPMENT_TEAM = JYCHA46QC4;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -785,7 +964,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ARCHS = "$(ARCHS_STANDARD)";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 27ZYBRBPV8;
+				DEVELOPMENT_TEAM = JYCHA46QC4;
 				INFOPLIST_FILE = AlphaTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -829,6 +1008,16 @@
 				A932720126AFB4A5009107CA /* Debug */,
 				A96A862426CCBE120057A16B /* mob */,
 				A932720226AFB4A5009107CA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A951631F280E806500B95719 /* Build configuration list for PBXNativeTarget "Ammo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A9516320280E806500B95719 /* Debug */,
+				A9516321280E806500B95719 /* mob */,
+				A9516322280E806500B95719 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

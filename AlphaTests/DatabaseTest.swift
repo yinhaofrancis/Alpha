@@ -7,9 +7,7 @@
 
 import Foundation
 import XCTest
-import Alpha
-
-
+import Ammo
 
 
 public class DatabaseTest: XCTestCase {
@@ -17,13 +15,20 @@ public class DatabaseTest: XCTestCase {
     
     func testDataBase() throws{
         let db = try DataBase(name: "dddt", readonly: false, writeLock: false)
-        let rs = try db.prepare(sql: "select * from ddd")
-        while try rs.step() {
-            for i in 0 ..< rs.columeCount{
-                print(rs.columeDecType(index: i))
-                print(rs.columeInt(index: i))
-            }
-        }
-        db.close()
+        let a = Ob()
+        try a.declare.create(db: db)
+        a.i = 19
+        a.d = nil
+        try a.tableModel.insert(db: db)
+        a.d = 100
+        try a.tableModel.update(db: db)
     }
 }
+public class Ob:DataBaseObject{
+    @Col(name:"dd",primaryKey:true)
+    var i:Int = 0
+    
+    @Col(name:"d")
+    var d:Int? = 0
+}
+
