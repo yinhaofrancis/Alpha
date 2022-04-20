@@ -9,7 +9,6 @@ import Foundation
 import XCTest
 import Ammo
 
-
 public class DatabaseTest: XCTestCase {
     
     
@@ -22,6 +21,18 @@ public class DatabaseTest: XCTestCase {
         try a.tableModel.insert(db: db)
         a.d = 100
         try a.tableModel.update(db: db)
+        
+        let mm = a.tableModel
+        mm.declare[0].origin = 1
+        mm.declare[1].origin = 2
+        a.tableModel = mm
+        a.d = 99999
+        a.i = 19
+        
+        try mm.select(db: db)
+        
+//        a.tableModel = mm
+        print(a.d)
     }
 }
 public class Ob:DataBaseObject{

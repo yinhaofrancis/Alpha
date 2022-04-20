@@ -7,19 +7,32 @@
 
 import Foundation
 
-open class DataBaseObject:NSObject{
-    public var name:String{
-        return NSStringFromClass(self.classForCoder).replacingOccurrences(of: ".", with: "_")
+open class DataBaseObject{
+    public static var name:String{
+        return NSStringFromClass(self).replacingOccurrences(of: ".", with: "_")
     }
     public var declare:TableDeclare{
         let cds = Mirror(reflecting: self).children.filter({$0.value is CollumnDeclare}).map { m in
             m.value as! CollumnDeclare
         }
-        return TableDeclare(name: self.name, declare: cds)
+        return TableDeclare(name: Self.name, declare: cds)
     }
     public var tableModel:TableModel{
-        TableModel(name: self.name, declare: Mirror(reflecting: self).children.filter({$0.value is TableColumn}).map ({$0.value as! TableColumn}))
+        get{
+            TableModel(name: Self.name, declare: Mirror(reflecting: self).children.filter({$0.value is TableColumn}).map ({$0.value as! TableColumn}))
+        }
+        set{
+            let a = newValue.declare.reduce(into: [:]) { partialResult, r in
+                partialResult[r.name] = r.origin
+            }
+            Mirror(reflecting: self).children.filter({$0.value is TableColumn}).forEach { kv in
+                let tc = kv.value as! TableColumn
+                tc.origin = a[tc.name]!
+            }
+
+        }
     }
+    public init() {}
 }
 
 public protocol DBType{

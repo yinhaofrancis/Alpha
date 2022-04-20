@@ -124,15 +124,18 @@ public class DataBase:Hashable{
                 break
             }
         }
-        public func step() throws ->Bool{
+        public func step() throws ->ResultSet.StepResult{
             let rc = sqlite3_step(self.stmt)
             if rc == SQLITE_ROW{
-                return true
+                return .hasMore
             }
             if rc == SQLITE_DONE{
-                return false
+                return .end
             }
             throw NSError(domain: String(cString: sqlite3_errmsg(self.sqlite)), code: 2)
+        }
+        public func columeName(index:Int32)->String{
+            String(cString: sqlite3_column_name(self.stmt, index))
         }
         public func columeInt(index:Int32)->Int32{
             sqlite3_column_int(self.stmt, index)
@@ -149,6 +152,20 @@ public class DataBase:Hashable{
         public func columeString(index:Int32)->String{
             String(cString: sqlite3_column_text(self.stmt, index))
         }
+        public func colume(index:Int32)->DBType?{
+            switch(self.columeType(index: index)){
+            case .nullCollumn:
+                return nil
+            case .intCollumn:
+                return Int(self.columeInt(index: index))
+            case .doubleCollumn:
+                return self.columeDouble(index: index)
+            case .textCollumn:
+                return self.columeString(index: index)
+            case .dataCollumn:
+                return self.columeData(index: index)
+            }
+        }
         public func columeData(index:Int32)->Data{
             let len = sqlite3_column_bytes(self.stmt, index)
             guard let byte = sqlite3_column_blob(self.stmt, index) else { return Data() }
@@ -163,9 +180,10 @@ public class DataBase:Hashable{
                 return .textCollumn
             }else if sqlite3_column_type(self.stmt, index) == SQLITE_BLOB{
                 return .dataCollumn
-            }else{
+            }else if sqlite3_column_type(self.stmt, index) == SQLITE_NULL{
                 return .nullCollumn
             }
+            return .nullCollumn
         }
         public func columeDecType(index:Int32)->CollumnDecType?{
             guard let r = sqlite3_column_decltype(self.stmt, index) else { return nil }
@@ -176,6 +194,10 @@ public class DataBase:Hashable{
         }
         public func close(){
             sqlite3_finalize(self.stmt)
+        }
+        public enum StepResult{
+            case hasMore
+            case end
         }
     }
     static public func checkDir() throws->URL{
@@ -200,7 +222,7 @@ public enum CollumnType{
 
 public enum CollumnDecType:String{
     case intDecType = "INTEGER"
-    case doubleDecType = "FLOAT"
+    case doubleDecType = "REAL"
     case textDecType = "TEXT"
     case dataDecType = "BLOB"
     case jsonDecType = "JSON"
@@ -303,7 +325,13 @@ public struct TableModel{
         "update `\(self.name)` set \(self.declare.map({"\($0.name)=@\($0.name)"}).joined(separator: ",")) " + primaryCondition
     }
     public var primaryCondition:String{
-        "where " + self.declare.filter({$0.primaryKey}).map({"\($0.name)=@p\($0.name)"}).joined(separator: "and")
+        if !self.hasPrimary{
+            return ""
+        }
+        return "where " + self.declare.filter({$0.primaryKey}).map({"\($0.name)=@p\($0.name)"}).joined(separator: "and")
+    }
+    public var selectCode:String{
+        "select * from \(self.name) " + self.primaryCondition
     }
     public var hasPrimary:Bool{
         return self.declare.filter({$0.primaryKey}).count > 0
@@ -338,7 +366,28 @@ public struct TableModel{
         }else{
             throw NSError(domain: "model don't has primary key", code: 5)
         }
-        
+    }
+    public func select(db:DataBase) throws{
+        let map = self.declare.reduce(into: [:]) { partialResult, tc in
+            partialResult[tc.name] = tc
+        }
+        let rs = try db.prepare(sql: self.selectCode)
+        try self.bindPrimaryConditionData(rs: rs)
+        while try rs.step() == .hasMore{
+            for i in 0 ..< rs.columeCount{
+                let name = rs.columeName(index: i)
+                if let v = rs.colume(index: i){
+                    map[name]?.origin = v
+                }
+            }
+        }
+        for i in 0 ..< rs.columeCount{
+            let name = rs.columeName(index: i)
+            if let v = rs.colume(index: i){
+                map[name]?.origin = v
+            }
+        }
+        rs.close()
     }
 }
 
@@ -347,11 +396,10 @@ public protocol QueryColumn{
     var relateTable:String { get }
 }
 
-public class QueryModel:NSObject{
+public class QueryModel{
     var columes:[QueryColumn]
     public init(columes:[QueryColumn]){
         self.columes = columes
-        super.init()
     }
     
 }
