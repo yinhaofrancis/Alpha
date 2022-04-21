@@ -13,8 +13,7 @@ public class DataBase:Hashable{
     
     public let url:URL
     
-    
-    private var sqlite:OpaquePointer?
+    public private(set) var sqlite:OpaquePointer?
     
     public init(url:URL,readonly:Bool = false,writeLock:Bool = false) throws {
         self.url = url
@@ -23,7 +22,7 @@ public class DataBase:Hashable{
             throw NSError(domain: "数据库打开失败", code: 0)
         }
     }
-    public convenience init(name:String,readonly:Bool,writeLock:Bool) throws {
+    public convenience init(name:String,readonly:Bool = false,writeLock:Bool = false) throws {
         let url = try DataBase.checkDir().appendingPathComponent(name)
         try self.init(url: url, readonly: readonly, writeLock: writeLock)
     }
@@ -37,7 +36,7 @@ public class DataBase:Hashable{
     public func prepare(sql:String) throws->DataBase.ResultSet{
         var stmt:OpaquePointer?
         if sqlite3_prepare(self.sqlite!, sql, Int32(sql.utf8.count), &stmt, nil) != SQLITE_OK{
-            throw NSError(domain: String(cString: sqlite3_errmsg(sqlite!)), code: 1)
+            throw NSError(domain: DataBase.errormsg(pointer: self.sqlite), code: 1)
         }
         return DataBase.ResultSet(sqlite: self.sqlite!, stmt: stmt!)
     }
@@ -62,12 +61,12 @@ public class DataBase:Hashable{
         }
         public func bindNull(index:Int32) throws{
             if sqlite3_bind_null(self.stmt, index) != SQLITE_OK{
-                throw NSError(domain: String(cString: sqlite3_errmsg(self.sqlite)), code: 4)
+                throw NSError(domain: DataBase.errormsg(pointer: self.stmt), code: 4)
             }
         }
         public func bindZero(index:Int32,blobSize:Int64) throws{
             if sqlite3_bind_zeroblob64(self.stmt, index, sqlite3_uint64(blobSize)) != SQLITE_OK{
-                throw NSError(domain: String(cString: sqlite3_errmsg(self.sqlite)), code: 4)
+                throw NSError(domain: DataBase.errormsg(pointer: self.stmt), code: 4)
             }
         }
         public func bind<T>(index:Int32,value:T) throws{
@@ -88,7 +87,12 @@ public class DataBase:Hashable{
                 flag = sqlite3_bind_double(self.stmt, index, Double(value as! Float))
             }else if (value is String){
                 let str = value as! String
-                flag = sqlite3_bind_text(self.stmt, index, str, Int32(str.utf8.count)) { p in }
+                let c = str.cString(using: .utf8)
+                let p = UnsafeMutablePointer<CChar>.allocate(capacity: str.utf8.count)
+                memcpy(p, c, str.utf8.count)
+                flag = sqlite3_bind_text(self.stmt, index, p, Int32(str.utf8.count)) { p in
+                    p?.deallocate()
+                }
             }else if (value is Data){
                 let str = value as! Data
                 let m:UnsafeMutablePointer<UInt8> = UnsafeMutablePointer.allocate(capacity: str.count)
@@ -98,7 +102,7 @@ public class DataBase:Hashable{
                 flag = sqlite3_bind_value(self.stmt, index, value as? OpaquePointer)
             }
             if(flag != noErr){
-                throw NSError(domain: String(cString: sqlite3_errmsg(self.sqlite)), code: 4)
+                throw NSError(domain: DataBase.errormsg(pointer: self.sqlite), code: 4)
             }
         }
         public func bind(index:Int32,value:DBType,type:CollumnType) throws{
@@ -132,7 +136,7 @@ public class DataBase:Hashable{
             if rc == SQLITE_DONE{
                 return .end
             }
-            throw NSError(domain: String(cString: sqlite3_errmsg(self.sqlite)), code: 2)
+            throw NSError(domain: DataBase.errormsg(pointer: self.sqlite), code: 2)
         }
         public func columeName(index:Int32)->String{
             String(cString: sqlite3_column_name(self.stmt, index))
@@ -209,6 +213,16 @@ public class DataBase:Hashable{
             try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
         }
         return url
+    }
+    public static func errormsg(pointer:OpaquePointer?)->String{
+        String(cString: sqlite3_errmsg(pointer))
+    }
+    public func deleteDatabaseFile(){
+        do{
+            try FileManager.default.removeItem(at: self.url)
+        }catch{
+            print(error)
+        }
     }
 }
 

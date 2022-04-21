@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A907BDC92810F3BC001BDE45 /* BackUpDataBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A907BDC82810F3BC001BDE45 /* BackUpDataBase.swift */; };
 		A909AD03280D0117000A49DD /* DatabaseTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A909AD02280D0117000A49DD /* DatabaseTest.swift */; };
 		A91BF41D2702EBBD002F5246 /* testJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = A91BF41C2702EBBD002F5246 /* testJson.swift */; };
 		A91CF2E526E28682007FB3B3 /* Condition.swift in Sources */ = {isa = PBXBuildFile; fileRef = A91CF2E426E28682007FB3B3 /* Condition.swift */; };
@@ -58,6 +59,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A907BDC82810F3BC001BDE45 /* BackUpDataBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackUpDataBase.swift; sourceTree = "<group>"; };
 		A909AD02280D0117000A49DD /* DatabaseTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseTest.swift; sourceTree = "<group>"; };
 		A91BF41C2702EBBD002F5246 /* testJson.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = testJson.swift; sourceTree = "<group>"; };
 		A91CF2E426E28682007FB3B3 /* Condition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Condition.swift; sourceTree = "<group>"; };
@@ -238,6 +240,7 @@
 			children = (
 				A9C47BBD280525DF00DFC556 /* DataBase.swift */,
 				A9516314280E676F00B95719 /* DatabaseModel.swift */,
+				A907BDC82810F3BC001BDE45 /* BackUpDataBase.swift */,
 			);
 			path = DataBase;
 			sourceTree = "<group>";
@@ -457,6 +460,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A907BDC92810F3BC001BDE45 /* BackUpDataBase.swift in Sources */,
 				A9516329280E81C400B95719 /* DataBase.swift in Sources */,
 				A9516328280E81C100B95719 /* DatabaseModel.swift in Sources */,
 			);
