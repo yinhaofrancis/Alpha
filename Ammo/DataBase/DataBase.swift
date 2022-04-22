@@ -40,6 +40,10 @@ public class DataBase:Hashable{
         }
         return DataBase.ResultSet(sqlite: self.sqlite!, stmt: stmt!)
     }
+    
+    public func exec(sql:String){
+        sqlite3_exec(self.sqlite, sql, nil, nil, nil)
+    }
     public func close(){
         sqlite3_close(self.sqlite)
     }
@@ -131,7 +135,7 @@ public class DataBase:Hashable{
         public func step() throws ->ResultSet.StepResult{
             let rc = sqlite3_step(self.stmt)
             if rc == SQLITE_ROW{
-                return .hasMore
+                return .hasColumn
             }
             if rc == SQLITE_DONE{
                 return .end
@@ -200,7 +204,7 @@ public class DataBase:Hashable{
             sqlite3_finalize(self.stmt)
         }
         public enum StepResult{
-            case hasMore
+            case hasColumn
             case end
         }
     }
@@ -360,7 +364,6 @@ public struct TableModel{
         let rs = try db.prepare(sql: self.insertCode)
         for i in self.declare{
             let indx = rs.getParamIndexBy(name: "@"+i.name)
-            print(i.origin)
             try rs.bind(index: indx, value: i.origin, type: i.type.collumnType)
         }
         _ = try rs.step()
@@ -371,7 +374,6 @@ public struct TableModel{
             let rs = try db.prepare(sql: self.updateCode)
             for i in self.declare{
                 let indx = rs.getParamIndexBy(name: "@"+i.name)
-                print(i.origin)
                 try rs.bind(index: indx, value: i.origin, type: i.type.collumnType)
             }
             try self.bindPrimaryConditionData(rs: rs)
@@ -387,7 +389,7 @@ public struct TableModel{
         }
         let rs = try db.prepare(sql: self.selectCode)
         try self.bindPrimaryConditionData(rs: rs)
-        while try rs.step() == .hasMore{
+        while try rs.step() == .hasColumn{
             for i in 0 ..< rs.columeCount{
                 let name = rs.columeName(index: i)
                 if let v = rs.colume(index: i){
@@ -403,17 +405,86 @@ public struct TableModel{
         }
         rs.close()
     }
-}
-
-public protocol QueryColumn{
-    var defineCode:String { get }
-    var relateTable:String { get }
-}
-
-public class QueryModel{
-    var columes:[QueryColumn]
-    public init(columes:[QueryColumn]){
-        self.columes = columes
+    public func delete(db:DataBase) throws{
+        let rs = try db.prepare(sql: "delete from \(self.name) \(self.primaryCondition)")
+        try self.bindPrimaryConditionData(rs: rs)
+        _ = try rs.step()
+        rs.close()
     }
     
+    public static func select(db:DataBase,table:String,condition:QueryCondition? = nil) throws -> [TableModel]{
+        let select = "select * from \(table)" + (condition == nil ? "" : " where \(condition!.condition)")
+        let rs = try db.prepare(sql: select)
+        var models:[TableModel] = []
+        while try rs.step() == .hasColumn {
+            var a:[TableColumn] = []
+            for i in 0 ..< rs.columeCount{
+                if let c = rs.colume(index: i){
+                    let tc = TableColumn(value: c, type: rs.columeDecType(index: i) ?? .textDecType, nullable: false, name: rs.columeName(index: i), primaryKey: false, unique: false)
+                    a.append(tc)
+                }
+            }
+            models.append(TableModel(name: table, declare: a))
+        }
+        rs.close()
+        return models
+    }
+    public func drop(db:DataBase){
+        db.exec(sql: "drop table \(self.name)")
+    }
+    public static func delete(db:DataBase,table:String,condition:QueryCondition) throws{
+        let sql = "delete from \(table) where \(condition.condition)"
+        let rs = try db.prepare(sql: sql)
+        _ = try rs.step()
+        rs.close()
+    }
+}
+
+public class QueryCondition{
+    public var condition:String
+    public init(condition:String){
+        self.condition = condition
+    }
+    public static func between(key:Key,value1:String,value2:String)->QueryCondition{
+        QueryCondition(condition:"\(key.key) between \(value1) and \(value2)")
+    }
+    public static func like(key:Key,value:String)->QueryCondition{
+        QueryCondition(condition:"\(key.key) like \(value)")
+    }
+    public static func `in`(key:Key,value:String...)->QueryCondition{
+        QueryCondition(condition:"\(key.key) in (\(value.joined(separator: ",")))")
+    }
+    public static func Not (condition:QueryCondition)->QueryCondition{
+        QueryCondition(condition:"NOT \(condition.condition)")
+    }
+    public static func &&(l:QueryCondition,r:QueryCondition)->QueryCondition{
+        QueryCondition(condition: l.condition+" and "+r.condition)
+    }
+    public static func ||(l:QueryCondition,r:QueryCondition)->QueryCondition{
+        QueryCondition(condition: l.condition+" or "+r.condition)
+    }
+    public struct Key{
+        public var key:String
+        public init(key:String,table:DataBaseObject.Type? = nil){
+            self.key = table == nil ? key : (table!.name + ".") + key
+        }
+        public static func ==(l:QueryCondition.Key,r:QueryCondition.Key)->QueryCondition{
+            QueryCondition(condition: l.key + " = " + r.key)
+        }
+        public static func >=(l:QueryCondition.Key,r:QueryCondition.Key)->QueryCondition{
+            QueryCondition(condition: l.key + " >= " + r.key)
+        }
+        public static func <=(l:QueryCondition.Key,r:QueryCondition.Key)->QueryCondition{
+            QueryCondition(condition: l.key + " <= " + r.key)
+        }
+        public static func >(l:QueryCondition.Key,r:QueryCondition.Key)->QueryCondition{
+            QueryCondition(condition: l.key + " > " + r.key)
+        }
+        public static func <(l:QueryCondition.Key,r:QueryCondition.Key)->QueryCondition{
+            QueryCondition(condition: l.key + " < " + r.key)
+        }
+        public static func !=(l:QueryCondition.Key,r:QueryCondition.Key)->QueryCondition{
+            QueryCondition(condition: l.key + " <> " + r.key)
+        }
+    }
 }

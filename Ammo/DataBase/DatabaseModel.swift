@@ -29,10 +29,20 @@ open class DataBaseObject{
                 let tc = kv.value as! TableColumn
                 tc.origin = a[tc.name]!
             }
-
         }
     }
-    public init() {}
+    
+    public static func select<T:DataBaseObject>(db:DataBase,condition:QueryCondition? = nil) throws ->[T]{
+        try TableModel.select(db: db, table: self.name, condition: condition).map { tm in
+            let m = T()
+            m.tableModel = tm
+            return m
+        }
+    }
+    public static func delete(db:DataBase,condition:QueryCondition) throws{
+        try TableModel.delete(db: db, table: self.name, condition: condition)
+    }
+    public required init() {}
 }
 
 public protocol DBType{

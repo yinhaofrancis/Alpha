@@ -19,12 +19,23 @@ public class DatabaseTest: XCTestCase {
         
         for i in 0 ..< 80 {
             a.i = i
-            a.d = nil
-            a.ki = "dadada王🉑️"
-            a.da = "dadada王🉑️".data(using: .utf8)
+            a.d = i * 100
+            a.ki = "dadada王🉑️\(i)"
+            a.da = "dadada王🉑️\(i * 100)".data(using: .utf8)
             try a.tableModel.insert(db: db)
-            a.d = 100
             try a.tableModel.update(db: db)
+        }
+        
+        let b = Oc()
+        try b.declare.create(db: db)
+        
+        for i in 0 ..< 80 {
+            b.i = 80 - i
+            b.d = i * 100
+            b.ki = "dadada王🉑️\(i)"
+            b.da = "dadada王🉑️\(i * 100)".data(using: .utf8)
+            try b.tableModel.insert(db: db)
+            try b.tableModel.update(db: db)
         }
         let mm = a.tableModel
         mm.declare[0].origin = 1
@@ -34,10 +45,15 @@ public class DatabaseTest: XCTestCase {
         a.i = 19
         
         try mm.select(db: db)
-        
-//        a.tableModel = mm
-        print(a.ki)
+        let tm:[Ob] = try Ob.select(db: db,condition: QueryCondition.Key(key: "a") != QueryCondition.Key(key: "10"))
+        print(tm)
+        let tm1:[Ob] = try Ob.select(db: db,condition: QueryCondition.in(key: .init(key: "a"), value: "1","10","100","1000"))
+        print(tm1)
+//        try Ob.delete(db: db, condition: QueryCondition.Key(key: "dd") != QueryCondition.Key(key: "10"))
+//        let tm2:[Ob] = try Ob.select(db: db)
+//        print(tm2)
         db.close()
+        
         
         
     }
@@ -53,19 +69,100 @@ public class DatabaseTest: XCTestCase {
         let rsd = try RestoreDataBase(name: "dddt", backup: "ddtb")
         try rsd.restore()
     }
+    func testConditionDataBase() throws {
+        
+        let a = QueryCondition.Key(key:"a") != QueryCondition.Key(key:"10") && QueryCondition.Key(key:"b") != QueryCondition.Key(key:"10")
+        XCTAssert(a.condition == "a <> 10 and b <> 10")
+    }
     
-}
-public class Ob:DataBaseObject{
-    @Col(name:"dd",primaryKey:true)
-    var i:Int = 0
-    
-    @Col(name:"d")
-    var d:Int? = nil
-    
-    @Col(name:"k")
-    var ki:String = ""
-    
-    @Col(name:"pipe")
-    var da:Data? = nil
+    func testQueryDataBase() throws {
+        let db = try DataBase(name: "dddt")
+        let tm:[oQ] = try oQ.selectSql(table: Ob.self).whereCondition(condition: QueryCondition(condition: "a % 2 = 0")).query(db: db)
+        print(tm)
+        
+        let tm1:[occ] = try occ.selectSql(table: Ob.self).whereCondition(condition: QueryCondition(condition: "a % 2 = 0")).query(db: db)
+        print(tm1)
+        
+        let tm2:[ocl] = try ocl.selectSql(table: Ob.self)
+            .joinQuery(join: .leftJoin, table: Oc.self)
+            .whereCondition(condition: QueryCondition.Key(key: "a", table: Ob.self) == QueryCondition.Key(key: "a", table: Oc.self))
+            .query(db: db)
+        print(tm2)
+    }
 }
 
+public class oQ:DataBaseFetchObject,CustomStringConvertible{
+    @QueryColume(colume: "a")
+    var a:Int? = nil
+    
+    @QueryColume(colume: "c")
+    var c:String? = nil
+    
+    public var description: String{
+        return "\(String(describing: a)),\(String(describing: c))"
+    }
+}
+
+public class occ:DataBaseFetchObject,CustomStringConvertible{
+    @QueryColume(colume: "max(a)")
+    var a:Int? = nil
+    
+    @QueryColume(colume: "count(c)")
+    var c:Int? = nil
+    
+    public var description: String{
+        return "\(a),\(c)"
+    }
+}
+
+public class ocl:DataBaseFetchObject,CustomStringConvertible{
+    @QueryColume(colume: "a", type: Ob.self,align:"ba")
+    var ba:Int? = nil
+    @QueryColume(colume: "c", type: Ob.self,align:"bc")
+    var bc:String? = nil
+    @QueryColume(colume: "a", type: Oc.self,align:"ca")
+    var ca:Int? = nil
+    @QueryColume(colume: "c", type: Oc.self,align:"cc")
+    var cc:String? = nil
+    @QueryColume(colume: "b", type: Oc.self,align:"cb")
+    var cb:Int? = nil
+    public var description: String{
+        return "\(ba),\(bc),\(ca),\(cc),\(cb)"
+    }
+}
+
+public class Ob:DataBaseObject,CustomStringConvertible{
+    @Col(name:"a",primaryKey:true)
+    var i:Int = 0
+    
+    @Col(name:"b")
+    var d:Int? = nil
+    
+    @Col(name:"c")
+    var ki:String = ""
+    
+    @Col(name:"d")
+    var da:Data? = nil
+    
+    public var description: String{
+        return "\(i),\(String(describing: d)),\(ki),\(da)"
+    }
+}
+
+public class Oc:DataBaseObject,CustomStringConvertible{
+    @Col(name:"a",primaryKey:true)
+    var i:Int = 0
+    
+    @Col(name:"b")
+    var d:Int? = nil
+    
+    @Col(name:"c")
+    var ki:String = ""
+    
+    @Col(name:"d")
+    var da:Data? = nil
+    
+    public var description: String{
+        return "\(i),\(String(describing: d)),\(ki),\(da)"
+    }
+}
