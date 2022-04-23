@@ -60,7 +60,7 @@ open class DataBaseFetchObject{
             }
         }
     }
-    public static func selectSql(table:DataBaseObject.Type)->Fetch{
+    public static func fetch(table:DataBaseObject.Type)->Fetch{
         let sample = Self()
         let f = Fetch()
         f.sql = "select \(sample.declare.map({$0.value.colume + "\($0.value.align != nil ? " as \($0.value.align!)" : "")"}).joined(separator: ",")) from \(table.name)"

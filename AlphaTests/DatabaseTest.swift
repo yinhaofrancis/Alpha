@@ -18,7 +18,7 @@ public class DatabaseTest: XCTestCase {
         try a.declare.create(db: db)
         
         for i in 0 ..< 80 {
-            a.i = i
+            a.i = i * 2
             a.d = i * 100
             a.ki = "dadada王🉑️\(i)"
             a.da = "dadada王🉑️\(i * 100)".data(using: .utf8)
@@ -77,13 +77,13 @@ public class DatabaseTest: XCTestCase {
     
     func testQueryDataBase() throws {
         let db = try DataBase(name: "dddt")
-        let tm:[oQ] = try oQ.selectSql(table: Ob.self).whereCondition(condition: QueryCondition(condition: "a % 2 = 0")).query(db: db)
+        let tm:[oQ] = try oQ.fetch(table: Ob.self).whereCondition(condition: QueryCondition(condition: "a % 2 = 0")).query(db: db)
         print(tm)
         
-        let tm1:[occ] = try occ.selectSql(table: Ob.self).whereCondition(condition: QueryCondition(condition: "a % 2 = 0")).query(db: db)
+        let tm1:[occ] = try occ.fetch(table: Ob.self).whereCondition(condition: QueryCondition(condition: "a % 2 = 0")).query(db: db)
         print(tm1)
         
-        let tm2:[ocl] = try ocl.selectSql(table: Ob.self)
+        let tm2:[ocl] = try ocl.fetch(table: Ob.self)
             .joinQuery(join: .leftJoin, table: Oc.self)
             .whereCondition(condition: QueryCondition.Key(key: "a", table: Ob.self) == QueryCondition.Key(key: "a", table: Oc.self))
             .query(db: db)
@@ -127,7 +127,7 @@ public class ocl:DataBaseFetchObject,CustomStringConvertible{
     @QueryColume(colume: "b", type: Oc.self,align:"cb")
     var cb:Int? = nil
     public var description: String{
-        return "\(ba),\(bc),\(ca),\(cc),\(cb)"
+        return "\(ba ?? 0),\(bc ?? "null"),\(ca ?? 0),\(cc ?? "null"),\(cb ?? 0)"
     }
 }
 
