@@ -63,7 +63,7 @@ open class DataBaseFetchObject{
     public static func fetch(table:DataBaseObject.Type)->Fetch{
         let sample = Self()
         let f = Fetch()
-        f.sql = "select \(sample.declare.map({$0.value.colume + "\($0.value.align != nil ? " as \($0.value.align!)" : "")"}).joined(separator: ",")) from \(table.name)"
+        f.select(sample: sample, table: table)
         return f
     }
     
@@ -82,6 +82,12 @@ open class DataBaseFetchObject{
         var sql:String = ""
         var join:[String] = []
         var condition:String = ""
+        var having:String = ""
+        var sort:[String] = []
+        var groupby:String = ""
+        public func select<T:DataBaseFetchObject>(sample:T,table:DataBaseObject.Type){
+            self.sql = "select \(sample.declare.map({$0.value.colume + "\($0.value.align != nil ? " as \($0.value.align!)" : "")"}).joined(separator: ",")) from \(table.name)"
+        }
         public func joinQuery(join:Join,table:DataBaseObject.Type,condition:QueryCondition? = nil)->Fetch{
             self.join.append(" \(join.code) \(table.name) \(condition == nil ? "" : "ON \(condition!.condition)")")
             return self
@@ -90,8 +96,26 @@ open class DataBaseFetchObject{
             self.condition = " where \(condition.condition)"
             return self
         }
+        public func orderBy(key:QueryCondition.Key,desc:Bool)->Fetch{
+            self.sort.append("\(key.key) \(desc ? "DESC" : "ASC")")
+            return self
+        }
+        public func groupBy(key:QueryCondition.Key...)->Fetch{
+            self.groupby = " group by \(key.map({$0.key}).joined(separator: ","))"
+            return self
+        }
+        public func having(condition:QueryCondition)->Fetch{
+            self.having = "HAVING \(condition.condition)"
+            return self
+        }
         public func query<T:DataBaseFetchObject>(db:DataBase) throws->[T]{
-            let sql = self.sql + join.joined(separator: " ") + condition
+            let sql = self.sql
+            + join.joined(separator: " ")
+            + condition
+            + self.groupby
+            + self.having
+            + (self.sort.count > 0 ? " order by \(self.sort.joined(separator: ","))" : "")
+            
             let rs = try db.prepare(sql: sql)
             var array:[T] = []
             while try rs.step() == .hasColumn {

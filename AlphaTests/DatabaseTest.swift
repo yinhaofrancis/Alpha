@@ -86,6 +86,7 @@ public class DatabaseTest: XCTestCase {
         let tm2:[ocl] = try ocl.fetch(table: Ob.self)
             .joinQuery(join: .leftJoin, table: Oc.self)
             .whereCondition(condition: QueryCondition.Key(key: "a", table: Ob.self) == QueryCondition.Key(key: "a", table: Oc.self))
+            .orderBy(key: .init(key: "a", table: Ob.self), desc: true)
             .query(db: db)
         print(tm2)
     }
@@ -127,7 +128,7 @@ public class ocl:DataBaseFetchObject,CustomStringConvertible{
     @QueryColume(colume: "b", type: Oc.self,align:"cb")
     var cb:Int? = nil
     public var description: String{
-        return "\(ba ?? 0),\(bc ?? "null"),\(ca ?? 0),\(cc ?? "null"),\(cb ?? 0)"
+        return "\(ba ?? 0)|\(bc ?? "null")|\(ca ?? 0)|\(cc ?? "null")|\(cb ?? 0)"
     }
 }
 
