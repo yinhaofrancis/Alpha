@@ -59,14 +59,14 @@ public class DatabaseTest: XCTestCase {
     }
     func testbkDataBase() throws {
         let db = try DataBase(name: "dddt")
-        let bdb = try BackUpDataBase(name: "ddtb", database: db);
+        let bdb = try DataBaseBackUp(name: "ddtb", database: db);
         try bdb.backup()
         db.close()
         db.deleteDatabaseFile()
         
     }
     func testrsDataBase() throws {
-        let rsd = try RestoreDataBase(name: "dddt", backup: "ddtb")
+        let rsd = try DataBaseRestore(name: "dddt", backup: "ddtb")
         try rsd.restore()
     }
     func testConditionDataBase() throws {
@@ -84,7 +84,7 @@ public class DatabaseTest: XCTestCase {
         print(tm1)
         
         let tm2:[ocl] = try ocl.fetch(table: Ob.self)
-            .joinQuery(join: .leftJoin, table: Oc.self)
+            .joinQuery(join: .crossJoin, table: Oc.self)
             .whereCondition(condition: QueryCondition.Key(key: "a", table: Ob.self) == QueryCondition.Key(key: "a", table: Oc.self))
             .orderBy(key: .init(key: "a", table: Ob.self), desc: true)
             .query(db: db)
@@ -112,7 +112,7 @@ public class occ:DataBaseFetchObject,CustomStringConvertible{
     var c:Int? = nil
     
     public var description: String{
-        return "\(a),\(c)"
+        return "\(String(describing: a)),\(String(describing: c))"
     }
 }
 
@@ -146,7 +146,7 @@ public class Ob:DataBaseObject,CustomStringConvertible{
     var da:Data? = nil
     
     public var description: String{
-        return "\(i),\(String(describing: d)),\(ki),\(da)"
+        return "\(i),\(String(describing: d)),\(ki),\(String(describing: da))"
     }
 }
 
@@ -164,6 +164,6 @@ public class Oc:DataBaseObject,CustomStringConvertible{
     var da:Data? = nil
     
     public var description: String{
-        return "\(i),\(String(describing: d)),\(ki),\(da)"
+        return "\(i),\(String(describing: d)),\(ki),\(String(describing: da))"
     }
 }

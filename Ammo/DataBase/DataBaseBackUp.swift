@@ -8,7 +8,7 @@
 import Foundation
 import SQLite3
 
-public class BackUpDataBase{
+public class DataBaseBackUp{
     fileprivate var backupPointer:DataBase
     private var origin:DataBase
     private var bkup:OpaquePointer?
@@ -21,7 +21,7 @@ public class BackUpDataBase{
         }
     }
     public convenience init(name:String,database:DataBase) throws{
-        let u = try BackUpDataBase.checkDir().appendingPathComponent(name)
+        let u = try DataBaseBackUp.checkDir().appendingPathComponent(name)
         try self.init(url: u, database: database)
     }
     public func backup() throws {
@@ -65,7 +65,7 @@ public class BackUpDataBase{
         return url
     }
 }
-public class RestoreDataBase{
+public class DataBaseRestore{
     private var bkup:OpaquePointer?
     private var restoreDb:DataBase
     private var backupDb:DataBase
@@ -76,7 +76,7 @@ public class RestoreDataBase{
     }
     public convenience init(name:String,backup:String) throws{
         let u = try DataBase.checkDir().appendingPathComponent(name)
-        let ub = try BackUpDataBase.checkDir().appendingPathComponent(backup)
+        let ub = try DataBaseBackUp.checkDir().appendingPathComponent(backup)
         try self.init(url: u, backup: ub)
     }
     public func restore() throws{

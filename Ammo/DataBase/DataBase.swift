@@ -35,6 +35,9 @@ public class DataBase:Hashable{
     }
     public func prepare(sql:String) throws->DataBase.ResultSet{
         var stmt:OpaquePointer?
+        #if DEBUG
+            print(sql)
+        #endif
         if sqlite3_prepare(self.sqlite!, sql, Int32(sql.utf8.count), &stmt, nil) != SQLITE_OK{
             throw NSError(domain: DataBase.errormsg(pointer: self.sqlite), code: 1)
         }
@@ -42,6 +45,9 @@ public class DataBase:Hashable{
     }
     
     public func exec(sql:String){
+        #if DEBUG
+            print(sql)
+        #endif
         sqlite3_exec(self.sqlite, sql, nil, nil, nil)
     }
     public func close(){

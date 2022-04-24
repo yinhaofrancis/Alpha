@@ -41,7 +41,6 @@ public class QueryColume<T:DBType>:FetchColume{
 open class DataBaseFetchObject{
     public enum Join{
         case leftJoin
-        case rightJoin
         case crossJoin
         case join
         case innerJoin
@@ -49,8 +48,6 @@ open class DataBaseFetchObject{
             switch(self){
             case .leftJoin:
                 return " LEFT JOIN "
-            case .rightJoin:
-                return " RIGHT JOIN "
             case .crossJoin:
                 return " CROSS JOIN "
             case .join:
