@@ -117,15 +117,15 @@ public class occ:DataBaseFetchObject,CustomStringConvertible{
 }
 
 public class ocl:DataBaseFetchObject,CustomStringConvertible{
-    @QueryColume(colume: "a", type: Ob.self,align:"ba")
+    @QueryColume(colume: "a", type: Ob.self)
     var ba:Int? = nil
-    @QueryColume(colume: "c", type: Ob.self,align:"bc")
+    @QueryColume(colume: "c", type: Ob.self)
     var bc:String? = nil
-    @QueryColume(colume: "a", type: Oc.self,align:"ca")
+    @QueryColume(colume: "a", type: Oc.self)
     var ca:Int? = nil
-    @QueryColume(colume: "c", type: Oc.self,align:"cc")
+    @QueryColume(colume: "c", type: Oc.self)
     var cc:String? = nil
-    @QueryColume(colume: "b", type: Oc.self,align:"cb")
+    @QueryColume(colume: "b", type: Oc.self)
     var cb:Int? = nil
     public var description: String{
         return "\(ba ?? 0)|\(bc ?? "null")|\(ca ?? 0)|\(cc ?? "null")|\(cb ?? 0)"

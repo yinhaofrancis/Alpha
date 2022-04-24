@@ -10,8 +10,9 @@ import Foundation
 public class FetchColume{
     public var colume:String
     public var value:DBType?
-    public var align:String?
+    public var align:Bool = false
     public init(colume:String,type:DataBaseObject.Type? = nil){
+        self.align = type != nil
         self.colume = (type == nil ? "" : (type!.name + ".")) + colume
     }
 }
@@ -31,9 +32,8 @@ public class QueryColume<T:DBType>:FetchColume{
         super.init(colume: colume, type: nil)
         self.value = wrappedValue
     }
-    public init(wrappedValue:T,colume:String,type:DataBaseObject.Type,align:String){
+    public init(wrappedValue:T,colume:String,type:DataBaseObject.Type){
         super.init(colume: colume, type: type)
-        self.align = align
     }
 }
 
@@ -69,7 +69,7 @@ open class DataBaseFetchObject{
             (kv.value as? FetchColume) != nil
         }.reduce(into: [:]) { partialResult, kv in
             let fc = kv.value as! FetchColume
-            partialResult[fc.align ?? fc.colume] = fc
+            partialResult[fc.align ? kv.label! : fc.colume] = fc
         }
     }
     public required init() {}
@@ -83,7 +83,7 @@ open class DataBaseFetchObject{
         var sort:[String] = []
         var groupby:String = ""
         public func select<T:DataBaseFetchObject>(sample:T,table:DataBaseObject.Type){
-            self.sql = "select \(sample.declare.map({$0.value.colume + "\($0.value.align != nil ? " as \($0.value.align!)" : "")"}).joined(separator: ",")) from \(table.name)"
+            self.sql = "select \(sample.declare.map({$0.value.colume + "\($0.value.align ? " as \($0.key)" : "")"}).joined(separator: ",")) from \(table.name)"
         }
         public func joinQuery(join:Join,table:DataBaseObject.Type,condition:QueryCondition? = nil)->Fetch{
             self.join.append(" \(join.code) \(table.name) \(condition == nil ? "" : "ON \(condition!.condition)")")
