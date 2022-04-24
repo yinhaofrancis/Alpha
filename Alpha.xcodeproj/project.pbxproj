@@ -16,6 +16,7 @@
 		A925326926AFB7520080E72D /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = A925326226AFB7520080E72D /* Map.swift */; };
 		A925326A26AFB7520080E72D /* Backup.swift in Sources */ = {isa = PBXBuildFile; fileRef = A925326326AFB7520080E72D /* Backup.swift */; };
 		A93271F326AFB4A5009107CA /* Alpha.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A93271E926AFB4A4009107CA /* Alpha.framework */; };
+		A93792062815426400EBA6C8 /* DataBaseJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = A93792052815426400EBA6C8 /* DataBaseJSON.swift */; };
 		A9516324280E80E200B95719 /* Ammo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A951631B280E806500B95719 /* Ammo.framework */; };
 		A9516328280E81C100B95719 /* DataBaseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9516314280E676F00B95719 /* DataBaseModel.swift */; };
 		A9516329280E81C400B95719 /* DataBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9C47BBD280525DF00DFC556 /* DataBase.swift */; };
@@ -71,6 +72,7 @@
 		A93271ED26AFB4A5009107CA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A93271F226AFB4A5009107CA /* AlphaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AlphaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A93271F926AFB4A5009107CA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A93792052815426400EBA6C8 /* DataBaseJSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBaseJSON.swift; sourceTree = "<group>"; };
 		A9516314280E676F00B95719 /* DataBaseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBaseModel.swift; sourceTree = "<group>"; };
 		A951631B280E806500B95719 /* Ammo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Ammo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9580AF126B120EA00530397 /* macos.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = macos.xcconfig; sourceTree = "<group>"; };
@@ -244,6 +246,7 @@
 				A9516314280E676F00B95719 /* DataBaseModel.swift */,
 				A907BDC82810F3BC001BDE45 /* DataBaseBackUp.swift */,
 				A9AF8850281240CE0056FE5F /* DataBaseFetch.swift */,
+				A93792052815426400EBA6C8 /* DataBaseJSON.swift */,
 			);
 			path = DataBase;
 			sourceTree = "<group>";
@@ -463,6 +466,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A93792062815426400EBA6C8 /* DataBaseJSON.swift in Sources */,
 				A907BDC92810F3BC001BDE45 /* DataBaseBackUp.swift in Sources */,
 				A9AF8851281240CE0056FE5F /* DataBaseFetch.swift in Sources */,
 				A9516329280E81C400B95719 /* DataBase.swift in Sources */,
