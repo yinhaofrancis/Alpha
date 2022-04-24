@@ -27,7 +27,7 @@ open class DataBaseObject{
             }
             Mirror(reflecting: self).children.filter({$0.value is TableColumn}).forEach { kv in
                 let tc = kv.value as! TableColumn
-                tc.origin = a[tc.name]!
+                tc.asignOrigin(origin: a[tc.name]!)
             }
         }
     }

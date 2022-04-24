@@ -70,9 +70,8 @@ public class DatabaseTest: XCTestCase {
         try rsd.restore()
     }
     func testConditionDataBase() throws {
-        
-        let a = QueryCondition.Key(key:"a") != QueryCondition.Key(key:"10") && QueryCondition.Key(key:"b") != QueryCondition.Key(key:"10")
-        XCTAssert(a.condition == "a <> 10 and b <> 10")
+        let a = JSONModel(object: ["a":1,"dd":2,"e":3])
+        print(a.a)
     }
     
     func testQueryDataBase() throws {

@@ -337,6 +337,9 @@ public class TableColumn:CollumnDeclare{
         self.origin = value
         super.init(type: type, nullable: nullable, name: name, primaryKey: primaryKey, unique: unique)
     }
+    public func asignOrigin(origin:DBType){
+        self.origin = origin
+    }
 }
 
 public struct TableModel{
@@ -399,14 +402,15 @@ public struct TableModel{
             for i in 0 ..< rs.columeCount{
                 let name = rs.columeName(index: i)
                 if let v = rs.colume(index: i){
-                    map[name]?.origin = v
+                    map[name]?.asignOrigin(origin: v)
                 }
             }
         }
         for i in 0 ..< rs.columeCount{
             let name = rs.columeName(index: i)
             if let v = rs.colume(index: i){
-                map[name]?.origin = v
+//                map[name]?.origin = v
+                map[name]?.asignOrigin(origin: v)
             }
         }
         rs.close()
