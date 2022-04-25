@@ -181,20 +181,9 @@ public class DataBase:Hashable{
             return JSONModel(jsonData: data)
         }
         public func colume(index:Int32)->DBType?{
-            
-            switch(self.columeDecType(index: index)){
-       
-            case .intDecType:
-                return Int(self.columeInt(index: index))
-            case .doubleDecType:
-                return self.columeDouble(index: index)
-            case .textDecType:
-                return self.columeString(index: index)
-            case .dataDecType:
-                return self.columeData(index: index)
-            case .jsonDecType:
+            if self.columeDecType(index: index) == .jsonDecType{
                 return self.columeJSON(index: index)
-            case .none:
+            }else{
                 switch (self.columeType(index: index)){
                 case .nullCollumn:
                     return nil
@@ -205,7 +194,7 @@ public class DataBase:Hashable{
                 case .textCollumn:
                     return self.columeString(index: index)
                 case .dataCollumn:
-                    return self.columeJSON(index: index)
+                    return self.columeData(index: index)
                 }
             }
         }

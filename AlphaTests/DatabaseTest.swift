@@ -15,6 +15,7 @@ public class DatabaseTest: XCTestCase {
     func testDataBase() throws{
         let db = try DataBase(name: "dddt")
         let a = Ob()
+        a.tableModel.drop(db: db)
         try a.declare.create(db: db)
         
         for i in 0 ..< 80 {
@@ -28,6 +29,7 @@ public class DatabaseTest: XCTestCase {
         }
         
         let b = Oc()
+        b.tableModel.drop(db: db)
         try b.declare.create(db: db)
         
         for i in 0 ..< 80 {
