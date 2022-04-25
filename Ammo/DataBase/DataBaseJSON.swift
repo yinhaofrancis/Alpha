@@ -41,7 +41,7 @@ public struct JSONModel:ExpressibleByArrayLiteral,
         get{
             let a:[String:JSONModel] = (self.content as? [String:Any])?.reduce(into: [:], { partialResult, kv in
                 partialResult[kv.key] = JSONModel(content: kv.value)
-            }) as? [String : JSONModel] ?? [:]
+            }) ?? [:]
             return a
         }
         set{
