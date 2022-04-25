@@ -22,6 +22,7 @@ public class DatabaseTest: XCTestCase {
             a.d = i * 100
             a.ki = "dadada王🉑️\(i)"
             a.da = "dadada王🉑️\(i * 100)".data(using: .utf8)
+            a.ea = ["ddd":"dddd","a":i + 1]
             try a.tableModel.insert(db: db)
             try a.tableModel.update(db: db)
         }
@@ -49,9 +50,9 @@ public class DatabaseTest: XCTestCase {
         print(tm)
         let tm1:[Ob] = try Ob.select(db: db,condition: QueryCondition.in(key: .init(key: "a"), value: "1","10","100","1000"))
         print(tm1)
-//        try Ob.delete(db: db, condition: QueryCondition.Key(key: "dd") != QueryCondition.Key(key: "10"))
-//        let tm2:[Ob] = try Ob.select(db: db)
-//        print(tm2)
+        try Ob.delete(db: db, condition: QueryCondition.Key(key: "a") == QueryCondition.Key(key: "10"))
+        let tm2:[Ob] = try Ob.select(db: db)
+        print(tm2)
         db.close()
         
         
@@ -72,6 +73,8 @@ public class DatabaseTest: XCTestCase {
     func testConditionDataBase() throws {
         let a = JSONModel(object: ["a":1,"dd":2,"e":3])
         print(a.a)
+        let s:JSONModel = ["ddd":"dddd","a":1]
+        print(s.jsonString)
     }
     
     func testQueryDataBase() throws {
@@ -79,15 +82,26 @@ public class DatabaseTest: XCTestCase {
         let tm:[oQ] = try oQ.fetch(table: Ob.self).whereCondition(condition: QueryCondition(condition: "a % 2 = 0")).query(db: db)
         print(tm)
         
-        let tm1:[occ] = try occ.fetch(table: Ob.self).whereCondition(condition: QueryCondition(condition: "a % 2 = 0")).query(db: db)
-        print(tm1)
-        
         let tm2:[ocl] = try ocl.fetch(table: Ob.self)
             .joinQuery(join: .crossJoin, table: Oc.self)
             .whereCondition(condition: QueryCondition.Key(key: "a", table: Ob.self) == QueryCondition.Key(key: "a", table: Oc.self))
             .orderBy(key: .init(key: "a", table: Ob.self), desc: true)
             .query(db: db)
         print(tm2)
+        
+        
+        let tm3:[Ob] = try Ob.select(db: db, condition: QueryCondition.Key(jsonKey: "e", keypath: "$.a") < QueryCondition.Key(key: "10"))
+        print(tm3)
+        db.close()
+    }
+    
+    func testFunction() throws{
+        let db = try DataBase(name: "dddt")
+        let tm1:[occ] = try occ.fetch(table: Ob.self).whereCondition(condition: QueryCondition(condition: "a % 2 = 0")).query(db: db)
+        print("---occ---")
+        print(tm1)
+        print("---occ---")
+        db.close()
     }
 }
 
@@ -104,10 +118,10 @@ public class oQ:DataBaseFetchObject,CustomStringConvertible{
 }
 
 public class occ:DataBaseFetchObject,CustomStringConvertible{
-    @QueryColume(colume: "max(a)")
+    @QueryColume(function: "max", colume: "a")
     var a:Int? = nil
     
-    @QueryColume(colume: "count(c)")
+    @QueryColume(function: "count", colume: "c")
     var c:Int? = nil
     
     public var description: String{
@@ -126,8 +140,10 @@ public class ocl:DataBaseFetchObject,CustomStringConvertible{
     var cc:String? = nil
     @QueryColume(colume: "b", type: Oc.self)
     var cb:Int? = nil
+    @QueryColume(colume: "e", type: Ob.self)
+    var json:JSONModel? = nil
     public var description: String{
-        return "\(ba ?? 0)|\(bc ?? "null")|\(ca ?? 0)|\(cc ?? "null")|\(cb ?? 0)"
+        return "\(ba ?? 0)|\(bc ?? "null")|\(ca ?? 0)|\(cc ?? "null")|\(cb ?? 0)|\(json ?? "null")"
     }
 }
 
@@ -144,8 +160,10 @@ public class Ob:DataBaseObject,CustomStringConvertible{
     @Col(name:"d")
     var da:Data? = nil
     
+    @Col(name:"e")
+    var ea:JSONModel? = nil
     public var description: String{
-        return "\(i),\(String(describing: d)),\(ki),\(String(describing: da))"
+        return "\(i),\(String(describing: d)),\(ki),\(String(describing: da)),\(self.ea)"
     }
 }
 

@@ -10,18 +10,18 @@ import Foundation
 @dynamicMemberLookup
 public struct JSONModel:ExpressibleByArrayLiteral,
                    ExpressibleByDictionaryLiteral,
-                        ExpressibleByStringLiteral,DBType{
+                        ExpressibleByStringLiteral,DBType,CustomStringConvertible{
     public static var originType: CollumnDecType = .jsonDecType
     
     public var isNull: Bool{
         return false
     }
     
-    public typealias ArrayLiteralElement = [JSONModel]
+    public typealias ArrayLiteralElement = [Any]
     
     public typealias Key = String
     
-    public typealias Value = JSONModel
+    public typealias Value = Any
     
     public typealias StringLiteralType = String
     
@@ -29,19 +29,25 @@ public struct JSONModel:ExpressibleByArrayLiteral,
     
     public var array:[JSONModel]{
         get{
-            return self.content as? [JSONModel] ?? []
+            guard let c = self.content as? [Any] else { return [] }
+            return c.map({JSONModel(content: $0)})
         }
         set{
-            self.content = newValue
+            self.content = newValue.map({$0.content})
         }
         
     }
     public var object:[String:JSONModel]{
         get{
-            return self.content as? [String:JSONModel] ?? [:]
+            let a:[String:JSONModel] = (self.content as? [String:Any])?.reduce(into: [:], { partialResult, kv in
+                partialResult[kv.key] = JSONModel(content: kv.value)
+            }) as? [String : JSONModel] ?? [:]
+            return a
         }
         set{
-            self.content = newValue
+            self.content = newValue.reduce(into: [:], { partialResult, kv in
+                partialResult[kv.key] = kv.value.content
+            })
         }
         
     }
@@ -177,11 +183,11 @@ public struct JSONModel:ExpressibleByArrayLiteral,
     public init(content:Any){
         self.content = content
     }
-    public init(arrayLiteral elements: [JSONModel]...) {
+    public init(arrayLiteral elements: [Any]...) {
         self.content = elements
     }
-    public init(dictionaryLiteral elements: (String, JSONModel)...) {
-        let a:[String:JSONModel] = elements.reduce(into: [:], { partialResult, kv in
+    public init(dictionaryLiteral elements: (String, Any)...) {
+        let a:[String:Any] = elements.reduce(into: [:], { partialResult, kv in
             partialResult[kv.0] = kv.1
         })
         self.content = a
@@ -200,5 +206,15 @@ public struct JSONModel:ExpressibleByArrayLiteral,
     }
     public init(array:[Any]){
         self.content = array.map({JSONModel(content: $0)})
+    }
+    public init(jsonData:Data){
+        self.content = (try? JSONSerialization.jsonObject(with: jsonData)) ?? ""
+    }
+    public var jsonString:String{
+        guard let da = try? JSONSerialization.data(withJSONObject: self.content, options: .fragmentsAllowed) else { return "" }
+        return String(data: da, encoding: .utf8) ?? ""
+    }
+    public var description: String{
+        return self.jsonString
     }
 }

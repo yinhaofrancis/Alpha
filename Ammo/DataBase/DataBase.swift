@@ -108,6 +108,14 @@ public class DataBase:Hashable{
                 let m:UnsafeMutablePointer<UInt8> = UnsafeMutablePointer.allocate(capacity: str.count)
                 str.copyBytes(to: m, count: str.count)
                 flag = sqlite3_bind_blob64(self.stmt, index, m, sqlite3_uint64(str.count), { p in p?.deallocate()})
+            }else if (value is JSONModel){
+                let str = (value as! JSONModel).jsonString
+                let c = str.cString(using: .utf8)
+                let p = UnsafeMutablePointer<CChar>.allocate(capacity: str.utf8.count)
+                memcpy(p, c, str.utf8.count)
+                flag = sqlite3_bind_text(self.stmt, index, p, Int32(str.utf8.count)) { p in
+                    p?.deallocate()
+                }
             }else{
                 flag = sqlite3_bind_value(self.stmt, index, value as? OpaquePointer)
             }
@@ -115,26 +123,26 @@ public class DataBase:Hashable{
                 throw NSError(domain: DataBase.errormsg(pointer: self.sqlite), code: 4)
             }
         }
-        public func bind(index:Int32,value:DBType,type:CollumnType) throws{
+        public func bind(index:Int32,value:DBType,type:CollumnDecType) throws{
             if(value.isNull){
                 try self.bindNull(index: index)
                 return
             }
             switch(type){
-            case .nullCollumn:
-                try self.bindNull(index: index)
-                break
-            case .intCollumn:
+            case .intDecType:
                 try self.bind(index: index, value: value as! Int)
                 break
-            case .doubleCollumn:
+            case .doubleDecType:
                 try self.bind(index: index, value: value as! Double)
                 break
-            case .textCollumn:
+            case .textDecType:
                 try self.bind(index: index, value: value as! String)
                 break
-            case .dataCollumn:
+            case .dataDecType:
                 try self.bind(index: index, value: value as! Data)
+                break
+            case .jsonDecType:
+                try self.bind(index: index, value: value as! JSONModel)
                 break
             }
         }
@@ -166,18 +174,39 @@ public class DataBase:Hashable{
         public func columeString(index:Int32)->String{
             String(cString: sqlite3_column_text(self.stmt, index))
         }
+        public func columeJSON(index:Int32)->JSONModel{
+            let len = sqlite3_column_bytes(self.stmt, index)
+            guard let byte = sqlite3_column_blob(self.stmt, index) else { return JSONModel(stringLiteral: "") }
+            let data = Data(bytes: byte, count: Int(len))
+            return JSONModel(jsonData: data)
+        }
         public func colume(index:Int32)->DBType?{
-            switch(self.columeType(index: index)){
-            case .nullCollumn:
-                return nil
-            case .intCollumn:
+            
+            switch(self.columeDecType(index: index)){
+       
+            case .intDecType:
                 return Int(self.columeInt(index: index))
-            case .doubleCollumn:
+            case .doubleDecType:
                 return self.columeDouble(index: index)
-            case .textCollumn:
+            case .textDecType:
                 return self.columeString(index: index)
-            case .dataCollumn:
+            case .dataDecType:
                 return self.columeData(index: index)
+            case .jsonDecType:
+                return self.columeJSON(index: index)
+            case .none:
+                switch (self.columeType(index: index)){
+                case .nullCollumn:
+                    return nil
+                case .intCollumn:
+                    return Int(self.columeInt(index: index))
+                case .doubleCollumn:
+                    return self.columeDouble(index: index)
+                case .textCollumn:
+                    return self.columeString(index: index)
+                case .dataCollumn:
+                    return self.columeJSON(index: index)
+                }
             }
         }
         public func columeData(index:Int32)->Data{
@@ -366,14 +395,14 @@ public struct TableModel{
     public func bindPrimaryConditionData(rs:DataBase.ResultSet) throws{
         for i in  self.declare.filter({$0.primaryKey}){
             let index = rs.getParamIndexBy(name: "@p"+i.name)
-            try rs.bind(index: index, value: i.origin, type: i.type.collumnType)
+            try rs.bind(index: index, value: i.origin, type: i.type)
         }
     }
     public func insert(db:DataBase) throws {
         let rs = try db.prepare(sql: self.insertCode)
         for i in self.declare{
             let indx = rs.getParamIndexBy(name: "@"+i.name)
-            try rs.bind(index: indx, value: i.origin, type: i.type.collumnType)
+            try rs.bind(index: indx, value: i.origin, type: i.type)
         }
         _ = try rs.step()
         rs.close()
@@ -383,7 +412,7 @@ public struct TableModel{
             let rs = try db.prepare(sql: self.updateCode)
             for i in self.declare{
                 let indx = rs.getParamIndexBy(name: "@"+i.name)
-                try rs.bind(index: indx, value: i.origin, type: i.type.collumnType)
+                try rs.bind(index: indx, value: i.origin, type: i.type)
             }
             try self.bindPrimaryConditionData(rs: rs)
             _ = try rs.step()
@@ -477,6 +506,10 @@ public class QueryCondition{
         public var key:String
         public init(key:String,table:DataBaseObject.Type? = nil){
             self.key = table == nil ? key : (table!.name + ".") + key
+        }
+        public init(jsonKey:String,keypath:String,table:DataBaseObject.Type? = nil){
+            let key = table == nil ? jsonKey : (table!.name + ".") + jsonKey
+            self.key = "json_extract(\(key),'\(keypath)')"
         }
         public static func ==(l:QueryCondition.Key,r:QueryCondition.Key)->QueryCondition{
             QueryCondition(condition: l.key + " = " + r.key)

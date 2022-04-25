@@ -13,7 +13,7 @@ public class FetchColume{
     public var align:Bool = false
     public init(colume:String,type:DataBaseObject.Type? = nil){
         self.align = type != nil
-        self.colume = (type == nil ? "" : (type!.name + ".")) + colume
+        self.colume = colume
     }
 }
 
@@ -32,8 +32,31 @@ public class QueryColume<T:DBType>:FetchColume{
         super.init(colume: colume, type: nil)
         self.value = wrappedValue
     }
-    public init(wrappedValue:T,colume:String,type:DataBaseObject.Type){
-        super.init(colume: colume, type: type)
+    public init(wrappedValue:T,function:String,colume:String,type:DataBaseObject.Type? = nil){
+        if let t = type{
+            let c = "\(function)(\(t.name).\(colume))"
+            super.init(colume:c, type: type)
+            self.value = wrappedValue
+        }else{
+            let c = "\(function)(\(colume))"
+            super.init(colume:c, type: type)
+            self.value = wrappedValue
+        }
+        self.align = true;
+    }
+    public init(wrappedValue:T,colume:String,type:DataBaseObject.Type? = nil){
+        if let t = type{
+            super.init(colume: t.name + "." + colume, type: type)
+            self.value = wrappedValue
+        }else{
+            super.init(colume: colume, type: type)
+            self.value = wrappedValue
+        }
+    }
+    public init(wrappedValue:T,colume:String,keyPath:String,type:DataBaseObject.Type? = nil){
+        let c = "json_extract(\((type == nil ? "" : type!.name + ".")  + colume),\(keyPath))"
+        super.init(colume: c, type: type)
+        self.value = wrappedValue
     }
 }
 
