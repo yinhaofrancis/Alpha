@@ -165,7 +165,7 @@ public class Ob:DataBaseObject,CustomStringConvertible{
     @Col(name:"e")
     var ea:JSONModel? = nil
     public var description: String{
-        return "\(i),\(String(describing: d)),\(ki),\(String(describing: da)),\(self.ea)"
+        return "\(i),\(String(describing: d)),\(ki),\(String(describing: da)),\(String(describing: self.ea))"
     }
 }
 
