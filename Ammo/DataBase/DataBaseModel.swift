@@ -27,7 +27,7 @@ open class DataBaseObject{
             }
             Mirror(reflecting: self).children.filter({$0.value is TableColumn}).forEach { kv in
                 let tc = kv.value as! TableColumn
-                tc.asignOrigin(origin: a[tc.name]!)
+                tc.origin = a[tc.name]!
             }
         }
     }
@@ -151,4 +151,28 @@ public class Col<T:DBType>:TableColumn{
     }
 }
 
-
+@propertyWrapper
+public class FK<T:TableColumn>:TableColumn{
+    public var wrappedValue:T
+    public init(wrappedValue:T,
+                refKey:String,
+                refTable:DataBaseObject.Type? = nil,
+                onUpdate:ForeignDeclareAction? = nil,
+                onDelete:ForeignDeclareAction? = nil){
+        self.wrappedValue = wrappedValue
+        super.init(value: self.wrappedValue.origin, type: self.wrappedValue.type, nullable: self.wrappedValue.nullable, name: self.wrappedValue.name, primaryKey: self.wrappedValue.primaryKey, unique: self.wrappedValue.unique)
+        self.foreignDeclare = ForeignDeclare(key: self.wrappedValue.name,
+                                                          refKey: refKey,
+                                                        table:refTable?.name ,
+                                                          onDelete: onDelete,
+                                                          onUpdate: onUpdate)
+    }
+    public override var origin: DBType{
+        get{
+            self.wrappedValue.origin
+        }
+        set{
+            self.wrappedValue.origin = newValue
+        }
+    }
+}

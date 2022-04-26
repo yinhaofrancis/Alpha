@@ -298,14 +298,36 @@ public enum CollumnDecType:String{
         }
     }
 }
+public struct ForeignDeclareAction:Hashable{
+    let action:String
+    static public var CASCADE:ForeignDeclareAction = ForeignDeclareAction(action: "CASCADE")
+    static public var NO_ACTION:ForeignDeclareAction = ForeignDeclareAction(action: "NO ACTION")
+    static public var RESTRICT:ForeignDeclareAction = ForeignDeclareAction(action: "RESTRICT")
+    static public var SET_NULL:ForeignDeclareAction = ForeignDeclareAction(action: "SET NULL")
+    static public var SET_DEFAULT:ForeignDeclareAction = ForeignDeclareAction(action: "SET DEFAULT")
+}
 
-public class CollumnDeclare:NSObject{
+public struct ForeignDeclare{
+    public var key:String
+    public var refKey:String
+    public var table:String?
+    public var onDelete:ForeignDeclareAction?
+    public var onUpdate:ForeignDeclareAction?
+    public var code:String{
+        
+        let rf = table == nil ? refKey : "\(table!)(\(refKey))"
+        
+        return "FOREIGN KEY(\(key)) REFERENCES \(rf) \(onDelete != nil ? "onDelete \(onDelete!.action)":"") \(onUpdate != nil ? "onUpdate \(onUpdate!.action)":"")"
+    }
+}
+public class CollumnDeclare{
     public var type:CollumnDecType
     public var nullable:Bool
     public var name:String
     public var primaryKey:Bool
     public var unique:Bool
     public var defaultValue:String?
+    public var foreignDeclare:ForeignDeclare?
     public init(type:CollumnDecType,nullable:Bool, name:String, primaryKey:Bool,unique:Bool,defaultValue:String?){
         self.type = type
         self.nullable = nullable
@@ -354,15 +376,28 @@ public struct TableDeclare{
     public var primaryColume:[CollumnDeclare]{
         self.declare.filter({$0.primaryKey})
     }
+    public var foreignColume:[CollumnDeclare]{
+        self.declare.filter({$0.foreignDeclare != nil}).map { cd in
+            if cd.foreignDeclare?.table == nil{
+                cd.foreignDeclare?.table = self.name
+            }
+            return cd
+        }
+    }
     public var code:String{
         let pk = self.primaryColume
+        let fk = self.foreignColume.map({$0.foreignDeclare!.code})
+        
+        let pkv = ",PRIMARY KEY(\(pk.map({"\"\($0.name)\""}).joined(separator: ",")))"
+        let fkv = "," + fk.joined(separator: ",")
+        var code = "create table if not exists \(name) (\(self.declare.map({$0.code}).joined(separator: ","))"
         if(pk.count > 0){
-            
-            let pkv = ",PRIMARY KEY(\(pk.map({"\"\($0.name)\""}).joined(separator: ",")))"
-            return "create table if not exists \(name) (\(self.declare.map({$0.code}).joined(separator: ",")) \(pkv))"
-        }else{
-            return "create table if not exists \(name) (\(self.declare.map({$0.code}).joined(separator: ",")))"
+             code += pkv
         }
+        if(fk.count > 0){
+            code += fkv
+        }
+        return code + ")"
     }
     public func create(db:DataBase) throws {
         let rs = try db.prepare(sql: self.code)
@@ -449,15 +484,14 @@ public struct TableModel{
             for i in 0 ..< rs.columeCount{
                 let name = rs.columeName(index: i)
                 if let v = rs.colume(index: i){
-                    map[name]?.asignOrigin(origin: v)
+                    map[name]?.origin = v
                 }
             }
         }
         for i in 0 ..< rs.columeCount{
             let name = rs.columeName(index: i)
             if let v = rs.colume(index: i){
-//                map[name]?.origin = v
-                map[name]?.asignOrigin(origin: v)
+                map[name]?.origin = v
             }
         }
         rs.close()

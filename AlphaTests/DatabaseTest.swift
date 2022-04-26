@@ -183,6 +183,7 @@ public class Oc:DataBaseObject,CustomStringConvertible{
     @Col(name:"a",primaryKey:true)
     var i:Int = 0
     
+    @FK(refKey: "a")
     @Col(name:"b")
     var d:Int? = nil
     
