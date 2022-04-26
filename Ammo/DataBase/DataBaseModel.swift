@@ -49,9 +49,14 @@ open class DataBaseObject{
 public protocol DBType{
     static var originType:CollumnDecType { get }
     var isNull:Bool { get }
+    var asDefault:String? { get }
 }
 
 extension Int:DBType{
+    public var asDefault: String? {
+        "\(self)"
+    }
+    
     public static var originType: CollumnDecType {
         return .intDecType
     }
@@ -66,6 +71,10 @@ extension String:DBType{
     public var isNull: Bool{
         return false
     }
+    public var asDefault: String? {
+        self
+    }
+    
 }
 extension Double:DBType{
     public static var originType: CollumnDecType {
@@ -74,6 +83,10 @@ extension Double:DBType{
     public var isNull: Bool{
         return false
     }
+    public var asDefault: String? {
+        "\(self)"
+    }
+    
 }
 extension Data:DBType{
     public static var originType: CollumnDecType {
@@ -82,9 +95,23 @@ extension Data:DBType{
     public var isNull: Bool{
         return false
     }
+    public var asDefault: String? {
+        ""
+    }
+    
 }
 
 extension Optional:DBType where Wrapped:DBType{
+    public var asDefault: String? {
+        switch(self){
+            
+        case .none:
+            return nil
+        case let .some(v):
+            return v.asDefault
+        }
+    }
+    
     public static var originType: CollumnDecType {
         Wrapped.originType
     }

@@ -291,21 +291,23 @@ public class CollumnDeclare:NSObject{
     public var name:String
     public var primaryKey:Bool
     public var unique:Bool
-    public init(type:CollumnDecType,nullable:Bool, name:String, primaryKey:Bool,unique:Bool){
+    public var defaultValue:String?
+    public init(type:CollumnDecType,nullable:Bool, name:String, primaryKey:Bool,unique:Bool,defaultValue:String?){
         self.type = type
         self.nullable = nullable
         self.name = name
         self.primaryKey = primaryKey
         self.unique = unique
+        self.defaultValue = defaultValue
     }
     public static func primaryCollumn(name:String,type:CollumnDecType)->CollumnDeclare{
-        CollumnDeclare(type: type, nullable: false, name: name, primaryKey: true, unique: false)
+        CollumnDeclare(type: type, nullable: false, name: name, primaryKey: true, unique: false, defaultValue: nil)
     }
     public static func normalCollumn(name:String,type:CollumnDecType)->CollumnDeclare{
-        CollumnDeclare(type: type, nullable: true, name: name, primaryKey: false, unique: false)
+        CollumnDeclare(type: type, nullable: true, name: name, primaryKey: false, unique: false, defaultValue: nil)
     }
     public var code:String{
-        return "\(name) \(type.rawValue) \(unique ? "unique":"") \(nullable ? "" : "NOT NULL")"
+        return "\(name) \(type.rawValue) \(unique ? "unique":"") \(nullable ? "" : "NOT NULL") \(self.defaultValue != nil ? "default \"\(self.defaultValue!)\"" : "" )"
     }
 }
 
@@ -359,7 +361,7 @@ public class TableColumn:CollumnDeclare{
     public var origin:DBType
     public init(value:DBType,type:CollumnDecType,nullable:Bool, name:String, primaryKey:Bool,unique:Bool){
         self.origin = value
-        super.init(type: type, nullable: nullable, name: name, primaryKey: primaryKey, unique: unique)
+        super.init(type: type, nullable: nullable, name: name, primaryKey: primaryKey, unique: unique, defaultValue: value.asDefault)
     }
     public func asignOrigin(origin:DBType){
         self.origin = origin

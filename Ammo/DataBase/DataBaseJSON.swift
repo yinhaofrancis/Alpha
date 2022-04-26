@@ -11,6 +11,10 @@ import Foundation
 public struct JSONModel:ExpressibleByArrayLiteral,
                    ExpressibleByDictionaryLiteral,
                         ExpressibleByStringLiteral,DBType,CustomStringConvertible{
+    public var asDefault: String?{
+        return ""
+    }
+    
     public static var originType: CollumnDecType = .jsonDecType
     
     public var isNull: Bool{
