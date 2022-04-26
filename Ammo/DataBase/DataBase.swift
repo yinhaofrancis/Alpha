@@ -116,6 +116,8 @@ public class DataBase:Hashable{
                 flag = sqlite3_bind_text(self.stmt, index, p, Int32(str.utf8.count)) { p in
                     p?.deallocate()
                 }
+            }else if (value is Date){
+                flag = sqlite3_bind_double(self.stmt, index, (value as! Date).timeIntervalSince1970)
             }else{
                 flag = sqlite3_bind_value(self.stmt, index, value as? OpaquePointer)
             }
@@ -143,6 +145,9 @@ public class DataBase:Hashable{
                 break
             case .jsonDecType:
                 try self.bind(index: index, value: value as! JSONModel)
+                break
+            case .dateDecType:
+                try self.bind(index: index, value: value as! Date)
                 break
             }
         }
@@ -180,9 +185,15 @@ public class DataBase:Hashable{
             let data = Data(bytes: byte, count: Int(len))
             return JSONModel(jsonData: data)
         }
+        public func columeDate(index:Int32)->Date{
+            let time = sqlite3_column_double(self.stmt, index)
+            return Date(timeIntervalSince1970: time)
+        }
         public func colume(index:Int32)->DBType?{
             if self.columeDecType(index: index) == .jsonDecType{
                 return self.columeJSON(index: index)
+            }else if self.columeDecType(index: index) == .dateDecType{
+                return self.columeDate(index: index)
             }else{
                 switch (self.columeType(index: index)){
                 case .nullCollumn:
@@ -268,6 +279,7 @@ public enum CollumnDecType:String{
     case textDecType = "TEXT"
     case dataDecType = "BLOB"
     case jsonDecType = "JSON"
+    case dateDecType = "DATE"
     public var collumnType:CollumnType{
         switch(self){
             
@@ -281,6 +293,8 @@ public enum CollumnDecType:String{
             return .dataCollumn
         case .jsonDecType:
             return .textCollumn
+        case .dateDecType:
+            return .doubleCollumn
         }
     }
 }

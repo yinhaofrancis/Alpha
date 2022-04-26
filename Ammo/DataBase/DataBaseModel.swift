@@ -52,6 +52,18 @@ public protocol DBType{
     var asDefault:String? { get }
 }
 
+extension Date:DBType{
+    public static var originType: CollumnDecType{
+        .dateDecType
+    }
+    public var isNull: Bool{
+        return false
+    }
+    public var asDefault: String?{
+        return "\(self.timeIntervalSince1970)"
+    }
+}
+
 extension Int:DBType{
     public var asDefault: String? {
         "\(self)"

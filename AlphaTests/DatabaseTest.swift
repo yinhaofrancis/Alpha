@@ -39,6 +39,7 @@ public class DatabaseTest: XCTestCase {
                 b.d = i * 100
                 b.ki = "dadada王🉑️\(i)"
                 b.da = "dadada王🉑️\(i * 100)".data(using: .utf8)
+                b.ee = Date()
                 try b.tableModel.insert(db: db)
                 try b.tableModel.update(db: db)
             }
@@ -151,8 +152,10 @@ public class ocl:DataBaseFetchObject,CustomStringConvertible{
     var cb:Int? = nil
     @QueryColume(colume: "e", type: Ob.self)
     var json:JSONModel? = nil
+    @QueryColume(colume: "e", type: Oc.self)
+    var fdate:Date? = nil
     public var description: String{
-        return "\(ba ?? 0)|\(bc ?? "null")|\(ca ?? 0)|\(cc ?? "null")|\(cb ?? 0)|\(json ?? "null")"
+        return "\(ba ?? 0)|\(bc ?? "null")|\(ca ?? 0)|\(cc ?? "null")|\(cb ?? 0)|\(json ?? "null")|\(fdate as Any)"
     }
 }
 
@@ -189,7 +192,10 @@ public class Oc:DataBaseObject,CustomStringConvertible{
     @Col(name:"d")
     var da:Data? = nil
     
+    @Col(name:"e")
+    var ee:Date? = nil
+    
     public var description: String{
-        return "\(i),\(String(describing: d)),\(ki),\(String(describing: da))"
+        return "\(i),\(String(describing: d)),\(ki),\(String(describing: da)),\(String(describing: self.ee))"
     }
 }
