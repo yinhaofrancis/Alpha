@@ -33,7 +33,8 @@ open class DataBaseObject{
     }
     
     public static func select<T:DataBaseObject>(db:DataBase,condition:QueryCondition? = nil) throws ->[T]{
-        try TableModel.select(db: db, table: self.name, condition: condition).map { tm in
+        
+        try TableModel.select(db: db,keys: T().declare.querykeys,table: self.name, condition: condition).map { tm in
             let m = T()
             m.tableModel = tm
             return m

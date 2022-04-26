@@ -290,6 +290,7 @@ public class CollumnDeclare:NSObject{
     public var nullable:Bool
     public var name:String
     public var primaryKey:Bool
+    public var queryAble:Bool = true
     public var unique:Bool
     public init(type:CollumnDecType,nullable:Bool, name:String, primaryKey:Bool,unique:Bool){
         self.type = type
@@ -332,8 +333,14 @@ public struct TableDeclare{
     public static func declare(@TableBuild build:()->TableDeclare)->TableDeclare{
         return build()
     }
+    public var querykeys:[String]{
+        self.declare.filter({$0.queryAble}).map({$0.name})
+    }
+    public var primaryColume:[CollumnDeclare]{
+        self.declare.filter({$0.primaryKey})
+    }
     public var code:String{
-        let pk = self.declare.filter({$0.primaryKey})
+        let pk = self.primaryColume
         if(pk.count > 0){
             
             let pkv = ",PRIMARY KEY(\(pk.map({"\"\($0.name)\""}).joined(separator: ",")))"
@@ -373,16 +380,23 @@ public struct TableModel{
         if !self.hasPrimary{
             return ""
         }
-        return "where " + self.declare.filter({$0.primaryKey}).map({"\($0.name)=@p\($0.name)"}).joined(separator: "and")
+        return "where " + self.primaryColume.map({"\($0.name)=@p\($0.name)"}).joined(separator: "and")
+    }
+    public var querykeys:[String]{
+        self.declare.filter({$0.queryAble}).map({$0.name})
     }
     public var selectCode:String{
-        "select * from \(self.name) " + self.primaryCondition
+        let key = self.querykeys.joined(separator: ",")
+        return "select \(key) from \(self.name) " + self.primaryCondition
+    }
+    public var primaryColume:[TableColumn]{
+        self.declare.filter({$0.primaryKey})
     }
     public var hasPrimary:Bool{
-        return self.declare.filter({$0.primaryKey}).count > 0
+        return self.primaryColume.count > 0
     }
     public func bindPrimaryConditionData(rs:DataBase.ResultSet) throws{
-        for i in  self.declare.filter({$0.primaryKey}){
+        for i in  self.primaryColume{
             let index = rs.getParamIndexBy(name: "@p"+i.name)
             try rs.bind(index: index, value: i.origin, type: i.type)
         }
@@ -440,8 +454,8 @@ public struct TableModel{
         rs.close()
     }
     
-    public static func select(db:DataBase,table:String,condition:QueryCondition? = nil) throws -> [TableModel]{
-        let select = "select * from \(table)" + (condition == nil ? "" : " where \(condition!.condition)")
+    public static func select(db:DataBase,keys:[String],table:String,condition:QueryCondition? = nil) throws -> [TableModel]{
+        let select = "select \(keys.joined(separator: ",")) from \(table)" + (condition == nil ? "" : " where \(condition!.condition)")
         let rs = try db.prepare(sql: select)
         var models:[TableModel] = []
         while try rs.step() == .hasColumn {

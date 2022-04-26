@@ -13,51 +13,53 @@ public class DatabaseTest: XCTestCase {
     
     
     func testDataBase() throws{
-        let db = try DataBase(name: "dddt")
-        let a = Ob()
-        a.tableModel.drop(db: db)
-        try a.declare.create(db: db)
-        
-        for i in 0 ..< 80 {
-            a.i = i * 2
-            a.d = i * 100
-            a.ki = "dadada王🉑️\(i)"
-            a.da = "dadada王🉑️\(i * 100)".data(using: .utf8)
-            a.ea = ["ddd":"dddd","a":i + 1]
-            try a.tableModel.insert(db: db)
-            try a.tableModel.update(db: db)
+        let wbfl = try DataBaseWorkFlow(name: "dddt")
+        wbfl.workflow { db in
+            let a = Ob()
+            a.tableModel.drop(db: db)
+            try a.declare.create(db: db)
+            
+            for i in 0 ..< 80 {
+                a.i = i * 2
+                a.d = i * 100
+                a.ki = "dadada王🉑️\(i)"
+                a.da = "dadada王🉑️\(i * 100)".data(using: .utf8)
+                a.ea = ["ddd":"dddd","a":i + 1]
+                try a.tableModel.insert(db: db)
+                try a.tableModel.update(db: db)
+            }
+            
+            let b = Oc()
+            b.tableModel.drop(db: db)
+            try b.declare.create(db: db)
+            
+            for i in 0 ..< 80 {
+                b.i = 80 - i
+                b.d = i * 100
+                b.ki = "dadada王🉑️\(i)"
+                b.da = "dadada王🉑️\(i * 100)".data(using: .utf8)
+                try b.tableModel.insert(db: db)
+                try b.tableModel.update(db: db)
+            }
+            let mm = a.tableModel
+            mm.declare[0].origin = 1
+            mm.declare[1].origin = 2
+            a.tableModel = mm
+            a.d = 99999
+            a.i = 19
+            
+            try mm.select(db: db)
+            let tm:[Ob] = try Ob.select(db: db,condition: QueryCondition.Key(key: "a") != QueryCondition.Key(key: "10"))
+            print(tm)
+            let tm1:[Ob] = try Ob.select(db: db,condition: QueryCondition.in(key: .init(key: "a"), value: "1","10","100","1000"))
+            print(tm1)
+            try Ob.delete(db: db, condition: QueryCondition.Key(key: "a") == QueryCondition.Key(key: "10"))
+            let tm2:[Ob] = try Ob.select(db: db)
+            print(tm2)
         }
-        
-        let b = Oc()
-        b.tableModel.drop(db: db)
-        try b.declare.create(db: db)
-        
-        for i in 0 ..< 80 {
-            b.i = 80 - i
-            b.d = i * 100
-            b.ki = "dadada王🉑️\(i)"
-            b.da = "dadada王🉑️\(i * 100)".data(using: .utf8)
-            try b.tableModel.insert(db: db)
-            try b.tableModel.update(db: db)
+        wbfl.workflowSync { db in
+            
         }
-        let mm = a.tableModel
-        mm.declare[0].origin = 1
-        mm.declare[1].origin = 2
-        a.tableModel = mm
-        a.d = 99999
-        a.i = 19
-        
-        try mm.select(db: db)
-        let tm:[Ob] = try Ob.select(db: db,condition: QueryCondition.Key(key: "a") != QueryCondition.Key(key: "10"))
-        print(tm)
-        let tm1:[Ob] = try Ob.select(db: db,condition: QueryCondition.in(key: .init(key: "a"), value: "1","10","100","1000"))
-        print(tm1)
-        try Ob.delete(db: db, condition: QueryCondition.Key(key: "a") == QueryCondition.Key(key: "10"))
-        let tm2:[Ob] = try Ob.select(db: db)
-        print(tm2)
-        db.close()
-        
-        
         
     }
     func testbkDataBase() throws {
@@ -98,12 +100,14 @@ public class DatabaseTest: XCTestCase {
     }
     
     func testFunction() throws{
-        let db = try DataBase(name: "dddt")
-        let tm1:[occ] = try occ.fetch(table: Ob.self).whereCondition(condition: QueryCondition(condition: "a % 2 = 0")).query(db: db)
-        print("---occ---")
-        print(tm1)
-        print("---occ---")
-        db.close()
+        let dnwf = try DataBaseWorkFlow(name: "dddt")
+        dnwf.workflow { db in
+            let tm1:[occ] = try occ.fetch(table: Ob.self).whereCondition(condition: QueryCondition(condition: "a % 2 = 0")).query(db: db)
+            print("---occ---")
+            print(tm1)
+            print("---occ---")
+        }
+        
     }
 }
 
