@@ -290,7 +290,6 @@ public class CollumnDeclare:NSObject{
     public var nullable:Bool
     public var name:String
     public var primaryKey:Bool
-    public var queryAble:Bool = true
     public var unique:Bool
     public init(type:CollumnDecType,nullable:Bool, name:String, primaryKey:Bool,unique:Bool){
         self.type = type
@@ -334,7 +333,7 @@ public struct TableDeclare{
         return build()
     }
     public var querykeys:[String]{
-        self.declare.filter({$0.queryAble}).map({$0.name})
+        self.declare.map({$0.name})
     }
     public var primaryColume:[CollumnDeclare]{
         self.declare.filter({$0.primaryKey})
@@ -383,7 +382,7 @@ public struct TableModel{
         return "where " + self.primaryColume.map({"\($0.name)=@p\($0.name)"}).joined(separator: "and")
     }
     public var querykeys:[String]{
-        self.declare.filter({$0.queryAble}).map({$0.name})
+        self.declare.map({$0.name})
     }
     public var selectCode:String{
         let key = self.querykeys.joined(separator: ",")
