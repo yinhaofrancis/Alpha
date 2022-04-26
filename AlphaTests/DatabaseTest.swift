@@ -13,6 +13,7 @@ public class DatabaseTest: XCTestCase {
     
     
     func testDataBase() throws{
+        let succes = XCTestExpectation(description: "end")
         let wbfl = try DataBaseWorkFlow(name: "dddt")
         wbfl.workflow { db in
             let a = Ob()
@@ -41,6 +42,10 @@ public class DatabaseTest: XCTestCase {
                 try b.tableModel.insert(db: db)
                 try b.tableModel.update(db: db)
             }
+            try Ob.delete(db: db, condition: QueryCondition.Key(key: "a") == QueryCondition.Key(key: "10"))
+        }
+        try wbfl.query { db in
+            let a = Ob()
             let mm = a.tableModel
             mm.declare[0].origin = 1
             mm.declare[1].origin = 2
@@ -53,14 +58,12 @@ public class DatabaseTest: XCTestCase {
             print(tm)
             let tm1:[Ob] = try Ob.select(db: db,condition: QueryCondition.in(key: .init(key: "a"), value: "1","10","100","1000"))
             print(tm1)
-            try Ob.delete(db: db, condition: QueryCondition.Key(key: "a") == QueryCondition.Key(key: "10"))
             let tm2:[Ob] = try Ob.select(db: db)
             print(tm2)
+            succes.fulfill()
         }
-        wbfl.workflowSync { db in
-            
-        }
-        
+        self.wait(for: [succes], timeout: 5)
+        print("end")
     }
     func testbkDataBase() throws {
         let db = try DataBase(name: "dddt")
