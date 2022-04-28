@@ -46,18 +46,19 @@ public class DatabaseTest: XCTestCase {
             try Ob.delete(db: db, condition: QueryCondition.Key(key: "a") == QueryCondition.Key(key: "10"))
         }
         try wbfl.query { db in
-            let a = Ob()
+            var a = Ob()
             let mm = a.tableModel
             mm.declare[0].origin = 1
             mm.declare[1].origin = 2
             a.tableModel = mm
+            
             a.d = 99999
             a.i = 19
             
             try mm.select(db: db)
             let tm:[Ob] = try Ob.select(db: db,condition: QueryCondition.Key(key: "a") != QueryCondition.Key(key: "10"))
             print(tm)
-            let tm1:[Ob] = try Ob.select(db: db,condition: QueryCondition.in(key: .init(key: "a"), value: "1","10","100","1000"))
+            let tm1:[Ob] = try Ob.select(db: db,condition: QueryCondition.in(key: .init(key: "a"), value: [1,10,100,1000]))
             print(tm1)
             let tm2:[Ob] = try Ob.select(db: db)
             print(tm2)
@@ -112,6 +113,17 @@ public class DatabaseTest: XCTestCase {
             print("---occ---")
         }
         
+    }
+    func testJSONSave() throws{
+        let db = try DataBase(name: "dddt")
+        try JSONObject().declare.create(db: db)
+        for i in 0 ..< 1000 {
+            try JSONObject(json: ["a\(i)":"a","b":"b\(i)","c":i,"d":[i + 1,i + 2,i + 3,i + 4,i + 5,i + 6,i + 7]]).save(db: db)
+        }
+        
+        let jsons:[JSONObject] = try JSONObject.select(db: db, condition: QueryCondition.in(key: QueryCondition.Key.init(jsonKey: "json", keypath: "$.d[0]"), value: [1,2,10,100,998,99]))
+        print(jsons)
+        db.close()
     }
 }
 
@@ -183,7 +195,7 @@ public class Oc:DataBaseObject,CustomStringConvertible{
     @Col(name:"a",primaryKey:true)
     var i:Int = 0
     
-    @FK(refKey: "a")
+    @FK(refKey: "b",refTable:Ob.self)
     @Col(name:"b")
     var d:Int? = nil
     

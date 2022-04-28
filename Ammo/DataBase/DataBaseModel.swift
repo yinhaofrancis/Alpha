@@ -7,10 +7,20 @@
 
 import Foundation
 
-open class DataBaseObject{
+public protocol DataBaseProtocol{
+    init()
+    static var name:String { get }
+}
+
+open class DataBaseObject:DataBaseProtocol{
+    public required init() {}
     public static var name:String{
-        return NSStringFromClass(self).replacingOccurrences(of: ".", with: "_")
+        return "\(self)"
     }
+}
+
+extension DataBaseProtocol{
+    
     public var declare:TableDeclare{
         let cds = Mirror(reflecting: self).children.filter({$0.value is CollumnDeclare}).map { m in
             m.value as! CollumnDeclare
@@ -32,10 +42,10 @@ open class DataBaseObject{
         }
     }
     
-    public static func select<T:DataBaseObject>(db:DataBase,condition:QueryCondition? = nil) throws ->[T]{
+    public static func select<T:DataBaseProtocol>(db:DataBase,condition:QueryCondition? = nil) throws ->[T]{
         
         try TableModel.select(db: db,keys: T().declare.querykeys,table: self.name, condition: condition).map { tm in
-            let m = T()
+            var m = T()
             m.tableModel = tm
             return m
         }
@@ -43,13 +53,14 @@ open class DataBaseObject{
     public static func delete(db:DataBase,condition:QueryCondition) throws{
         try TableModel.delete(db: db, table: self.name, condition: condition)
     }
-    public required init() {}
+    
 }
 
 public protocol DBType{
     static var originType:CollumnDecType { get }
     var isNull:Bool { get }
     var asDefault:String? { get }
+    var stringValue: String { get }
 }
 
 extension Date:DBType{
@@ -62,9 +73,16 @@ extension Date:DBType{
     public var asDefault: String?{
         return "\(self.timeIntervalSince1970)"
     }
+    public var stringValue: String{
+        return "\(self.timeIntervalSince1970)"
+    }
 }
 
 extension Int:DBType{
+    public var stringValue: String {
+        return "\(self)"
+    }
+    
     public var asDefault: String? {
         "\(self)"
     }
@@ -77,6 +95,10 @@ extension Int:DBType{
     }
 }
 extension String:DBType{
+    public var stringValue: String {
+        return "\"\(self)\""
+    }
+    
     public static var originType: CollumnDecType {
         return .textDecType
     }
@@ -98,7 +120,9 @@ extension Double:DBType{
     public var asDefault: String? {
         "\(self)"
     }
-    
+    public var stringValue: String {
+        return "\(self)"
+    }
 }
 extension Data:DBType{
     public static var originType: CollumnDecType {
@@ -109,6 +133,9 @@ extension Data:DBType{
     }
     public var asDefault: String? {
         ""
+    }
+    public var stringValue: String {
+        return ""
     }
     
 }
@@ -130,6 +157,9 @@ extension Optional:DBType where Wrapped:DBType{
     public var isNull: Bool{
         return self == nil
     }
+    public var stringValue: String {
+        return ""
+    }
 }
 
 @propertyWrapper
@@ -144,10 +174,10 @@ public class Col<T:DBType>:TableColumn{
         }
     }
     public init(wrappedValue:T,name:String){
-        super.init(value:wrappedValue, type:T.originType, nullable: true, name: name, primaryKey: false, unique: false)
+        super.init(value:wrappedValue, type:T.originType, nullable: true, name: name, primaryKey: false, unique: false, autoInc: false)
     }
-    public init(wrappedValue:T,name:String,primaryKey: Bool){
-        super.init(value:wrappedValue,type:T.originType, nullable: true, name: name, primaryKey: primaryKey, unique: false)
+    public init(wrappedValue:T,name:String,primaryKey: Bool,autoInc: Bool = false){
+        super.init(value:wrappedValue,type:T.originType, nullable: true, name: name, primaryKey: primaryKey, unique: false, autoInc: autoInc)
     }
 }
 
@@ -160,7 +190,7 @@ public class FK<T:TableColumn>:TableColumn{
                 onUpdate:ForeignDeclareAction? = nil,
                 onDelete:ForeignDeclareAction? = nil){
         self.wrappedValue = wrappedValue
-        super.init(value: self.wrappedValue.origin, type: self.wrappedValue.type, nullable: self.wrappedValue.nullable, name: self.wrappedValue.name, primaryKey: self.wrappedValue.primaryKey, unique: self.wrappedValue.unique)
+        super.init(value: self.wrappedValue.origin, type: self.wrappedValue.type, nullable: self.wrappedValue.nullable, name: self.wrappedValue.name, primaryKey: self.wrappedValue.primaryKey, unique: self.wrappedValue.unique, autoInc: self.wrappedValue.autoInc)
         self.foreignDeclare = ForeignDeclare(key: self.wrappedValue.name,
                                                           refKey: refKey,
                                                         table:refTable?.name ,

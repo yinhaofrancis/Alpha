@@ -327,20 +327,22 @@ public class CollumnDeclare{
     public var primaryKey:Bool
     public var unique:Bool
     public var defaultValue:String?
+    public var autoInc:Bool
     public var foreignDeclare:ForeignDeclare?
-    public init(type:CollumnDecType,nullable:Bool, name:String, primaryKey:Bool,unique:Bool,defaultValue:String?){
+    public init(type:CollumnDecType,nullable:Bool, name:String, primaryKey:Bool,unique:Bool,defaultValue:String?,autoInc:Bool){
         self.type = type
         self.nullable = nullable
         self.name = name
         self.primaryKey = primaryKey
         self.unique = unique
+        self.autoInc = autoInc
         self.defaultValue = defaultValue
     }
     public static func primaryCollumn(name:String,type:CollumnDecType)->CollumnDeclare{
-        CollumnDeclare(type: type, nullable: false, name: name, primaryKey: true, unique: false, defaultValue: nil)
+        CollumnDeclare(type: type, nullable: false, name: name, primaryKey: true, unique: false, defaultValue: nil, autoInc: false)
     }
     public static func normalCollumn(name:String,type:CollumnDecType)->CollumnDeclare{
-        CollumnDeclare(type: type, nullable: true, name: name, primaryKey: false, unique: false, defaultValue: nil)
+        CollumnDeclare(type: type, nullable: true, name: name, primaryKey: false, unique: false, defaultValue: nil, autoInc: false)
     }
     public var code:String{
         return "\(name) \(type.rawValue) \(unique ? "unique":"") \(nullable ? "" : "NOT NULL") \(self.defaultValue != nil ? "default \"\(self.defaultValue!)\"" : "" )"
@@ -387,8 +389,7 @@ public struct TableDeclare{
     public var code:String{
         let pk = self.primaryColume
         let fk = self.foreignColume.map({$0.foreignDeclare!.code})
-        
-        let pkv = ",PRIMARY KEY(\(pk.map({"\"\($0.name)\""}).joined(separator: ",")))"
+        let pkv = self.pkCode
         let fkv = "," + fk.joined(separator: ",")
         var code = "create table if not exists \(name) (\(self.declare.map({$0.code}).joined(separator: ","))"
         if(pk.count > 0){
@@ -404,13 +405,23 @@ public struct TableDeclare{
         _ = try rs.step()
         rs.close()
     }
+    private var pkCode:String{
+        let pk = self.primaryColume
+        if pk.count == 1 && pk.first!.autoInc{
+            return ",PRIMARY KEY(\(pk.first!.name) AUTOINCREMENT)"
+        }else if pk.count > 0{
+            return ",PRIMARY KEY(\(pk.map({"\"\($0.name)\""}).joined(separator: ",")))"
+        }else{
+            return ""
+        }
+    }
 }
 
 public class TableColumn:CollumnDeclare{
     public var origin:DBType
-    public init(value:DBType,type:CollumnDecType,nullable:Bool, name:String, primaryKey:Bool,unique:Bool){
+    public init(value:DBType,type:CollumnDecType,nullable:Bool, name:String, primaryKey:Bool,unique:Bool,autoInc:Bool){
         self.origin = value
-        super.init(type: type, nullable: nullable, name: name, primaryKey: primaryKey, unique: unique, defaultValue: value.asDefault)
+        super.init(type: type, nullable: nullable, name: name, primaryKey: primaryKey, unique: unique, defaultValue: value.asDefault, autoInc: autoInc)
     }
     public func asignOrigin(origin:DBType){
         self.origin = origin
@@ -511,7 +522,7 @@ public struct TableModel{
             var a:[TableColumn] = []
             for i in 0 ..< rs.columeCount{
                 if let c = rs.colume(index: i){
-                    let tc = TableColumn(value: c, type: rs.columeDecType(index: i) ?? .textDecType, nullable: false, name: rs.columeName(index: i), primaryKey: false, unique: false)
+                    let tc = TableColumn(value: c, type: rs.columeDecType(index: i) ?? .textDecType, nullable: false, name: rs.columeName(index: i), primaryKey: false, unique: false,autoInc:false)
                     a.append(tc)
                 }
             }
@@ -536,14 +547,14 @@ public class QueryCondition{
     public init(condition:String){
         self.condition = condition
     }
-    public static func between(key:Key,value1:String,value2:String)->QueryCondition{
+    public static func between(key:Key,value1:DBType,value2:DBType)->QueryCondition{
         QueryCondition(condition:"\(key.key) between \(value1) and \(value2)")
     }
     public static func like(key:Key,value:String)->QueryCondition{
         QueryCondition(condition:"\(key.key) like \(value)")
     }
-    public static func `in`(key:Key,value:String...)->QueryCondition{
-        QueryCondition(condition:"\(key.key) in (\(value.joined(separator: ",")))")
+    public static func `in`(key:Key,value:[DBType])->QueryCondition{
+        QueryCondition(condition:"\(key.key) in (\(value.map({$0.stringValue}).joined(separator: ",")))")
     }
     public static func Not (condition:QueryCondition)->QueryCondition{
         QueryCondition(condition:"NOT \(condition.condition)")

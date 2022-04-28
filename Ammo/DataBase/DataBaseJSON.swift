@@ -11,6 +11,10 @@ import Foundation
 public struct JSONModel:ExpressibleByArrayLiteral,
                    ExpressibleByDictionaryLiteral,
                         ExpressibleByStringLiteral,DBType,CustomStringConvertible{
+    public var stringValue: String{
+        return "\"\(self.jsonString)\""
+    }
+    
     public var asDefault: String?{
         return ""
     }
@@ -220,5 +224,30 @@ public struct JSONModel:ExpressibleByArrayLiteral,
     }
     public var description: String{
         return self.jsonString
+    }
+}
+
+public struct JSONObject:DataBaseProtocol,CustomStringConvertible{
+    public var description: String{
+        return self.json?.description ?? ""
+    }
+    
+    public static var name: String = "JSON"
+    @Col(name: "json")
+    public var json:JSONModel? = nil
+    
+    @Col(name: "row", primaryKey: true,autoInc:true)
+    fileprivate var rowid:Int? = nil
+    
+    public init() { }
+    
+    public init(json:JSONModel){
+        self.json = json
+    }
+    public static func save(db:DataBase,json:JSONObject) throws{
+        try json.save(db: db)
+    }
+    public func save(db:DataBase) throws{
+        try self.tableModel.insert(db: db)
     }
 }
