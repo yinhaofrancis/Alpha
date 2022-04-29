@@ -17,6 +17,9 @@ public class DataBase:Hashable{
     
     public init(url:URL,readonly:Bool = false,writeLock:Bool = false) throws {
         self.url = url
+        #if DEBUG
+        print(url)
+        #endif
         let r = readonly ? SQLITE_OPEN_READONLY | SQLITE_OPEN_NOMUTEX  : (SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | (writeLock ? SQLITE_OPEN_FULLMUTEX: SQLITE_OPEN_NOMUTEX))
         if sqlite3_open_v2(url.path, &self.sqlite, r , nil) != noErr || self.sqlite == nil{
             throw NSError(domain: "数据库打开失败", code: 0)
@@ -32,6 +35,23 @@ public class DataBase:Hashable{
     
     public func hash(into hasher: inout Hasher) {
         hasher.combine(url)
+    }
+    public var foreignKeys:Bool{
+        set{
+            self.exec(sql: "PRAGMA foreign_keys = \(newValue ? 1 : 0)")
+        }
+        get{
+            do {
+                let rs = try self.prepare(sql: "PRAGMA foreign_keys")
+                _ = try rs.step()
+                let v = rs.columeInt(index: 0) > 0
+                rs.close()
+                return v
+            }catch{
+                return false
+            }
+            
+        }
     }
     public func prepare(sql:String) throws->DataBase.ResultSet{
         var stmt:OpaquePointer?

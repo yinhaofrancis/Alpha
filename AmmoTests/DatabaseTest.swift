@@ -120,7 +120,11 @@ public class DatabaseTest: XCTestCase {
         for i in 0 ..< 1000 {
             try JSONObject(json: ["a\(i)":"a","b":"b\(i)","c":i,"d":[i + 1,i + 2,i + 3,i + 4,i + 5,i + 6,i + 7]]).save(db: db)
         }
-        
+        let json:[JSONObject] = try JSONObject.select(db: db)
+        for i in json{
+            i.json = ["v":1]
+            try i.tableModel.update(db: db)
+        }
         let jsons:[JSONObject] = try JSONObject.select(db: db, condition: QueryCondition.in(key: QueryCondition.Key.init(jsonKey: "json", keypath: "$.d[0]"), value: [1,2,10,100,998,99]))
         print(jsons)
         db.close()
