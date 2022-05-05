@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 public protocol DataBaseProtocol{
     init()
@@ -16,6 +17,29 @@ open class DataBaseObject:DataBaseProtocol{
     public required init() {}
     public static var name:String{
         return "\(self)"
+    }
+    public static func colume<T:DBType>(rs:DataBase.ResultSet,index:Int32)->T?{
+        T.create(rs: rs, index: index)
+    }
+    public static func colume(rs:DataBase.ResultSet,index:Int32)->DBType?{
+        if rs.columeDecType(index: index) == .jsonDecType{
+            return JSONModel.create(rs: rs, index: index)
+        }else if rs.columeDecType(index: index) == .dateDecType{
+            return Date.create(rs: rs, index: index)
+        }else{
+            switch (rs.columeType(index: index)){
+            case .nullCollumn:
+                return nil
+            case .intCollumn:
+                return Int.create(rs: rs, index: index)
+            case .doubleCollumn:
+                return Double.create(rs: rs, index: index)
+            case .textCollumn:
+                return String.create(rs: rs, index: index)
+            case .dataCollumn:
+                return Data.create(rs: rs, index: index)
+            }
+        }
     }
 }
 
@@ -61,9 +85,19 @@ public protocol DBType{
     var isNull:Bool { get }
     var asDefault:String? { get }
     var stringValue: String { get }
+    static func create(rs:DataBase.ResultSet,index:Int32)->Self?
+    func bind(rs:DataBase.ResultSet,index:Int32) throws
 }
 
 extension Date:DBType{
+    public func bind(rs: DataBase.ResultSet, index: Int32) throws {
+        try rs.bind(index: index, value: self)
+    }
+    
+    public static func create(rs: DataBase.ResultSet, index: Int32) -> Date? {
+        rs.columeDate(index: index)
+    }
+    
     public static var originType: CollumnDecType{
         .dateDecType
     }
@@ -79,6 +113,14 @@ extension Date:DBType{
 }
 
 extension Int:DBType{
+    public func bind(rs: DataBase.ResultSet, index: Int32) throws {
+        try rs.bind(index: index, value: self)
+    }
+    
+    public static func create(rs: DataBase.ResultSet, index: Int32) -> Int? {
+        Int(rs.columeInt(index: index))
+    }
+    
     public var stringValue: String {
         return "\(self)"
     }
@@ -95,6 +137,14 @@ extension Int:DBType{
     }
 }
 extension String:DBType{
+    public func bind(rs: DataBase.ResultSet, index: Int32) throws {
+        try rs.bind(index: index, value: self)
+    }
+    
+    public static func create(rs: DataBase.ResultSet, index: Int32) -> String? {
+        rs.columeString(index: index)
+    }
+    
     public var stringValue: String {
         return "\"\(self)\""
     }
@@ -111,6 +161,14 @@ extension String:DBType{
     
 }
 extension Double:DBType{
+    public func bind(rs: DataBase.ResultSet, index: Int32) throws {
+        try rs.bind(index: index, value: self)
+    }
+    
+    public static func create(rs: DataBase.ResultSet, index: Int32) -> Double? {
+        rs.columeDouble(index: index)
+    }
+    
     public static var originType: CollumnDecType {
         return .doubleDecType
     }
@@ -125,6 +183,14 @@ extension Double:DBType{
     }
 }
 extension Data:DBType{
+    public func bind(rs: DataBase.ResultSet, index: Int32) throws {
+        try rs.bind(index: index, value: self)
+    }
+    
+    public static func create(rs: DataBase.ResultSet, index: Int32) -> Data? {
+        rs.columeData(index: index)
+    }
+    
     public static var originType: CollumnDecType {
         return .dataDecType
     }
@@ -141,6 +207,13 @@ extension Data:DBType{
 }
 
 extension Optional:DBType where Wrapped:DBType{
+    public func bind(rs: DataBase.ResultSet, index: Int32) throws {
+        try rs.bind(index: index, value: self)
+    }
+    
+    public static func create(rs: DataBase.ResultSet, index: Int32) -> Optional<Wrapped>? {
+        rs.colume(index: index)
+    }    
     public var asDefault: String? {
         switch(self){
             

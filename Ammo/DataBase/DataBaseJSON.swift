@@ -11,6 +11,14 @@ import Foundation
 public struct JSONModel:ExpressibleByArrayLiteral,
                    ExpressibleByDictionaryLiteral,
                         ExpressibleByStringLiteral,DBType,CustomStringConvertible{
+    public func bind(rs: DataBase.ResultSet, index: Int32) throws {
+        try rs.bind(index: index, value: self)
+    }
+    
+    public static func create(rs: DataBase.ResultSet, index: Int32) -> JSONModel? {
+        rs.columeJSON(index: index)
+    }
+    
     public var stringValue: String{
         return "\"\(self.jsonString)\""
     }

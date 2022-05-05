@@ -144,7 +144,7 @@ open class DataBaseFetchObject{
                 for i in 0 ..< rs.columeCount{
                     let id = rs.columeName(index: i)
                     if let col = dec[id]{
-                        col.value = rs.colume(index: i)
+                        col.value = DataBaseObject.colume(rs:rs, index: i)
                     }else{
                         continue
                     }

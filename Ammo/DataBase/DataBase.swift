@@ -209,25 +209,11 @@ public class DataBase:Hashable{
             let time = sqlite3_column_double(self.stmt, index)
             return Date(timeIntervalSince1970: time)
         }
-        public func colume(index:Int32)->DBType?{
-            if self.columeDecType(index: index) == .jsonDecType{
-                return self.columeJSON(index: index)
-            }else if self.columeDecType(index: index) == .dateDecType{
-                return self.columeDate(index: index)
-            }else{
-                switch (self.columeType(index: index)){
-                case .nullCollumn:
-                    return nil
-                case .intCollumn:
-                    return Int(self.columeInt(index: index))
-                case .doubleCollumn:
-                    return self.columeDouble(index: index)
-                case .textCollumn:
-                    return self.columeString(index: index)
-                case .dataCollumn:
-                    return self.columeData(index: index)
-                }
-            }
+        public func colume<T:DBType>(index:Int32)->T?{
+            return T.create(rs: self, index: index)
+        }
+        public func columeDBType(index:Int32)->DBType?{
+            DataBaseObject.colume(rs:self, index: index)
         }
         public func columeData(index:Int32)->Data{
             let len = sqlite3_column_bytes(self.stmt, index)
@@ -514,14 +500,14 @@ public struct TableModel{
         while try rs.step() == .hasColumn{
             for i in 0 ..< rs.columeCount{
                 let name = rs.columeName(index: i)
-                if let v = rs.colume(index: i){
+                if let v:DBType = DataBaseObject.colume(rs:rs, index: i){
                     map[name]?.origin = v
                 }
             }
         }
         for i in 0 ..< rs.columeCount{
             let name = rs.columeName(index: i)
-            if let v = rs.colume(index: i){
+            if let v:DBType = DataBaseObject.colume(rs:rs, index: i){
                 map[name]?.origin = v
             }
         }
@@ -541,7 +527,7 @@ public struct TableModel{
         while try rs.step() == .hasColumn {
             var a:[TableColumn] = []
             for i in 0 ..< rs.columeCount{
-                if let c = rs.colume(index: i){
+                if let c:DBType = DataBaseObject.colume(rs:rs, index: i){
                     let tc = TableColumn(value: c, type: rs.columeDecType(index: i) ?? .textDecType, nullable: false, name: rs.columeName(index: i), primaryKey: false, unique: false,autoInc:false)
                     a.append(tc)
                 }
