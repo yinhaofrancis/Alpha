@@ -10,6 +10,7 @@ import Foundation
 public class DataBaseWorkFlow{
     fileprivate var writeQueue:DispatchQueue = DispatchQueue(label: "DataBaseWorkFlow", qos: .userInitiated, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil)
     fileprivate var wdb:DataBase
+    private var semaphore:DispatchSemaphore = DispatchSemaphore(value: 1)
     public init(name:String) throws {
         self.wdb = try DataBase(name: name, readonly: false, writeLock: true)
     }
