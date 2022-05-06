@@ -39,3 +39,29 @@ public class DataBaseWorkFlow{
         self.wdb.close()
     }
 }
+
+@propertyWrapper
+public struct DBWorkFlow{
+    private static var workFlow:[String:DataBaseWorkFlow] = [:]
+    
+    private var semaphore:DispatchSemaphore = DispatchSemaphore(value: 1)
+                                 
+    public var name:String
+    
+    public var wrappedValue:DataBaseWorkFlow{
+        defer{
+            semaphore.signal()
+        }
+        semaphore.wait()
+        guard let a = DBWorkFlow.workFlow[name] else {
+            DBWorkFlow.workFlow[name] = try! DataBaseWorkFlow(name: self.name)
+            return DBWorkFlow.workFlow[name]!
+        }
+        return a
+    }
+    
+    public init(name:String){
+        self.name = name
+        
+    }
+}
