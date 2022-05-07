@@ -421,6 +421,20 @@ public struct TableDeclare{
             return ""
         }
     }
+    public func tableDeclare(from:DataBase) throws->String{
+        return try TableDeclare.queryTableDeclare(from: from, name: self.name)
+    }
+    public static func queryTableDeclare(from:DataBase,name:String)throws->String{
+        let sql = "select sql from sqlite_master where type=\"table\" AND name = \"\(name)\""
+        let rs = try from.prepare(sql: sql)
+        defer{
+            rs.close()
+        }
+        if try rs.step() == .hasColumn{
+            return rs.columeString(index: 0)
+        }
+        return ""
+    }
 }
 
 public class TableColumn:CollumnDeclare{

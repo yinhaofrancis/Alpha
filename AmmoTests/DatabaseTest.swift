@@ -127,6 +127,8 @@ public class DatabaseTest: XCTestCase {
         }
         let jsons:[JSONObject] = try JSONObject.select(db: db, condition: QueryCondition.in(key: QueryCondition.Key.init(jsonKey: "json", keypath: "$.d[0]"), value: [1,2,10,100,998,99]))
         print(jsons)
+        let c = try JSONObject().declare.tableDeclare(from: db)
+        print(c)
         db.close()
     }
 }
