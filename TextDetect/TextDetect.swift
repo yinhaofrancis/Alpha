@@ -37,7 +37,11 @@ public class TextDetect{
             let a = (rq.results as! [VNBarcodeObservation]).compactMap({$0.payloadStringValue})
             callback(a)
         }
-        barReq.symbologies = [.qr]
+        if #available(iOS 15.0, *) {
+            barReq.symbologies = [.qr,.microQR]
+        } else {
+            barReq.symbologies = [.qr]
+        }
         try VNImageRequestHandler(cgImage: image).perform([barReq])
     }
 }
