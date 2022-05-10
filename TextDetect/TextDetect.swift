@@ -32,4 +32,12 @@ public class TextDetect{
         textRecognitionRequest.usesLanguageCorrection = true
         try VNImageRequestHandler(cgImage: image).perform([textRecognitionRequest])
     }
+    public func detectQR(image:CGImage,callback:@escaping ([String])->Void) throws{
+        let barReq = VNDetectBarcodesRequest { rq, e in
+            let a = (rq.results as! [VNBarcodeObservation]).compactMap({$0.payloadStringValue})
+            callback(a)
+        }
+        barReq.symbologies = [.qr]
+        try VNImageRequestHandler(cgImage: image).perform([barReq])
+    }
 }
