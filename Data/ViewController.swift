@@ -28,7 +28,7 @@ class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePic
             let n = a.map { i in
                 placeDecode.decodeName(code: i)
             }.compactMap({$0})
-            print(n)
+            print(o)
         })
         
         

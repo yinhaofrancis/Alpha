@@ -131,6 +131,17 @@ public class DatabaseTest: XCTestCase {
         print(c)
         db.close()
     }
+    func testUpdateDb() throws{
+        let db = try DataBase(name: "dddt")
+        print(Oc().version)
+        db.begin()
+        print(db.version)
+        db.version = 100
+        print(db.version)
+        db.rollback()
+        print(db.version)
+        db.close()
+    }
 }
 
 public class oQ:DataBaseFetchObject,CustomStringConvertible{
@@ -217,4 +228,22 @@ public class Oc:DataBaseObject,CustomStringConvertible{
     public var description: String{
         return "\(i),\(String(describing: d)),\(ki),\(String(describing: da)),\(String(describing: self.ee))"
     }
+    
+    
+    @DBUpdate(version: 5, callback:{( v,db) in
+        print(v)
+    })
+    @DBUpdate(version: 4, callback:{( v,db) in
+        print(v)
+    })
+    @DBUpdate(version: 3, callback:{( v,db) in
+        print(v)
+    })
+    @DBUpdate(version: 2, callback:{( v,db) in
+        print(v)
+    })
+    @DBUpdate(version: 1, callback:{( v,db) in
+        print(v)
+    })
+    var update:DataBaseUpdate = DataBaseUpdate()
 }

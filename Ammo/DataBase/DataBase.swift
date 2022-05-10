@@ -36,6 +36,33 @@ public class DataBase:Hashable{
     public func hash(into hasher: inout Hasher) {
         hasher.combine(url)
     }
+    public func tableExist(name:String) throws->Bool{
+        let rs = try self.prepare(sql: "PRAGMA table_info(\(name)")
+        defer{
+            rs.close()
+        }
+        if try rs.step() == .hasColumn{
+            return true
+        }else{
+            return false
+        }
+    }
+    public var version:Int32{
+        get{
+            do {
+                let rs = try self.prepare(sql: "PRAGMA user_version")
+                _ = try rs.step()
+                let v = rs.columeInt(index: 0)
+                rs.close()
+                return v
+            }catch{
+                return 0
+            }
+        }
+        set{
+            self.exec(sql: "PRAGMA user_version = \(newValue)")
+        }
+    }
     public var foreignKeys:Bool{
         set{
             self.exec(sql: "PRAGMA foreign_keys = \(newValue ? 1 : 0)")
@@ -52,6 +79,15 @@ public class DataBase:Hashable{
             }
             
         }
+    }
+    public func begin(){
+        self.exec(sql: "begin")
+    }
+    public func commit(){
+        self.exec(sql: "commit")
+    }
+    public func rollback(){
+        self.exec(sql: "rollback")
     }
     public func prepare(sql:String) throws->DataBase.ResultSet{
         var stmt:OpaquePointer?
@@ -427,6 +463,9 @@ public struct TableDeclare{
     public static func queryTableDeclare(from:DataBase,name:String)throws->String{
         let sql = "select sql from sqlite_master where type=\"table\" AND name = \"\(name)\""
         let rs = try from.prepare(sql: sql)
+        defer{
+            rs.close()
+        }
         defer{
             rs.close()
         }

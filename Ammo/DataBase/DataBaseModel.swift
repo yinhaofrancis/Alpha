@@ -77,7 +77,20 @@ extension DataBaseProtocol{
     public static func delete(db:DataBase,condition:QueryCondition) throws{
         try TableModel.delete(db: db, table: self.name, condition: condition)
     }
-    
+    public func updateDB(db:DataBase) throws{
+        try self.updates?.callback(db: db)
+    }
+    public var updates:DataBaseUpdate?{
+        let updates = Mirror(reflecting: self).children.filter({$0.value is DataBaseUpdate}).map { m in
+            m.value as! DataBaseUpdate
+        }
+        return updates.first?.origin
+    }
+    public var version:Int32{
+        self.updates?.callbacks.max(by: { l, r in
+            l.version < r.version
+        })?.version ?? 0
+    }
 }
 
 public protocol DBType{
