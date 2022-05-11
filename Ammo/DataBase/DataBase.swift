@@ -37,7 +37,7 @@ public class DataBase:Hashable{
         hasher.combine(url)
     }
     public func tableExist(name:String) throws->Bool{
-        let rs = try self.prepare(sql: "PRAGMA table_info(\(name)")
+        let rs = try self.prepare(sql: "PRAGMA table_info(\(name))")
         defer{
             rs.close()
         }
@@ -356,10 +356,18 @@ public struct ForeignDeclare{
     public var onDelete:ForeignDeclareAction?
     public var onUpdate:ForeignDeclareAction?
     public var code:String{
-        
+        return "FOREIGN KEY(\(key)) " + self.alterCode
+    }
+    public var alterCode:String{
         let rf = table == nil ? refKey : "\(table!)(\(refKey))"
-        
-        return "FOREIGN KEY(\(key)) REFERENCES \(rf) \(onDelete != nil ? "onDelete \(onDelete!.action)":"") \(onUpdate != nil ? "onUpdate \(onUpdate!.action)":"")"
+        return "REFERENCES \(rf) \(onDelete != nil ? "ON Delete \(onDelete!.action)":"") \(onUpdate != nil ? "ON Update \(onUpdate!.action)":"")"
+    }
+    public init(key:String, refKey:String,table:String?, onDelete:ForeignDeclareAction?,onUpdate:ForeignDeclareAction?){
+        self.key = key
+        self.refKey = refKey
+        self.table = table
+        self.onDelete = onDelete
+        self.onUpdate = onUpdate
     }
 }
 public class CollumnDeclare{
@@ -398,17 +406,20 @@ public struct TableBuild{
         return components
     }
     
-    public static func buildBlock(_ name:String,_ components: CollumnDeclare...) -> TableDeclare {
-        return TableDeclare(name: name,declare: components)
+    public static func buildBlock(_ name:String,version:Int32,_ components: CollumnDeclare...) -> TableDeclare {
+        return TableDeclare(name: name,version: version,declare: components)
     }
 }
 
 public struct TableDeclare{
     public var name:String
+    public var version:Int32
+    public var updates:DataBaseUpdate?
     public var declare:[CollumnDeclare]
-    public init(name:String,declare:[CollumnDeclare]){
+    public init(name:String,version:Int32,declare:[CollumnDeclare]){
         self.name = name
         self.declare = declare
+        self.version = version
     }
     
     public static func declare(@TableBuild build:()->TableDeclare)->TableDeclare{
@@ -427,6 +438,30 @@ public struct TableDeclare{
             }
             return cd
         }
+    }
+    public func addColume(colume:CollumnDeclare,db:DataBase){
+        var sql = "alter table \(self.name) add \(colume.name) \(colume.type.rawValue)"
+
+        if colume.primaryKey{
+            sql += " primary key "
+        }
+        
+        if colume.unique{
+            sql += " unique "
+        }
+        
+        if colume.nullable == false && colume.defaultValue != nil{
+            sql += " NOT NULL DEFAULT \(colume.defaultValue!)"
+        }
+        if let fk = colume.foreignDeclare{
+            sql += (" " + fk.alterCode)
+        }
+        db.exec(sql: sql)
+    }
+    public func removeColume(colume:String,db:DataBase){
+        let sql = "alter table \(self.name) drop \(colume)"
+
+        db.exec(sql: sql)
     }
     public var code:String{
         let pk = self.primaryColume
@@ -463,9 +498,6 @@ public struct TableDeclare{
     public static func queryTableDeclare(from:DataBase,name:String)throws->String{
         let sql = "select sql from sqlite_master where type=\"table\" AND name = \"\(name)\""
         let rs = try from.prepare(sql: sql)
-        defer{
-            rs.close()
-        }
         defer{
             rs.close()
         }

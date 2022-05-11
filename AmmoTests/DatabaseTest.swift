@@ -133,15 +133,73 @@ public class DatabaseTest: XCTestCase {
     }
     func testUpdateDb() throws{
         let db = try DataBase(name: "dddt")
-        print(Oc().version)
-        db.begin()
-        print(db.version)
-        db.version = 100
-        print(db.version)
-        db.rollback()
-        print(db.version)
+   
+        let d = TableDeclare(name: "Origin", version: 0, declare: [
+            CollumnDeclare(type: .intDecType, nullable: false, name: "a", primaryKey: true, unique: false, defaultValue: nil, autoInc: false)
+        ])
+
+        try Oc().declare.create(db: db)
+        try d.create(db: db)
+
         db.close()
+        let flow = try DataBaseWorkFlow(config: DataBaseConfiguration(name: "dddt", models: [Origin().declare]))
+        
+        flow.workflow({ db in
+            let a = Origin()
+            for i in 0 ..< 10 {
+                a.i = i
+                a.ki = "dadad"
+                do{
+                    try a.tableModel.insert(db: db)
+                }catch{
+                    a.da = "asfasfas".data(using: .utf8)
+                    try a.tableModel.update(db: db)
+                }
+                
+            }
+        })
+        try flow.query { db in
+            let o:[Origin] = try Origin.select(db: db)
+            print(o)
+        }
+        let v = Origin.self
+        print(v.init().declare)
+        print(Origin().declare)
+        print(Oc.name)
     }
+}
+
+public class Origin:DataBaseObject,CustomStringConvertible{
+    public var description: String{
+        return "\(i),\(ki),\(String(describing: da ?? nil))"
+    }
+    
+    
+    @Col(name:"a",primaryKey:true)
+    var i:Int = 0
+    
+    @Col(name:"c")
+    var ki:String = ""
+    
+    @Col(name:"d")
+    var da:Data? = nil
+    
+//    @DBUpdate(version: 2, callback: { (i,v) in
+//        print(i)
+//        Origin().declare.addColume(colume: Origin()._da, db: v)
+//    })
+//    @DBUpdate(version: 1, callback: { (i,v) in
+//        print(i)
+//        Origin().declare.addColume(colume: Origin()._ki, db: v)
+//    })
+    var update:DataBaseUpdate = DataBaseUpdate(callbacks: [
+        DataBaseUpdateCallback(version: 1, callback: { i, db in
+            Origin().declare.addColume(colume: Origin()._ki, db: db)
+        }),
+        DataBaseUpdateCallback(version: 2, callback: { i, db in
+            Origin().declare.addColume(colume: Origin()._da, db: db)
+        }),
+    ])
 }
 
 public class oQ:DataBaseFetchObject,CustomStringConvertible{
@@ -228,22 +286,4 @@ public class Oc:DataBaseObject,CustomStringConvertible{
     public var description: String{
         return "\(i),\(String(describing: d)),\(ki),\(String(describing: da)),\(String(describing: self.ee))"
     }
-    
-    
-    @DBUpdate(version: 5, callback:{( v,db) in
-        print(v)
-    })
-    @DBUpdate(version: 4, callback:{( v,db) in
-        print(v)
-    })
-    @DBUpdate(version: 3, callback:{( v,db) in
-        print(v)
-    })
-    @DBUpdate(version: 2, callback:{( v,db) in
-        print(v)
-    })
-    @DBUpdate(version: 1, callback:{( v,db) in
-        print(v)
-    })
-    var update:DataBaseUpdate = DataBaseUpdate()
 }

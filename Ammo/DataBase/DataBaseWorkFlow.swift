@@ -70,19 +70,38 @@ public struct DBWorkFlow{
     }
 }
 
+@resultBuilder
+public struct DBUpdate{
+    public static func buildBlock(_ components: DataBaseUpdateCallback...) -> DataBaseUpdate {
+        DataBaseUpdate(callbacks: components)
+    }
+    public static func buildBlock(_ components:DataBaseUpdateCallback.CallbackBlock...) -> DataBaseUpdate {
+        
+        var a:[DataBaseUpdateCallback] = []
+        for i in 1 ... components.count{
+            a.append(DataBaseUpdateCallback(version: Int32(i), callback: components[i - 1]))
+        }
+        
+        return DataBaseUpdate(callbacks: a)
+    }
+}
 public struct DataBaseUpdateCallback{
+    public typealias CallbackBlock = (Int32,DataBase) throws ->Void
     public var version:Int32
     public var callback:(Int32,DataBase) throws ->Void
+    public init(version:Int32,callback:@escaping (Int32,DataBase) throws ->Void) {
+        self.version = version
+        self.callback = callback
+    }
 }
 
 public class DataBaseUpdate{
-    public var callbacks:[DataBaseUpdateCallback] = []
-    public init() {}
-    public var origin:DataBaseUpdate{
-        return self
+    public var callbacks:[DataBaseUpdateCallback]
+    public init(callbacks:[DataBaseUpdateCallback]) {
+        self.callbacks = callbacks
     }
-    public func callback(db:DataBase) throws {
-        let calls = self.origin.callbacks.sorted { l, r in
+    public func update(db:DataBase) throws {
+        let calls = self.callbacks.sorted { l, r in
             l.version < r.version
         }
         for i in calls{
@@ -93,35 +112,26 @@ public class DataBaseUpdate{
     }
 }
 
-@propertyWrapper
-public class DBUpdate<T:DataBaseUpdate>:DataBaseUpdate{
-    public var wrappedValue: T
-    public override var origin: DataBaseUpdate{
-        return wrappedValue.origin
-    }
-    public init(wrappedValue: T,version:Int32,callback:@escaping (Int32,DataBase)->Void){
-        self.wrappedValue = wrappedValue
-        super.init()
-        self.origin.callbacks.append(DataBaseUpdateCallback(version: version, callback: callback))
-    }
-}
 
 public struct DataBaseConfiguration{
     public var name:String
-    public var models:[DataBaseObject]
+    public var models:[TableDeclare]
     public func configure() throws ->DataBase{
         let db = try DataBase(name: name, readonly: false, writeLock: false)
         do{
             db.begin()
+            let a = db.foreignKeys
+            db.foreignKeys = false
             for i in models{
-                if try !db.tableExist(name: i.declare.name){
-                    try i.declare.create(db: db)
+                if try !db.tableExist(name: i.name){
+                    try i.create(db: db)
                 }else{
-                    try i.updateDB(db: db)
+                    try i.updates?.update(db: db)
                 }
             }
             let v = models.map({$0.version}).max() ?? 0
             db.version = v;
+            db.foreignKeys = a
             db.commit()
             return db
         }catch{
@@ -130,7 +140,7 @@ public struct DataBaseConfiguration{
         }
         
     }
-    public init(name:String,models:[DataBaseObject]){
+    public init(name:String,models:[TableDeclare]){
         self.name = name
         self.models = models
     }

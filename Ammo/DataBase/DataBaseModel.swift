@@ -16,7 +16,7 @@ public protocol DataBaseProtocol{
 open class DataBaseObject:DataBaseProtocol{
     public required init() {}
     public static var name:String{
-        return "\(self)"
+        return "\(Self.self)"
     }
     public static func colume<T:DBType>(rs:DataBase.ResultSet,index:Int32)->T?{
         T.create(rs: rs, index: index)
@@ -49,7 +49,9 @@ extension DataBaseProtocol{
         let cds = Mirror(reflecting: self).children.filter({$0.value is CollumnDeclare}).map { m in
             m.value as! CollumnDeclare
         }
-        return TableDeclare(name: Self.name, declare: cds)
+        var dc = TableDeclare(name: Self.name, version: self.version, declare: cds)
+        dc.updates = self.updates
+        return dc;
     }
     public var tableModel:TableModel{
         get{
@@ -61,7 +63,10 @@ extension DataBaseProtocol{
             }
             Mirror(reflecting: self).children.filter({$0.value is TableColumn}).forEach { kv in
                 let tc = kv.value as! TableColumn
-                tc.origin = a[tc.name]!
+                guard let v = a[tc.name] else {
+                    return
+                }
+                tc.origin = v
             }
         }
     }
@@ -77,14 +82,11 @@ extension DataBaseProtocol{
     public static func delete(db:DataBase,condition:QueryCondition) throws{
         try TableModel.delete(db: db, table: self.name, condition: condition)
     }
-    public func updateDB(db:DataBase) throws{
-        try self.updates?.callback(db: db)
-    }
     public var updates:DataBaseUpdate?{
         let updates = Mirror(reflecting: self).children.filter({$0.value is DataBaseUpdate}).map { m in
             m.value as! DataBaseUpdate
         }
-        return updates.first?.origin
+        return updates.first
     }
     public var version:Int32{
         self.updates?.callbacks.max(by: { l, r in
