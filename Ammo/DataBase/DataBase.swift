@@ -439,7 +439,7 @@ public struct TableDeclare{
             return cd
         }
     }
-    public func addColume(colume:CollumnDeclare,db:DataBase){
+    public func add(colume:CollumnDeclare,db:DataBase){
         var sql = "alter table \(self.name) add \(colume.name) \(colume.type.rawValue)"
 
         if colume.primaryKey{
@@ -458,7 +458,12 @@ public struct TableDeclare{
         }
         db.exec(sql: sql)
     }
-    public func removeColume(colume:String,db:DataBase){
+    public func rename(fromcolume:String,to:String,db:DataBase){
+        let sql = "alter table \(self.name) rename \(fromcolume) to \(to)"
+
+        db.exec(sql: sql)
+    }
+    public func remove(colume:String,db:DataBase){
         let sql = "alter table \(self.name) drop \(colume)"
 
         db.exec(sql: sql)

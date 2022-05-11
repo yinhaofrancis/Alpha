@@ -137,20 +137,28 @@ public class DatabaseTest: XCTestCase {
         let d = TableDeclare(name: "Origin", version: 0, declare: [
             CollumnDeclare(type: .intDecType, nullable: false, name: "a", primaryKey: true, unique: false, defaultValue: nil, autoInc: false)
         ])
+        let d2 = TableDeclare(name: "Origin2", version: 0, declare: [
+            CollumnDeclare(type: .intDecType, nullable: false, name: "a", primaryKey: true, unique: false, defaultValue: nil, autoInc: false)
+        ])
 
         try Oc().declare.create(db: db)
         try d.create(db: db)
-
+        try d2.create(db: db)
         db.close()
-        let flow = try DataBaseWorkFlow(config: DataBaseConfiguration(name: "dddt", models: [Origin().declare]))
+        
+        let flow = try DataBaseWorkFlow(config: DataBaseConfiguration(name: "dddt", models: [Origin().declare,Oc().declare,Origin2().declare]))
         
         flow.workflow({ db in
             let a = Origin()
+            let a2 = Origin2()
             for i in 0 ..< 10 {
                 a.i = i
                 a.ki = "dadad"
+                a2.i = i
+                a2.ki = "dadad"
                 do{
                     try a.tableModel.insert(db: db)
+                    try a2.tableModel.insert(db: db)
                 }catch{
                     a.da = "asfasfas".data(using: .utf8)
                     try a.tableModel.update(db: db)
@@ -171,7 +179,7 @@ public class DatabaseTest: XCTestCase {
 
 public class Origin:DataBaseObject,CustomStringConvertible{
     public var description: String{
-        return "\(i),\(ki),\(String(describing: da ?? nil))"
+        return "\(i),\(ki),\(String(describing: da ?? nil)),\(String(describing: self.e))"
     }
     
     
@@ -184,6 +192,9 @@ public class Origin:DataBaseObject,CustomStringConvertible{
     @Col(name:"d")
     var da:Data? = nil
     
+    @Col(name:"e")
+    var e:Date? = nil
+    
 //    @DBUpdate(version: 2, callback: { (i,v) in
 //        print(i)
 //        Origin().declare.addColume(colume: Origin()._da, db: v)
@@ -194,10 +205,44 @@ public class Origin:DataBaseObject,CustomStringConvertible{
 //    })
     var update:DataBaseUpdate = DataBaseUpdate(callbacks: [
         DataBaseUpdateCallback(version: 1, callback: { i, db in
-            Origin().declare.addColume(colume: Origin()._ki, db: db)
+            Origin().declare.add(colume: Origin()._ki, db: db)
         }),
         DataBaseUpdateCallback(version: 2, callback: { i, db in
-            Origin().declare.addColume(colume: Origin()._da, db: db)
+            Origin().declare.add(colume: Origin()._da, db: db)
+        }),
+        DataBaseUpdateCallback(version: 3, callback: { i, db in
+            Origin().declare.remove(colume: "d", db: db)
+        }),
+        DataBaseUpdateCallback(version: 4, callback: { i, db in
+            Origin().declare.add(colume: Origin()._da, db: db)
+        }),
+        DataBaseUpdateCallback(version: 5, callback: { i, db in
+            Origin().declare.add(colume: Origin()._e, db: db)
+        })
+    ])
+}
+public class Origin2:DataBaseObject,CustomStringConvertible{
+    public var description: String{
+        return "\(i),\(ki)"
+    }
+    
+    
+    @Col(name:"a",primaryKey:true)
+    var i:Int = 0
+    
+    @Col(name:"c")
+    var ki:String = ""
+//    @DBUpdate(version: 2, callback: { (i,v) in
+//        print(i)
+//        Origin().declare.addColume(colume: Origin()._da, db: v)
+//    })
+//    @DBUpdate(version: 1, callback: { (i,v) in
+//        print(i)
+//        Origin().declare.addColume(colume: Origin()._ki, db: v)
+//    })
+    var update:DataBaseUpdate = DataBaseUpdate(callbacks: [
+        DataBaseUpdateCallback(version: 5, callback: { i, db in
+            Origin2().declare.add(colume: Origin2()._ki, db: db)
         }),
     ])
 }
