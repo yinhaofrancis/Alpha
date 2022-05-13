@@ -154,6 +154,7 @@ public class DatabaseTest: XCTestCase {
             for i in 0 ..< 10 {
                 a.i = i
                 a.ki = "dadad"
+                a.e = Date()
                 a2.i = i
                 a2.ki = "dadad"
                 do{
