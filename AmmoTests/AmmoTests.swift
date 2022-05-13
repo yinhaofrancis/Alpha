@@ -40,10 +40,18 @@ public struct aa:ModuleEntry{
 public struct mm:Module{
     var i:Int = 100
     public var entries: [String : ModuleEntry]{
-        for i in 0 ..< 100{
-            aa(memory: .Normal, name: "\(i)")
-        }
+        aa(memory: .Normal, name: "q")
+        aa(memory: .Normal, name: "q")
+        aa(memory: .Normal, name: "q")
+        aa(memory: .Normal, name: "q")
+        aa(memory: .Normal, name: "q")
+        aa(memory: .Normal, name: "q")
+        aa(memory: .Normal, name: "q")
+        aa(memory: .Normal, name: "q")
+        aa(memory: .Normal, name: "q")
+        aa(memory: .Normal, name: "q")
+        aa(memory: .Normal, name: "q")
+        aa(memory: .Normal, name: "q")
+        aa(memory: .Normal, name: "q")
     }
-    
-    
 }

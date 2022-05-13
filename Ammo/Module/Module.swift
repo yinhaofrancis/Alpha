@@ -28,36 +28,5 @@ public struct ModuleBuilder{
             partialResult[me.name] = me
         }
     }
-//    public static func buildBlock(_ components: [String:ModuleEntry] ...) -> [String:ModuleEntry] {
-//        return components.reduce(into: [:]) { partialResult, me in
-//            for i in me{
-//                partialResult[i.key] = i.value
-//            }
-//        }
-//    }
-//    public static func buildArray(_ components: [[String:ModuleEntry]]) -> [String:ModuleEntry] {
-//        return components.reduce(into: [:]) { partialResult, me in
-//            for i in me{
-//                partialResult[i.key] = i.value
-//            }
-//        }
-//    }
-    public static func buildArray(_ components: ModuleEntry...) -> [String:ModuleEntry] {
-        return components.reduce(into: [:]) { partialResult, me in
-            partialResult[me.name] = me
-        }
-    }
-//    public static func buildEither(first component: [String:ModuleEntry]) -> [String:ModuleEntry] {
-//        return component
-//    }
-//    public static func buildEither(second component: [String:ModuleEntry]) -> [String:ModuleEntry] {
-//        return component
-//    }
-//    public static func buildEither(first component: ModuleEntry) -> [String:ModuleEntry] {
-//        return [component.name:component]
-//    }
-//    public static func buildEither(second component: ModuleEntry) -> [String:ModuleEntry] {
-//        return [component.name:component]
-//    }
 }
 
