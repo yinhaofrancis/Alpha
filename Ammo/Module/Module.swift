@@ -27,26 +27,27 @@ public struct EventKey:RawRepresentable{
 }
 
 public protocol ModuleEntry{
+    typealias ModuleReturn = ([String:Any]?)->Void
     var name:EventKey { get }
-    func call(param:[String:Any]?)
+    func call(param:[String:Any]?,ret:ModuleReturn?)
 }
 
 public struct ClosureEntry:ModuleEntry{
     public var name: EventKey
     
-    public var call:([String:Any]?)->Void
+    public var call:([String:Any]?,ModuleReturn?)->Void
     
-    public func call(param: [String : Any]?) {
+    public func call(param: [String : Any]?,ret:ModuleReturn?) {
         #if DEBUG
         
         print("event: " + self.name.rawValue, "param \(String(describing: param))")
         
         #endif
-        self.call(param)
+        self.call(param,ret)
     }
     
     
-    public init(name:EventKey,call:@escaping ([String:Any]?)->Void){
+    public init(name:EventKey,call:@escaping ([String:Any]?,ModuleReturn?)->Void){
         self.name = name
         self.call = call
     }
@@ -82,7 +83,7 @@ public class ModuleBucket{
                 return nil
             }
             let module = ty.init()
-            module.call(event: .onCreate)?.call(param: nil)
+            module.call(event: .onCreate)?.call(param: nil, ret: nil)
             return module
         }
     }
@@ -92,7 +93,7 @@ public class ModuleBucket{
         for i in kv{
             if i.value.memory == .Singleton{
                 singletonModule[i.key] = i.value.init()
-                singletonModule[i.key]?.call(event: .onCreate)?.call(param: nil)
+                singletonModule[i.key]?.call(event: .onCreate)?.call(param: nil, ret: nil)
             }
         }
     }

@@ -12,7 +12,9 @@ class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePic
 
     @IBAction func detect(_ sender: Any) {
 
-        self.kol?.call(event: .KLO1)?.call(param: nil)
+        self.kol?.call(event: .KLO1)?.call(param: nil,ret: { r in
+            print(r)
+        })
     }
     override func viewDidLoad() {
         super.viewDidLoad()

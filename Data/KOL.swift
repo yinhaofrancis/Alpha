@@ -54,27 +54,28 @@ public struct KOL:Module{
     var count:Int64 = 0
     
     public var entries: [String : ModuleEntry]{
-        ClosureEntry(name: .onCreate) { param in
+        ClosureEntry(name: .onCreate) { param,ret  in
             try? self.workflow.syncQuery({ db in
                 self.count = try One().tableModel.count(db: db)
             })
         }
-        ClosureEntry(name: .KLO1) { param in
+        ClosureEntry(name: .KLO1) { param,ret in
             self.workflow.workflow { db in
                 let o = One()
                 o.a = Int(count)
                 count += 1
                 o.b = "dsdada"
                 try o.tableModel.insert(db: db)
+                ret?(["d":"dsds"])
             }
         }
-        ClosureEntry(name: .KLO2) { param in
+        ClosureEntry(name: .KLO2) { param,ret in
             
         }
-        ClosureEntry(name: .KLO3) { param in
+        ClosureEntry(name: .KLO3) { param,ret in
             
         }
-        ClosureEntry(name: .KLO4) { param in
+        ClosureEntry(name: .KLO4) { param,ret in
             
         }
     }
