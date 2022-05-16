@@ -66,7 +66,13 @@ public struct DBWorkFlow{
     
     public init(name:String){
         self.name = name
-        
+    }
+    public init(configure:DataBaseConfiguration){
+        self.name = configure.name
+        guard DBWorkFlow.workFlow[name]  != nil else {
+            DBWorkFlow.workFlow[name] = try! DataBaseWorkFlow(config: configure)
+            return
+        }
     }
 }
 

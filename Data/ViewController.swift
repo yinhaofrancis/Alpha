@@ -11,36 +11,20 @@ import TextDetect
 class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePickerControllerDelegate {
 
     @IBAction func detect(_ sender: Any) {
-        let c = UIImagePickerController()
-        c.delegate = self
-        c.sourceType = .camera
-        self.showDetailViewController(c, sender: nil)
+
+        self.kol?.call(event: .KLO1)?.call(param: nil)
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-    }
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        guard let img:UIImage = info[.originalImage] as? UIImage else { return }
-        print(img)
-        
-        try! self.dt.detectQR(image: img.cgImage!, callback: { o in
-            let a = placeDecode.decode(o: o)
-            let n = a.map { i in
-                placeDecode.decodeName(code: i)
-            }.compactMap({$0})
-            print(o)
-        })
-        
-        
-        
-        picker.dismiss(animated: true)
-        
+        SharedModuleBucket.sharedConfiguration {
+            KOL()
+        }
+        SharedModuleBucket.resetConfiguration()
     }
 
-    @DBWorkFlow(name:"mark")
-    public var db:DataBaseWorkFlow
-    
-    var dt:TextDetect = TextDetect()
+
+    @ModuleProperty(name: "KOL")
+    var kol:KOL?
 
 }
 public class placeDecode{

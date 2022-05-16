@@ -34,6 +34,11 @@ public struct ClosureEntry:ModuleEntry{
     public var call:([String:Any]?)->Void
     
     public func call(param: [String : Any]?) {
+        #if DEBUG
+        
+        print("event: " + self.name.rawValue, "param \(String(describing: param))")
+        
+        #endif
         self.call(param)
     }
     
@@ -63,19 +68,23 @@ public class ModuleBucket{
     private var singletonModule:[String:Module] = [:]
     private var configuration:()->[String:Module]
     public init(@ModuleBucketBuilder module:@escaping ()->[String:Module]){
-        let kv = module()
         self.configuration = module
-        for i in kv{
-            if i.value.memory == .Singleton{
-                singletonModule[i.key] = i.value
-            }
-        }
+        self.resetConfiguration(module: module)
     }
     public func module(name:String)->Module?{
         if let s = singletonModule[name]{
             return s
         }else{
             return self.configuration()[name]
+        }
+    }
+    fileprivate func resetConfiguration(@ModuleBucketBuilder module:@escaping ()->[String:Module]){
+        self.configuration = module
+        let kv = module()
+        for i in kv{
+            if i.value.memory == .Singleton{
+                singletonModule[i.key] = i.value
+            }
         }
     }
 }
@@ -85,7 +94,7 @@ public final class SharedModuleBucket:ModuleBucket{
         configration = module
     }
     public static func resetConfiguration(){
-        self.shared = SharedModuleBucket(module: SharedModuleBucket.configration)
+        self.shared.resetConfiguration(module: configration)
     }
     public static var shared:SharedModuleBucket = {
         SharedModuleBucket(module: SharedModuleBucket.configration)
