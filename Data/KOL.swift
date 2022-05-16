@@ -37,7 +37,7 @@ public struct KOL:Module{
     public init() {
         
     }
-    public static var memory: Memory = .Singleton
+    public static var memory: Memory = .Normal
     
     public static var name: String = "KOL"
     
@@ -78,6 +78,4 @@ public struct KOL:Module{
             
         }
     }
-    
-    
 }
