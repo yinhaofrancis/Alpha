@@ -79,6 +79,18 @@ public class ModuleBucket{
         }
     }
 }
+public final class SharedModuleBucket:ModuleBucket{
+    private static var configration:()->[String:Module] = {[:]}
+    public static func sharedConfiguration(@ModuleBucketBuilder module:@escaping ()->[String:Module]){
+        configration = module
+    }
+    public static func resetConfiguration(){
+        self.shared = SharedModuleBucket(module: SharedModuleBucket.configration)
+    }
+    public static var shared:SharedModuleBucket = {
+        SharedModuleBucket(module: SharedModuleBucket.configration)
+    }()
+}
 
 @resultBuilder
 public struct ModuleBuilder{
@@ -135,7 +147,7 @@ public struct ModuleProperty<T:Module>{
     }
     public var bucket:ModuleBucket
     public var name:String
-    public init(name:String,bucket:ModuleBucket){
+    public init(name:String,bucket:ModuleBucket = SharedModuleBucket.shared){
         self.bucket = bucket
         self.name = name
     }
