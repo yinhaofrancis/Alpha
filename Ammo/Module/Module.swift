@@ -129,7 +129,7 @@ public class ModuleNullableState<T>{
 }
 
 @propertyWrapper
-public struct AmmoModule<T:Module>{
+public struct ModuleProperty<T:Module>{
     public var wrappedValue:T?{
         bucket.module(name: self.name) as? T
     }
