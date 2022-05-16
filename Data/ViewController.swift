@@ -17,7 +17,7 @@ class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePic
     override func viewDidLoad() {
         super.viewDidLoad()
         SharedModuleBucket.sharedConfiguration {
-            KOL()
+            KOL.self
         }
         SharedModuleBucket.resetConfiguration()
     }

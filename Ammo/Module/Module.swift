@@ -20,6 +20,9 @@ public struct EventKey:RawRepresentable{
     
     public typealias RawValue = String
     
+    public static var onCreate = EventKey(rawValue: "onCreate")
+    
+    public static var onFinish = EventKey(rawValue: "onFinish")
     
 }
 
@@ -51,9 +54,10 @@ public struct ClosureEntry:ModuleEntry{
 }
 
 public protocol Module{
-    var memory: Memory { get }
-    var name:String { get }
+    static var memory: Memory { get }
+    static var name:String { get }
     @ModuleBuilder var entries:[String:ModuleEntry] { get }
+    init()
 }
 
 extension Module{
@@ -66,31 +70,36 @@ extension Module{
 
 public class ModuleBucket{
     private var singletonModule:[String:Module] = [:]
-    private var configuration:()->[String:Module]
-    public init(@ModuleBucketBuilder module:@escaping ()->[String:Module]){
-        self.configuration = module
+    private var configuration:()->[String:Module.Type] = { return [:] }
+    public init(@ModuleBucketBuilder module:@escaping ()->[String:Module.Type]){
         self.resetConfiguration(module: module)
     }
     public func module(name:String)->Module?{
         if let s = singletonModule[name]{
             return s
         }else{
-            return self.configuration()[name]
+            guard let ty =  self.configuration()[name] else {
+                return nil
+            }
+            let module = ty.init()
+            module.call(event: .onCreate)?.call(param: nil)
+            return module
         }
     }
-    fileprivate func resetConfiguration(@ModuleBucketBuilder module:@escaping ()->[String:Module]){
+    fileprivate func resetConfiguration(@ModuleBucketBuilder module:@escaping ()->[String:Module.Type]){
         self.configuration = module
         let kv = module()
         for i in kv{
             if i.value.memory == .Singleton{
-                singletonModule[i.key] = i.value
+                singletonModule[i.key] = i.value.init()
+                singletonModule[i.key]?.call(event: .onCreate)?.call(param: nil)
             }
         }
     }
 }
 public final class SharedModuleBucket:ModuleBucket{
-    private static var configration:()->[String:Module] = {[:]}
-    public static func sharedConfiguration(@ModuleBucketBuilder module:@escaping ()->[String:Module]){
+    private static var configration:()->[String:Module.Type] = {[:]}
+    public static func sharedConfiguration(@ModuleBucketBuilder module:@escaping ()->[String:Module.Type]){
         configration = module
     }
     public static func resetConfiguration(){
@@ -111,7 +120,7 @@ public struct ModuleBuilder{
 }
 @resultBuilder
 public struct ModuleBucketBuilder{
-    public static func buildBlock(_ components: Module ...) -> [String:Module] {
+    public static func buildBlock(_ components: Module.Type ...) -> [String:Module.Type] {
         return components.reduce(into: [:]) { partialResult, me in
             partialResult[me.name] = me
         }

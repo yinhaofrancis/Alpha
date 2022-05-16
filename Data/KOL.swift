@@ -22,11 +22,24 @@ public class One:DataBaseObject{
     @Col(name:"b")
     var b:String? = nil
     
+    @Col(name:"c")
+    var c:String? = nil
+    
+    var update:DataBaseUpdate = DataBaseUpdate {
+        DataBaseUpdateCallback(version: 1, callback: { v, db in
+            One().declare.add(colume: One()._c, db: db)
+        })
+    }
+    
 }
 public struct KOL:Module{
-    public var memory: Memory = .Normal
     
-    public var name: String = "KOL"
+    public init() {
+        
+    }
+    public static var memory: Memory = .Singleton
+    
+    public static var name: String = "KOL"
     
     private static var dbConfig:DataBaseConfiguration = {
         DataBaseConfiguration(name: "KOL", models: [
@@ -37,11 +50,20 @@ public struct KOL:Module{
     @DBWorkFlow(configure: KOL.dbConfig)
     var workflow:DataBaseWorkFlow
     
+    @ModuleState
+    var count:Int64 = 0
+    
     public var entries: [String : ModuleEntry]{
+        ClosureEntry(name: .onCreate) { param in
+            try? self.workflow.syncQuery({ db in
+                self.count = try One().tableModel.count(db: db)
+            })
+        }
         ClosureEntry(name: .KLO1) { param in
             self.workflow.workflow { db in
                 let o = One()
-                o.a = Int(arc4random())
+                o.a = Int(count)
+                count += 1
                 o.b = "dsdada"
                 try o.tableModel.insert(db: db)
             }

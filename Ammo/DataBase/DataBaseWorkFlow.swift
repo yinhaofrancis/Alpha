@@ -28,9 +28,31 @@ public class DataBaseWorkFlow{
             }
         }))
     }
+    public func syncWorkflow(_ callback:@escaping (DataBase) throws ->Void){
+        self.writeQueue.sync(execute: DispatchWorkItem(qos: .userInitiated, flags: .barrier, block: {
+            do{
+                self.wdb.begin()
+                try callback(self.wdb)
+                self.wdb.commit()
+            }catch{
+                self.wdb.rollback()
+            }
+        }))
+    }
     public func query(_ callback:@escaping (DataBase) throws ->Void) throws{
         let db = try DataBase(url: self.wdb.url, readonly: true, writeLock: false)
         self.writeQueue.async {
+            do{
+                try callback(db)
+            }catch{
+                print(error)
+            }
+            db.close()
+        }
+    }
+    public func syncQuery(_ callback:@escaping (DataBase) throws ->Void) throws{
+        let db = try DataBase(url: self.wdb.url, readonly: true, writeLock: false)
+        self.writeQueue.sync {
             do{
                 try callback(db)
             }catch{
@@ -101,10 +123,20 @@ public struct DataBaseUpdateCallback{
     }
 }
 
+@resultBuilder
+public struct DataBaseUpdateBuilder{
+    public static func buildBlock(_ components: DataBaseUpdateCallback...) -> [DataBaseUpdateCallback] {
+        return components
+    }
+    
+}
 public class DataBaseUpdate{
     public var callbacks:[DataBaseUpdateCallback]
     public init(callbacks:[DataBaseUpdateCallback]) {
         self.callbacks = callbacks
+    }
+    public init(@DataBaseUpdateBuilder buider:()->[DataBaseUpdateCallback]) {
+        self.callbacks = buider()
     }
     public func update(db:DataBase) throws {
         let calls = self.callbacks.sorted { l, r in
