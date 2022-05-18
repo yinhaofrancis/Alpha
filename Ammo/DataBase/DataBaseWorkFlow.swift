@@ -96,6 +96,15 @@ public struct DBWorkFlow{
             return
         }
     }
+    public static func createWorkFlow(configure:DataBaseConfiguration) throws ->DataBaseWorkFlow?{
+        let name = configure.name
+        guard let owf = DBWorkFlow.workFlow[name] else {
+            let wf = try DataBaseWorkFlow(config: configure)
+            DBWorkFlow.workFlow[name] = wf
+            return wf
+        }
+        return owf
+    }
 }
 
 @resultBuilder
@@ -181,5 +190,50 @@ public struct DataBaseConfiguration{
     public init(name:String,models:[TableDeclare]){
         self.name = name
         self.models = models
+    }
+}
+
+@propertyWrapper
+public class DBContent<T:DataBaseObject>{
+    
+    public var wrappedValue: Array<T>{
+        if(self.origin.count == 0){
+            self.query()
+        }
+        return self.origin
+    }
+    private var origin:Array<T> = []
+    private var work:DataBaseWorkFlow
+    public init(configration:DataBaseConfiguration){
+        self.work = try! DBWorkFlow.createWorkFlow(configure: configration)!
+    }
+    public func add(content:T){
+        self.origin.append(content)
+        self.work.workflow { db in
+            try content.tableModel.insert(db: db)
+        }
+    }
+    public func remove(content:T){
+        var array:[T] = []
+        self.work.syncWorkflow { db in
+            try content.tableModel.delete(db: db)
+            array = try self.query(db: db)
+        }
+        self.origin = array
+    }
+    public func remove(index:Int){
+        if origin.count > index{
+            self.remove(content: self.origin[index])
+        }
+    }
+    private func query(db:DataBase) throws ->[T]{
+        return try T.select(db: db)
+    }
+    public func query(){
+        var array:[T] = []
+        self.work.syncWorkflow { db in
+            array = try self.query(db: db)
+        }
+        self.origin = array
     }
 }

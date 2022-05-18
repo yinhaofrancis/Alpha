@@ -30,6 +30,7 @@
 		A9FB79A4281A69CA008CCF39 /* AmmoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB79A3281A69CA008CCF39 /* AmmoTests.swift */; };
 		A9FB79A5281A69CA008CCF39 /* Ammo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9FB7976281A68B0008CCF39 /* Ammo.framework */; };
 		A9FB79AC281A6A0A008CCF39 /* DatabaseTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB79AB281A6A0A008CCF39 /* DatabaseTest.swift */; };
+		A9FF618A28328CD4006637DC /* KOL.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9E511CF2832030E00CA5655 /* KOL.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +54,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = A9FB7975281A68B0008CCF39;
 			remoteInfo = Ammo;
+		};
+		A9FF618828328CA6006637DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A9FB796D281A68B0008CCF39 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A95BCB6F2824C491000982D0;
+			remoteInfo = Data;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -313,6 +321,7 @@
 			);
 			dependencies = (
 				A9FB79A7281A69CA008CCF39 /* PBXTargetDependency */,
+				A9FF618928328CA6006637DC /* PBXTargetDependency */,
 			);
 			name = AmmoTests;
 			productName = AmmoTests;
@@ -341,6 +350,7 @@
 					};
 					A9FB79A0281A69CA008CCF39 = {
 						CreatedOnToolsVersion = 13.3.1;
+						TestTargetID = A95BCB6F2824C491000982D0;
 					};
 				};
 			};
@@ -438,6 +448,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A9FF618A28328CD4006637DC /* KOL.swift in Sources */,
 				A9FB79AC281A6A0A008CCF39 /* DatabaseTest.swift in Sources */,
 				A9FB79A4281A69CA008CCF39 /* AmmoTests.swift in Sources */,
 			);
@@ -460,6 +471,11 @@
 			isa = PBXTargetDependency;
 			target = A9FB7975281A68B0008CCF39 /* Ammo */;
 			targetProxy = A9FB79A6281A69CA008CCF39 /* PBXContainerItemProxy */;
+		};
+		A9FF618928328CA6006637DC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A95BCB6F2824C491000982D0 /* Data */;
+			targetProxy = A9FF618828328CA6006637DC /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -797,6 +813,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Data.app/Data";
 			};
 			name = Debug;
 		};
@@ -813,6 +830,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Data.app/Data";
 			};
 			name = Release;
 		};
