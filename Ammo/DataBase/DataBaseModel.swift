@@ -12,10 +12,19 @@ public protocol DataBaseProtocol{
     init()
     init(db:DataBase) throws
     static var name:String { get }
+    
+    var updates:DataBaseUpdate?{ get }
 }
 
 open class DataBaseObject:DataBaseProtocol{
-    public required init(db: DataBase) throws {}
+    
+    open var updates: DataBaseUpdate?{
+        return nil
+    }
+    
+    public required init(db: DataBase) throws {
+        try Self.createTable(update: self.updates, db: db)
+    }
     
     public required init() {}
     
@@ -87,22 +96,16 @@ extension DataBaseProtocol{
     public static func delete(db:DataBase,condition:QueryCondition) throws{
         try TableModel.delete(db: db, table: self.name, condition: condition)
     }
-    public var updates:DataBaseUpdate?{
-        let updates = Mirror(reflecting: self).children.filter({$0.value is DataBaseUpdate}).map { m in
-            m.value as! DataBaseUpdate
-        }
-        return updates.first
-    }
     public var version:Int32{
         self.updates?.callbacks.max(by: { l, r in
             l.version < r.version
         })?.version ?? 0
     }
-    public func createTable(update:DataBaseUpdate,db:DataBase) throws {
-        if try db.tableExist(name: Self.name){
-            try update.update(db: db)
+    public static func createTable(update:DataBaseUpdate?,db:DataBase) throws {
+        if try db.tableExist(name: self.name){
+            try update?.update(db: db)
         }else{
-            try self.declare.create(db: db)
+            try Self.init().declare.create(db: db)
         }
     }
 }

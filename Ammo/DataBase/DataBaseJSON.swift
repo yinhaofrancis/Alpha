@@ -236,6 +236,8 @@ public struct JSONModel:ExpressibleByArrayLiteral,
 }
 
 public struct JSONObject:DataBaseProtocol,CustomStringConvertible{
+    public var updates: DataBaseUpdate?
+    
     public init() {
         
     }
@@ -251,7 +253,9 @@ public struct JSONObject:DataBaseProtocol,CustomStringConvertible{
     @Col(name: "row", primaryKey: true,autoInc:true)
     fileprivate var rowid:Int? = nil
     
-    public init(db:DataBase) { }
+    public init(db:DataBase) throws{
+        try JSONObject.createTable(update: self.updates, db: db)
+    }
     
     public init(json:JSONModel){
         self.json = json

@@ -32,6 +32,7 @@ public class DataBaseWorkFlow{
                 try callback(self.wdb)
                 self.wdb.commit()
             }catch{
+                print(error)
                 self.wdb.rollback()
             }
         }))

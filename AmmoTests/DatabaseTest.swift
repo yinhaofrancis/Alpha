@@ -23,8 +23,8 @@ public class DatabaseTest: XCTestCase {
         
         for i in 0 ..< 10 {
             let testa = testA()
-            testa.contentId = i
-            testa.name = "\(i)"
+            testa.contentId = Date()
+            testa.name = "\(i) + \(Date())"
             self._ta.add(content: testa)
         }
         print(self.tb)
@@ -34,24 +34,54 @@ public class DatabaseTest: XCTestCase {
 public class testA:DataBaseObject,CustomDebugStringConvertible{
     
     @Col(name:"contentId",primaryKey:true)
-    public var contentId:Int = 0
+    public var contentId:Date = Date()
     
     @Col(name:"name")
     public var name:String? = nil
     
-    public required init(db: DataBase) throws {
-        try super.init(db: db)
-        
-        try self.createTable(update: DataBaseUpdate {
-            
-        }, db: db)
+    @Col(name:"display")
+    public var display:String? = nil
+    
+    @Col(name:"display1")
+    public var display1:String? = nil
+    
+    public override var updates: DataBaseUpdate?{
+        return DataBaseUpdate {
+            DataBaseUpdateCallback(version: 1) { i, db in
+                testA().declare.add(colume: testA()._display1, db: db)
+            }
+        }
     }
     
-    required init() {
-        super.init()
-    }
     
     public var debugDescription: String{
         "\(contentId) | \(String(describing: name))"
     }
+}
+
+public struct testB:DataBaseProtocol,CustomDebugStringConvertible{
+    public init() {}
+    
+    
+    @Col(name:"contentId",primaryKey:true)
+    public var contentId:Date = Date()
+    
+    @Col(name:"name")
+    public var name:String? = nil
+    
+    
+    
+    public init(db: DataBase) throws {
+        try testB.createTable(update: self.updates, db: db)
+    }
+    
+    public static var name: String = "testB"
+    
+    public var updates: DataBaseUpdate?
+    
+    public var debugDescription: String{
+        "\(contentId),\(String(describing: name))"
+    }
+    
+    
 }
