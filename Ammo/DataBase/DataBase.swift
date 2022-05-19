@@ -47,7 +47,7 @@ public class DataBase:Hashable{
             return false
         }
     }
-    public var version:Int32{
+    public var databaseVersion:Int32{
         get{
             do {
                 let rs = try self.prepare(sql: "PRAGMA user_version")
@@ -528,10 +528,10 @@ public struct TableModel{
     public var name:String
     public var declare:[TableColumn]
     public var insertCode:String{
-        "insert into \(self.name) (\(declare.map({$0.name}).joined(separator: ","))) values(\(declare.map({"@" + $0.name}).joined(separator: ",")))"
+        "insert into \(self.name) (\(declare.filter({$0.autoInc == false}).map({$0.name}).joined(separator: ","))) values(\(declare.filter({$0.autoInc == false}).map({"@" + $0.name}).joined(separator: ",")))"
     }
     public var updateCode:String{
-        "update `\(self.name)` set \(self.declare.map({"\($0.name)=@\($0.name)"}).joined(separator: ",")) " + primaryCondition
+        "update `\(self.name)` set \(self.declare.filter({$0.autoInc == false}).map({"\($0.name)=@\($0.name)"}).joined(separator: ",")) " + primaryCondition
     }
     public var primaryCondition:String{
         if !self.hasPrimary{
@@ -561,8 +561,11 @@ public struct TableModel{
     public func insert(db:DataBase) throws {
         let rs = try db.prepare(sql: self.insertCode)
         for i in self.declare{
-            let indx = rs.getParamIndexBy(name: "@"+i.name)
-            try rs.bind(index: indx, value: i.origin, type: i.type)
+            if i.autoInc == false{
+                let indx = rs.getParamIndexBy(name: "@"+i.name)
+                try rs.bind(index: indx, value: i.origin, type: i.type)
+            }
+            
         }
         _ = try rs.step()
         rs.close()
@@ -571,8 +574,10 @@ public struct TableModel{
         if self.hasPrimary{
             let rs = try db.prepare(sql: self.updateCode)
             for i in self.declare{
-                let indx = rs.getParamIndexBy(name: "@"+i.name)
-                try rs.bind(index: indx, value: i.origin, type: i.type)
+                if i.autoInc == false{
+                    let indx = rs.getParamIndexBy(name: "@"+i.name)
+                    try rs.bind(index: indx, value: i.origin, type: i.type)
+                }
             }
             try self.bindPrimaryConditionData(rs: rs)
             _ = try rs.step()

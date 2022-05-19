@@ -101,11 +101,37 @@ extension DataBaseProtocol{
             l.version < r.version
         })?.version ?? 0
     }
+    fileprivate static func databaseVersion(db:DataBase) throws ->Version{
+        do{
+            if let v = try Version.versionOf(db: db, tableName: self.name){
+                return v
+            }
+            
+        }catch{
+            try Version().declare.create(db: db)
+        }
+        let v = Version()
+        v.tableName = self.name
+        v.versionNum = Int(Self().version)
+        try v.tableModel.insert(db: db)
+        return v
+    }
+    public static func databaseVersionNum(db:DataBase) throws ->Int{
+        return try self.databaseVersion(db: db).versionNum 
+    }
     public static func createTable(update:DataBaseUpdate?,db:DataBase) throws {
         if try db.tableExist(name: self.name){
-            try update?.update(db: db)
+            let ver = try databaseVersion(db: db)
+            let last = try update?.update(db: db,model: Self.self)
+            if(last != nil && last! > 0 && ver.versionNum < last!){
+                ver.versionNum = Int(last!)
+                try ver.tableModel.update(db: db)
+            }
         }else{
             try Self.init().declare.create(db: db)
+            let v = try self.databaseVersion(db: db)
+            v.versionNum = Int(Self.init().version)
+            try v.tableModel.update(db: db)
         }
     }
 }
@@ -307,5 +333,32 @@ public class FK<T:TableColumn>:TableColumn{
         set{
             self.wrappedValue.origin = newValue
         }
+    }
+}
+
+fileprivate struct Version:DataBaseProtocol{
+    public init() {}
+    
+    public init(db: DataBase) throws {
+        try Version.createTable(update: self.updates, db: db)
+    }
+    
+    public static var name: String = "version"
+    
+    public var updates: DataBaseUpdate?
+    
+    @Col(name:"id",primaryKey:true,autoInc:true)
+    public var tbId:Int = 0
+    
+    @Col(name:"tableName")
+    public var tableName:String = ""
+    
+    @Col(name:"versionNum")
+    public var versionNum:Int = 0
+    
+    
+    public static func versionOf(db:DataBase,tableName:String) throws ->Version?{
+        let v:[Version] = try Version.select(db: db, condition: QueryCondition(condition: "tableName = \'\(tableName)\'"))
+        return v.first
     }
 }

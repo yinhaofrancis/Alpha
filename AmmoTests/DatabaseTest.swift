@@ -12,29 +12,34 @@ import Ammo
 public class DatabaseTest: XCTestCase {
     
     
-    @DBContent(name: "data")
+    @DBContent(databaseName: "data")
     var ta:[testA]
     
     
-    @DBContent(name: "data")
-    var tb:[testA]
-    
     func testTestA() throws{
-        
+        let exp = XCTestExpectation(description: "end")
+        let start = Int(Date().timeIntervalSince1970 * 10)
         for i in 0 ..< 10 {
-            let testa = testA()
-            testa.contentId = Date()
-            testa.name = "\(i) + \(Date())"
-            self._ta.add(content: testa)
+            DispatchQueue.global().async {
+                let testa = testA()
+                testa.contentId = (start + i)
+                testa.name = "\(i) + \(Date())"
+                self._ta.add(content: testa)
+                if i == 9{
+                    DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(1)) {
+                        exp.fulfill()
+                    }
+                }
+            }
         }
-        print(self.tb)
+        self.wait(for: [exp], timeout: 20000)
     }
 }
 
 public class testA:DataBaseObject,CustomDebugStringConvertible{
     
     @Col(name:"contentId",primaryKey:true)
-    public var contentId:Date = Date()
+    public var contentId:Int = 0
     
     @Col(name:"name")
     public var name:String? = nil
@@ -47,7 +52,7 @@ public class testA:DataBaseObject,CustomDebugStringConvertible{
     
     public override var updates: DataBaseUpdate?{
         return DataBaseUpdate {
-            DataBaseUpdateCallback(version: 1) { i, db in
+            DataBaseUpdateCallback(version: 1) { db in
                 testA().declare.add(colume: testA()._display1, db: db)
             }
         }

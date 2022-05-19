@@ -22,6 +22,7 @@ public class DataBaseWorkFlow{
                 self.wdb.commit()
             }catch{
                 self.wdb.rollback()
+                print(error)
             }
         }))
     }
@@ -109,10 +110,10 @@ public struct DBUpdate{
     }
 }
 public struct DataBaseUpdateCallback{
-    public typealias CallbackBlock = (Int32,DataBase) throws ->Void
+    public typealias CallbackBlock = (DataBase) throws ->Void
     public var version:Int32
-    public var callback:(Int32,DataBase) throws ->Void
-    public init(version:Int32,callback:@escaping (Int32,DataBase) throws ->Void) {
+    public var callback:CallbackBlock
+    public init(version:Int32,callback:@escaping CallbackBlock) {
         self.version = version
         self.callback = callback
     }
@@ -133,15 +134,19 @@ public class DataBaseUpdate{
     public init(@DataBaseUpdateBuilder buider:()->[DataBaseUpdateCallback]) {
         self.callbacks = buider()
     }
-    public func update(db:DataBase) throws {
+    public func update(db:DataBase,model:DataBaseProtocol.Type) throws->Int32 {
         let calls = self.callbacks.sorted { l, r in
             l.version < r.version
         }
+        var v:Int32 = 0
+        let version = try model.databaseVersionNum(db: db)
         for i in calls{
-            if i.version > db.version{
-                try i.callback(i.version,db)
+            if i.version > version{
+                try i.callback(db)
+                v = max(v, i.version)
             }
         }
+        return v
     }
 }
 
@@ -157,15 +162,15 @@ public class DBContent<T:DataBaseObject>{
     }
     private var origin:Array<T> = []
     private var work:DataBaseWorkFlow
-    public init(name:String){
-        self.work = DBWorkFlow.createWorkFlow(name: name)
-        self.work.syncWorkflow { db in
+    public init(databaseName:String){
+        self.work = DBWorkFlow.createWorkFlow(name: databaseName)
+        self.work.workflow { db in
             _ = try T.init(db: db)
         }
     }
     public func add(content:T){
         self.origin.append(content)
-        self.work.workflow { db in
+        self.work.syncWorkflow { db in
             try content.tableModel.insert(db: db)
         }
     }
@@ -187,7 +192,7 @@ public class DBContent<T:DataBaseObject>{
     }
     public func sync(){
         var array:[T] = []
-        self.work.syncWorkflow { db in
+        try? self.work.syncQuery{ db in
             array = try self.query(db: db)
         }
         self.origin = array
