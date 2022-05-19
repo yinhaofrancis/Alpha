@@ -11,22 +11,12 @@ import TextDetect
 class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePickerControllerDelegate {
 
     @IBAction func detect(_ sender: Any) {
-
-        self.kol?.call(event: .KLO1)?.call(param: nil,ret: { r in
-            print(r)
-        })
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-        SharedModuleBucket.sharedConfiguration {
-            KOL.self
-        }
-        SharedModuleBucket.resetConfiguration()
     }
 
 
-    @ModuleProperty(name: "KOL")
-    var kol:KOL?
 
 }
 public class placeDecode{

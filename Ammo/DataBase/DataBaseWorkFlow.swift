@@ -14,9 +14,6 @@ public class DataBaseWorkFlow{
     public init(name:String) throws {
         self.wdb = try DataBase(name: name, readonly: false, writeLock: true)
     }
-    public init(config:DataBaseConfiguration) throws{
-        self.wdb = try config.configure()
-    }
     public func workflow(_ callback:@escaping (DataBase) throws ->Void){
         self.writeQueue.async(execute: DispatchWorkItem(qos: .userInitiated, flags: .barrier, block: {
             do{
@@ -70,40 +67,28 @@ public class DataBaseWorkFlow{
 public struct DBWorkFlow{
     private static var workFlow:[String:DataBaseWorkFlow] = [:]
     
-    private var semaphore:DispatchSemaphore = DispatchSemaphore(value: 1)
+    private static var lock:DispatchSemaphore = DispatchSemaphore(value: 1)
                                  
     public var name:String
     
     public var wrappedValue:DataBaseWorkFlow{
-        defer{
-            semaphore.signal()
-        }
-        semaphore.wait()
-        guard let a = DBWorkFlow.workFlow[name] else {
-            DBWorkFlow.workFlow[name] = try! DataBaseWorkFlow(name: self.name)
-            return DBWorkFlow.workFlow[name]!
-        }
-        return a
+        
+        return DBWorkFlow.createWorkFlow(name: self.name)
     }
     
     public init(name:String){
         self.name = name
     }
-    public init(configure:DataBaseConfiguration){
-        self.name = configure.name
-        guard DBWorkFlow.workFlow[name]  != nil else {
-            DBWorkFlow.workFlow[name] = try! DataBaseWorkFlow(config: configure)
-            return
+    fileprivate static func createWorkFlow(name:String)->DataBaseWorkFlow{
+        defer{
+            lock.signal()
         }
-    }
-    public static func createWorkFlow(configure:DataBaseConfiguration) throws ->DataBaseWorkFlow?{
-        let name = configure.name
-        guard let owf = DBWorkFlow.workFlow[name] else {
-            let wf = try DataBaseWorkFlow(config: configure)
-            DBWorkFlow.workFlow[name] = wf
-            return wf
+        lock.wait()
+        guard let a = DBWorkFlow.workFlow[name] else {
+            DBWorkFlow.workFlow[name] = try! DataBaseWorkFlow(name: name)
+            return DBWorkFlow.workFlow[name]!
         }
-        return owf
+        return a
     }
 }
 
@@ -160,52 +145,22 @@ public class DataBaseUpdate{
 }
 
 
-public struct DataBaseConfiguration{
-    public var name:String
-    public var models:[TableDeclare]
-    public func configure() throws ->DataBase{
-        let db = try DataBase(name: name, readonly: false, writeLock: false)
-        do{
-            db.begin()
-            let a = db.foreignKeys
-            db.foreignKeys = false
-            for i in models{
-                if try !db.tableExist(name: i.name){
-                    try i.create(db: db)
-                }else{
-                    try i.updates?.update(db: db)
-                }
-            }
-            let v = models.map({$0.version}).max() ?? 0
-            db.version = v;
-            db.foreignKeys = a
-            db.commit()
-            return db
-        }catch{
-            db.rollback()
-            throw error
-        }
-        
-    }
-    public init(name:String,models:[TableDeclare]){
-        self.name = name
-        self.models = models
-    }
-}
-
 @propertyWrapper
 public class DBContent<T:DataBaseObject>{
     
     public var wrappedValue: Array<T>{
         if(self.origin.count == 0){
-            self.query()
+            self.sync()
         }
         return self.origin
     }
     private var origin:Array<T> = []
     private var work:DataBaseWorkFlow
-    public init(configration:DataBaseConfiguration){
-        self.work = try! DBWorkFlow.createWorkFlow(configure: configration)!
+    public init(name:String){
+        self.work = DBWorkFlow.createWorkFlow(name: name)
+        self.work.syncWorkflow { db in
+            _ = try T.init(db: db)
+        }
     }
     public func add(content:T){
         self.origin.append(content)
@@ -229,7 +184,7 @@ public class DBContent<T:DataBaseObject>{
     private func query(db:DataBase) throws ->[T]{
         return try T.select(db: db)
     }
-    public func query(){
+    public func sync(){
         var array:[T] = []
         self.work.syncWorkflow { db in
             array = try self.query(db: db)

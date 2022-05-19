@@ -10,14 +10,22 @@ import UIKit
 
 public protocol DataBaseProtocol{
     init()
+    init(db:DataBase) throws
     static var name:String { get }
 }
 
 open class DataBaseObject:DataBaseProtocol{
+    public required init(db: DataBase) throws {}
+    
     public required init() {}
+    
     public static var name:String{
         return "\(Self.self)"
     }
+}
+
+extension DataBaseProtocol{
+    
     public static func colume<T:DBType>(rs:DataBase.ResultSet,index:Int32)->T?{
         T.create(rs: rs, index: index)
     }
@@ -41,9 +49,6 @@ open class DataBaseObject:DataBaseProtocol{
             }
         }
     }
-}
-
-extension DataBaseProtocol{
     
     public var declare:TableDeclare{
         let cds = Mirror(reflecting: self).children.filter({$0.value is CollumnDeclare}).map { m in
@@ -92,6 +97,13 @@ extension DataBaseProtocol{
         self.updates?.callbacks.max(by: { l, r in
             l.version < r.version
         })?.version ?? 0
+    }
+    public func createTable(update:DataBaseUpdate,db:DataBase) throws {
+        if try db.tableExist(name: Self.name){
+            try update.update(db: db)
+        }else{
+            try self.declare.create(db: db)
+        }
     }
 }
 

@@ -18,13 +18,10 @@ class AmmoTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    @ModuleProperty(name: "KOL")
-    var kol:KOL?
+
     
     func testExample() throws {
-        self.kol?.call(event: .KLO1)?.call(param: nil,ret: { r in
-            print(r)
-        })  
+
     }
 
     func testPerformanceExample() throws {

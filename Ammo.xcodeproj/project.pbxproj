@@ -20,7 +20,6 @@
 		A95BCB97282507D8000982D0 /* TextDetect.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A95BCB91282507D8000982D0 /* TextDetect.framework */; };
 		A95BCB98282507D8000982D0 /* TextDetect.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A95BCB91282507D8000982D0 /* TextDetect.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A95BCB9D28250846000982D0 /* TextDetect.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95BCB9C28250846000982D0 /* TextDetect.swift */; };
-		A9E511D02832030E00CA5655 /* KOL.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9E511CF2832030E00CA5655 /* KOL.swift */; };
 		A9FB7989281A6942008CCF39 /* DataBaseBackUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB7983281A6942008CCF39 /* DataBaseBackUp.swift */; };
 		A9FB798A281A6942008CCF39 /* DataBaseFetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB7984281A6942008CCF39 /* DataBaseFetch.swift */; };
 		A9FB798B281A6942008CCF39 /* DataBaseWorkFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB7985281A6942008CCF39 /* DataBaseWorkFlow.swift */; };
@@ -30,7 +29,6 @@
 		A9FB79A4281A69CA008CCF39 /* AmmoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB79A3281A69CA008CCF39 /* AmmoTests.swift */; };
 		A9FB79A5281A69CA008CCF39 /* Ammo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9FB7976281A68B0008CCF39 /* Ammo.framework */; };
 		A9FB79AC281A6A0A008CCF39 /* DatabaseTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB79AB281A6A0A008CCF39 /* DatabaseTest.swift */; };
-		A9FF618A28328CD4006637DC /* KOL.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9E511CF2832030E00CA5655 /* KOL.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -92,7 +90,6 @@
 		A95BCB8A2824C4F3000982D0 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		A95BCB91282507D8000982D0 /* TextDetect.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TextDetect.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A95BCB9C28250846000982D0 /* TextDetect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextDetect.swift; sourceTree = "<group>"; };
-		A9E511CF2832030E00CA5655 /* KOL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KOL.swift; sourceTree = "<group>"; };
 		A9FB7976281A68B0008CCF39 /* Ammo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Ammo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9FB7983281A6942008CCF39 /* DataBaseBackUp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataBaseBackUp.swift; sourceTree = "<group>"; };
 		A9FB7984281A6942008CCF39 /* DataBaseFetch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataBaseFetch.swift; sourceTree = "<group>"; };
@@ -159,7 +156,6 @@
 				A95BCB7D2824C493000982D0 /* LaunchScreen.storyboard */,
 				A95BCB802824C493000982D0 /* Info.plist */,
 				A95BCB8A2824C4F3000982D0 /* Settings.bundle */,
-				A9E511CF2832030E00CA5655 /* KOL.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -417,7 +413,6 @@
 			files = (
 				A95BCB772824C491000982D0 /* ViewController.swift in Sources */,
 				A95BCB732824C491000982D0 /* AppDelegate.swift in Sources */,
-				A9E511D02832030E00CA5655 /* KOL.swift in Sources */,
 				A95BCB752824C491000982D0 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -448,7 +443,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A9FF618A28328CD4006637DC /* KOL.swift in Sources */,
 				A9FB79AC281A6A0A008CCF39 /* DatabaseTest.swift in Sources */,
 				A9FB79A4281A69CA008CCF39 /* AmmoTests.swift in Sources */,
 			);
