@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A9161EE4282E78F700FA05A9 /* Module.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9161EE3282E78F700FA05A9 /* Module.swift */; };
 		A95BCB732824C491000982D0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95BCB722824C491000982D0 /* AppDelegate.swift */; };
 		A95BCB752824C491000982D0 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95BCB742824C491000982D0 /* SceneDelegate.swift */; };
 		A95BCB772824C491000982D0 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95BCB762824C491000982D0 /* ViewController.swift */; };
@@ -78,7 +77,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		A9161EE3282E78F700FA05A9 /* Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Module.swift; sourceTree = "<group>"; };
 		A95BCB702824C491000982D0 /* Data.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Data.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A95BCB722824C491000982D0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A95BCB742824C491000982D0 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -137,14 +135,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		A9161EE2282E78CE00FA05A9 /* Module */ = {
-			isa = PBXGroup;
-			children = (
-				A9161EE3282E78F700FA05A9 /* Module.swift */,
-			);
-			path = Module;
-			sourceTree = "<group>";
-		};
 		A95BCB712824C491000982D0 /* Data */ = {
 			isa = PBXGroup;
 			children = (
@@ -201,7 +191,6 @@
 		A9FB7978281A68B0008CCF39 /* Ammo */ = {
 			isa = PBXGroup;
 			children = (
-				A9161EE2282E78CE00FA05A9 /* Module */,
 				A9FB7982281A6942008CCF39 /* DataBase */,
 			);
 			path = Ammo;
@@ -430,7 +419,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				A9FB798D281A6942008CCF39 /* DataBaseJSON.swift in Sources */,
-				A9161EE4282E78F700FA05A9 /* Module.swift in Sources */,
 				A9FB798C281A6942008CCF39 /* DataBaseModel.swift in Sources */,
 				A9FB7989281A6942008CCF39 /* DataBaseBackUp.swift in Sources */,
 				A9FB798B281A6942008CCF39 /* DataBaseWorkFlow.swift in Sources */,
