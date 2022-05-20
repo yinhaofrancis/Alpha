@@ -15,6 +15,12 @@ public class DatabaseTest: XCTestCase {
     @DBContent(databaseName: "data")
     var ta:[testA]
     
+    @DBContent(databaseName: "data")
+    var tb:[testB]
+    
+    @DBFetchContent(databaseName: "data", fetch: testAB.fetch(table: testA.self).joinQuery(join: .join, table: testB.self).whereCondition(condition: QueryCondition.Key(key: "contentId", table: testA.self) == QueryCondition.Key(key: "contentId", table: testB.self)))
+    var tab:[testAB]
+    
     
     func testTestA() throws{
         let exp = XCTestExpectation(description: "end")
@@ -25,6 +31,11 @@ public class DatabaseTest: XCTestCase {
                 testa.contentId = (start + i)
                 testa.name = "\(i) + \(Date())"
                 self._ta.add(content: testa)
+                let testb = testB()
+                testb.contentId = (start + i)
+                testb.name = "\(start + i)"
+                self._tb.add(content: testb)
+                
                 if i == 9{
                     DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(1)) {
                         exp.fulfill()
@@ -32,7 +43,11 @@ public class DatabaseTest: XCTestCase {
                 }
             }
         }
+        
         self.wait(for: [exp], timeout: 20000)
+    }
+    public func testABr() throws{
+        print(tab)
     }
 }
 
@@ -69,7 +84,7 @@ public struct testB:DataBaseProtocol,CustomDebugStringConvertible{
     
     
     @Col(name:"contentId",primaryKey:true)
-    public var contentId:Date = Date()
+    public var contentId:Int = 0
     
     @Col(name:"name")
     public var name:String? = nil
@@ -88,5 +103,25 @@ public struct testB:DataBaseProtocol,CustomDebugStringConvertible{
         "\(contentId),\(String(describing: name))"
     }
     
+    
+}
+
+public class testAB:DataBaseFetchObject,CustomDebugStringConvertible{
+    public var debugDescription: String{
+        return "\(contentAId)|\(String(describing: contentAName))|\(contentBId)|\(contentBName)"
+    }
+    
+    
+    @QueryColume(colume: "contentId", type: testA.self)
+    public var contentAId:Int = 0
+    
+    @QueryColume(colume: "name", type: testA.self)
+    public var contentAName:String? = nil
+    
+    @QueryColume(colume: "contentId", type: testB.self)
+    public var contentBId:Int = 0
+    
+    @QueryColume(colume: "name", type: testB.self)
+    public var contentBName:String? = nil
     
 }

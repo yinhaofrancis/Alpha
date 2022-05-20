@@ -47,7 +47,7 @@ public class DataBase:Hashable{
             return false
         }
     }
-    public var databaseVersion:Int32{
+    public var databaseVersion:Int{
         get{
             do {
                 let rs = try self.prepare(sql: "PRAGMA user_version")
@@ -220,8 +220,12 @@ public class DataBase:Hashable{
         public func columeName(index:Int32)->String{
             String(cString: sqlite3_column_name(self.stmt, index))
         }
-        public func columeInt(index:Int32)->Int32{
-            sqlite3_column_int(self.stmt, index)
+        public func columeInt(index:Int32)->Int{
+            if MemoryLayout<Int>.size == 4{
+                return Int(sqlite3_column_int(self.stmt, index))
+            }else{
+                return Int(sqlite3_column_int64(self.stmt, index))
+            }
         }
         public func columeInt64(index:Int32)->Int64{
             sqlite3_column_int64(self.stmt, index)
@@ -565,7 +569,7 @@ public struct TableModel{
                 let indx = rs.getParamIndexBy(name: "@"+i.name)
                 try rs.bind(index: indx, value: i.origin, type: i.type)
             }
-            
+            print(i.origin)
         }
         _ = try rs.step()
         rs.close()
@@ -677,10 +681,10 @@ public class QueryCondition{
     }
     public struct Key{
         public var key:String
-        public init(key:String,table:DataBaseObject.Type? = nil){
+        public init(key:String,table:DataBaseProtocol.Type? = nil){
             self.key = table == nil ? key : (table!.name + ".") + key
         }
-        public init(jsonKey:String,keypath:String,table:DataBaseObject.Type? = nil){
+        public init(jsonKey:String,keypath:String,table:DataBaseProtocol.Type? = nil){
             let key = table == nil ? jsonKey : (table!.name + ".") + jsonKey
             self.key = "json_extract(\(key),'\(keypath)')"
         }

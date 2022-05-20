@@ -315,7 +315,7 @@ public class FK<T:TableColumn>:TableColumn{
     public var wrappedValue:T
     public init(wrappedValue:T,
                 refKey:String,
-                refTable:DataBaseObject.Type? = nil,
+                refTable:DataBaseProtocol.Type? = nil,
                 onUpdate:ForeignDeclareAction? = nil,
                 onDelete:ForeignDeclareAction? = nil){
         self.wrappedValue = wrappedValue

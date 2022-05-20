@@ -11,7 +11,7 @@ public class FetchColume{
     public var colume:String
     public var value:DBType?
     public var align:Bool = false
-    public init(colume:String,type:DataBaseObject.Type? = nil){
+    public init(colume:String,type:DataBaseProtocol.Type? = nil){
         self.align = type != nil
         self.colume = colume
     }
@@ -32,7 +32,7 @@ public class QueryColume<T:DBType>:FetchColume{
         super.init(colume: colume, type: nil)
         self.value = wrappedValue
     }
-    public init(wrappedValue:T,function:String,colume:String,type:DataBaseObject.Type? = nil){
+    public init(wrappedValue:T,function:String,colume:String,type:DataBaseProtocol.Type? = nil){
         if let t = type{
             let c = "\(function)(\(t.name).\(colume))"
             super.init(colume:c, type: type)
@@ -44,7 +44,7 @@ public class QueryColume<T:DBType>:FetchColume{
         }
         self.align = true;
     }
-    public init(wrappedValue:T,colume:String,type:DataBaseObject.Type? = nil){
+    public init(wrappedValue:T,colume:String,type:DataBaseProtocol.Type? = nil){
         if let t = type{
             super.init(colume: t.name + "." + colume, type: type)
             self.value = wrappedValue
@@ -53,8 +53,8 @@ public class QueryColume<T:DBType>:FetchColume{
             self.value = wrappedValue
         }
     }
-    public init(wrappedValue:T,colume:String,keyPath:String,type:DataBaseObject.Type? = nil){
-        let c = "json_extract(\((type == nil ? "" : type!.name + ".")  + colume),\(keyPath))"
+    public init(wrappedValue:T,colume:String,jsonKeyPath:String,type:DataBaseProtocol.Type? = nil){
+        let c = "json_extract(\((type == nil ? "" : type!.name + ".")  + colume),\(jsonKeyPath))"
         super.init(colume: c, type: type)
         self.value = wrappedValue
     }
@@ -80,7 +80,7 @@ open class DataBaseFetchObject{
             }
         }
     }
-    public static func fetch(table:DataBaseObject.Type)->Fetch{
+    public static func fetch(table:DataBaseProtocol.Type)->Fetch{
         let sample = Self()
         let f = Fetch()
         f.select(sample: sample, table: table)
@@ -105,10 +105,10 @@ open class DataBaseFetchObject{
         var having:String = ""
         var sort:[String] = []
         var groupby:String = ""
-        public func select<T:DataBaseFetchObject>(sample:T,table:DataBaseObject.Type){
+        public func select<T:DataBaseFetchObject>(sample:T,table:DataBaseProtocol.Type){
             self.sql = "select \(sample.declare.map({$0.value.colume + "\($0.value.align ? " as \($0.key)" : "")"}).joined(separator: ",")) from \(table.name)"
         }
-        public func joinQuery(join:Join,table:DataBaseObject.Type,condition:QueryCondition? = nil)->Fetch{
+        public func joinQuery(join:Join,table:DataBaseProtocol.Type,condition:QueryCondition? = nil)->Fetch{
             self.join.append(" \(join.code) \(table.name) \(condition == nil ? "" : "ON \(condition!.condition)")")
             return self
         }
@@ -155,3 +155,5 @@ open class DataBaseFetchObject{
         }
     }
 }
+
+

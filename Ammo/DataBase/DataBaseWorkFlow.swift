@@ -152,7 +152,7 @@ public class DataBaseUpdate{
 
 
 @propertyWrapper
-public class DBContent<T:DataBaseObject>{
+public class DBContent<T:DataBaseProtocol>{
     
     public var wrappedValue: Array<T>{
         if(self.origin.count == 0){
@@ -196,5 +196,22 @@ public class DBContent<T:DataBaseObject>{
             array = try self.query(db: db)
         }
         self.origin = array
+    }
+}
+
+@propertyWrapper
+public struct DBFetchContent<T:DataBaseFetchObject>{
+    public var wrappedValue:[T]{
+        var arr:[T] = []
+        try? self.work.syncQuery { db in
+            arr = try self.fetch.query(db: db)
+        }
+        return arr
+    }
+    private var fetch:DataBaseFetchObject.Fetch
+    private var work:DataBaseWorkFlow
+    public init(databaseName:String,fetch:DataBaseFetchObject.Fetch){
+        self.fetch = fetch
+        self.work = DBWorkFlow.createWorkFlow(name: databaseName)
     }
 }
