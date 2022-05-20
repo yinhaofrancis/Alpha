@@ -569,7 +569,6 @@ public struct TableModel{
                 let indx = rs.getParamIndexBy(name: "@"+i.name)
                 try rs.bind(index: indx, value: i.origin, type: i.type)
             }
-            print(i.origin)
         }
         _ = try rs.step()
         rs.close()

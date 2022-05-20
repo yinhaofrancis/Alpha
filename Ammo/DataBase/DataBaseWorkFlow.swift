@@ -170,7 +170,7 @@ public class DBContent<T:DataBaseProtocol>{
     }
     public func add(content:T){
         self.origin.append(content)
-        self.work.syncWorkflow { db in
+        self.work.workflow { db in
             try content.tableModel.insert(db: db)
         }
     }
@@ -202,16 +202,22 @@ public class DBContent<T:DataBaseProtocol>{
 @propertyWrapper
 public struct DBFetchContent<T:DataBaseFetchObject>{
     public var wrappedValue:[T]{
-        var arr:[T] = []
-        try? self.work.syncQuery { db in
-            arr = try self.fetch.query(db: db)
-        }
-        return arr
+        return self.origin
     }
+    private var origin:[T] = []
     private var fetch:DataBaseFetchObject.Fetch
     private var work:DataBaseWorkFlow
     public init(databaseName:String,fetch:DataBaseFetchObject.Fetch){
         self.fetch = fetch
         self.work = DBWorkFlow.createWorkFlow(name: databaseName)
+        self.query()
+    }
+    public mutating func query(){
+        var arr:[T] = []
+        let fetc = self.fetch
+        try? self.work.syncQuery { db in
+            arr = try fetc.query(db: db)
+        }
+        self.origin = arr
     }
 }

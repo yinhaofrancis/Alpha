@@ -108,7 +108,7 @@ public struct testB:DataBaseProtocol,CustomDebugStringConvertible{
 
 public class testAB:DataBaseFetchObject,CustomDebugStringConvertible{
     public var debugDescription: String{
-        return "\(contentAId)|\(String(describing: contentAName))|\(contentBId)|\(contentBName)"
+        return "\(contentAId)|\(String(describing: contentAName))|\(contentBId)|\(String(describing: contentBName))"
     }
     
     
