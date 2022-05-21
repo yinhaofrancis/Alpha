@@ -24,6 +24,9 @@ public class DatabaseTest: XCTestCase {
     @DBFetchContent(databaseName: "data", fetch:testAB.fetch(table: testA.self).joinQuery(join: .join, table: testB.self).whereCondition(condition: QueryCondition.Key(key: "contentId",table:testA.self) == QueryCondition.Key(key: "@id") &&  QueryCondition.Key(key: "contentId",table:testB.self) == QueryCondition.Key(key: "@id2")),param:["@id":16531432022,"@id2":16531432022])
     var tab2:[testAB]
     
+    @DBFetchView(view: testabv(), name: "data")
+    var tab3:[testAB]
+    
     @DBWorkFlow(name: "data")
     var work:DataBaseWorkFlow
     

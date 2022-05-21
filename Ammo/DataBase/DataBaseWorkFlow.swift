@@ -234,6 +234,8 @@ public struct DBFetchContent<T:DataBaseFetchObject>{
 public struct DBFetchView<T,V:DataBaseFetchViewProtocol> where T == V.Objects{
     public var view:V
     public var work:DataBaseWorkFlow
+    public var condition:QueryCondition?
+    public var param:[String:DBType]?
     public init(view:V,name:String){
         self.view = view
         self.work = DBWorkFlow.createWorkFlow(name: name)
@@ -243,7 +245,7 @@ public struct DBFetchView<T,V:DataBaseFetchViewProtocol> where T == V.Objects{
         var a:[T] = []
         let v = self.view
         try? self.work.syncQuery { db in
-            a = try v.query(db: db)
+            a = try v.query(db: db,condition: self.condition,param: self.param)
         }
         return a
         
