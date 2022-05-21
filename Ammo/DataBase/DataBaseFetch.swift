@@ -181,6 +181,7 @@ extension DataBaseFetchViewProtocol{
     public func query(db:DataBase,condition:QueryCondition? = nil ,param:[String:DBType]? = nil) throws ->[Objects]{
         var sql = "select * from \(self.name) "
         if let condition = condition {
+            sql += " where "
             sql += condition.condition
         }
         let rs = try db.prepare(sql: sql)

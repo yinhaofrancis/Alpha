@@ -59,10 +59,8 @@ public class DatabaseTest: XCTestCase {
 
     }
     public func testABVr() throws{
-        let t = testabv()
-        self.work.syncWorkflow { db in
-            try t.createView(db: db)
-        }
+        _tab3.condition = QueryCondition.Key(key: "_contentAId") == QueryCondition.Key(key: "16531432024")
+        print(tab3)
     }
 }
 
