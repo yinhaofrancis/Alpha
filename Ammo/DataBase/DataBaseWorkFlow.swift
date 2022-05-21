@@ -162,6 +162,7 @@ public class DBContent<T:DataBaseProtocol>{
     }
     private var origin:Array<T> = []
     private var work:DataBaseWorkFlow
+    private var lock:DispatchSemaphore = DispatchSemaphore(value: 1)
     public init(databaseName:String){
         self.work = DBWorkFlow.createWorkFlow(name: databaseName)
         self.work.workflow { db in
@@ -169,18 +170,22 @@ public class DBContent<T:DataBaseProtocol>{
         }
     }
     public func add(content:T){
+        self.lock.wait()
         self.origin.append(content)
         self.work.workflow { db in
             try content.tableModel.insert(db: db)
         }
+        self.lock.signal()
     }
     public func remove(content:T){
+        self.lock.wait()
         var array:[T] = []
         self.work.syncWorkflow { db in
             try content.tableModel.delete(db: db)
             array = try self.query(db: db)
         }
         self.origin = array
+        self.lock.signal()
     }
     public func remove(index:Int){
         if origin.count > index{
@@ -207,17 +212,40 @@ public struct DBFetchContent<T:DataBaseFetchObject>{
     private var origin:[T] = []
     private var fetch:DataBaseFetchObject.Fetch
     private var work:DataBaseWorkFlow
-    public init(databaseName:String,fetch:DataBaseFetchObject.Fetch){
+    private var param:[String:DBType]?
+    public init(databaseName:String,fetch:DataBaseFetchObject.Fetch,param:[String:DBType]? = nil){
         self.fetch = fetch
+        self.param = param
         self.work = DBWorkFlow.createWorkFlow(name: databaseName)
         self.query()
     }
     public mutating func query(){
         var arr:[T] = []
         let fetc = self.fetch
+        let param = self.param
         try? self.work.syncQuery { db in
-            arr = try fetc.query(db: db)
+            arr = try fetc.query(db: db,param: param)
         }
         self.origin = arr
+    }
+}
+
+@propertyWrapper
+public struct DBFetchView<T,V:DataBaseFetchViewProtocol> where T == V.Objects{
+    public var view:V
+    public var work:DataBaseWorkFlow
+    public init(view:V,name:String){
+        self.view = view
+        self.work = DBWorkFlow.createWorkFlow(name: name)
+    }
+    
+    public var wrappedValue: [T]{
+        var a:[T] = []
+        let v = self.view
+        try? self.work.syncQuery { db in
+            a = try v.query(db: db)
+        }
+        return a
+        
     }
 }

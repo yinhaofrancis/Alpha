@@ -128,15 +128,15 @@ open class DataBaseFetchObject{
             self.having = "HAVING \(condition.condition)"
             return self
         }
-        public func query<T:DataBaseFetchObject>(db:DataBase) throws->[T]{
-            let sql = self.sql
-            + join.joined(separator: " ")
-            + condition
-            + self.groupby
-            + self.having
-            + (self.sort.count > 0 ? " order by \(self.sort.joined(separator: ","))" : "")
-            
+        public func query<T:DataBaseFetchObject>(db:DataBase,param:[String:DBType]? = nil) throws->[T]{
+            let sql = self.selectCode
             let rs = try db.prepare(sql: sql)
+            if let v = param{
+                for i in v {
+                    try rs.bind(name: i.key, value: i.value)
+                }
+            }
+            
             var array:[T] = []
             while try rs.step() == .hasColumn {
                 let model = T()
@@ -153,7 +153,58 @@ open class DataBaseFetchObject{
             }
             return array
         }
+        public var selectCode:String{
+            return self.sql
+            + join.joined(separator: " ")
+            + condition
+            + self.groupby
+            + self.having
+            + (self.sort.count > 0 ? " order by \(self.sort.joined(separator: ","))" : "")
+        }
     }
 }
+
+
+public protocol DataBaseFetchViewProtocol{
+    var fetch:DataBaseFetchObject.Fetch { get }
+    var name:String { get }
+    associatedtype Objects:DataBaseFetchObject
+}
+
+extension DataBaseFetchViewProtocol{
+    public func createView(db:DataBase) throws {
+        let sql = "create view if not exists \(self.name) as " + self.fetch.selectCode
+        let rs = try db.prepare(sql: sql)
+        _ = try rs.step()
+        rs.close()
+    }
+    public func query(db:DataBase,condition:QueryCondition? = nil ,param:[String:DBType]? = nil) throws ->[Objects]{
+        var sql = "select * from \(self.name) "
+        if let condition = condition {
+            sql += condition.condition
+        }
+        let rs = try db.prepare(sql: sql)
+        if let param = param {
+            for i in param{
+                try rs.bind(name: i.key, value: i.value)
+            }
+        }
+        var array:[Objects] = []
+        
+        while try rs.step() == .hasColumn{
+            let o = Objects()
+            for i in 0 ..< rs.columeCount{
+                o.declare[rs.columeName(index: i)]?.value = rs.columeDBType(index: i)
+            }
+            array.append(o)
+        }
+        rs.close()
+        return array
+    }
+    public func drop(db:DataBase){
+        db.exec(sql: "drop view \(self.name)")
+    }
+}
+
 
 

@@ -135,6 +135,10 @@ public class DataBase:Hashable{
                 throw NSError(domain: DataBase.errormsg(pointer: self.stmt), code: 4)
             }
         }
+        public func bind<T>(name:String,value:T) throws{
+            let i = self.getParamIndexBy(name: name)
+            try self.bind(index: i, value: value)
+        }
         public func bind<T>(index:Int32,value:T) throws{
             var flag:OSStatus = noErr
             if(value is Int32){

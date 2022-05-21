@@ -21,6 +21,11 @@ public class DatabaseTest: XCTestCase {
     @DBFetchContent(databaseName: "data", fetch: testAB.fetch(table: testA.self).joinQuery(join: .join, table: testB.self).whereCondition(condition: QueryCondition.Key(key: "contentId", table: testA.self) == QueryCondition.Key(key: "contentId", table: testB.self)))
     var tab:[testAB]
     
+    @DBFetchContent(databaseName: "data", fetch:testAB.fetch(table: testA.self).joinQuery(join: .join, table: testB.self).whereCondition(condition: QueryCondition.Key(key: "contentId",table:testA.self) == QueryCondition.Key(key: "@id") &&  QueryCondition.Key(key: "contentId",table:testB.self) == QueryCondition.Key(key: "@id2")),param:["@id":16531432022,"@id2":16531432022])
+    var tab2:[testAB]
+    
+    @DBWorkFlow(name: "data")
+    var work:DataBaseWorkFlow
     
     func testTestA() throws{
         let exp = XCTestExpectation(description: "end")
@@ -47,7 +52,14 @@ public class DatabaseTest: XCTestCase {
         self.wait(for: [exp], timeout: 20000)
     }
     public func testABr() throws{
-        print(tab)
+        print(tab2)
+
+    }
+    public func testABVr() throws{
+        let t = testabv()
+        self.work.syncWorkflow { db in
+            try t.createView(db: db)
+        }
     }
 }
 
@@ -124,4 +136,18 @@ public class testAB:DataBaseFetchObject,CustomDebugStringConvertible{
     @QueryColume(colume: "name", type: testB.self)
     public var contentBName:String? = nil
     
+}
+
+
+public struct testabv:DataBaseFetchViewProtocol{
+    
+    public typealias Objects = testAB
+    
+    public var fetch: DataBaseFetchObject.Fetch{
+        testAB.fetch(table: testA.self).joinQuery(join: .join, table: testB.self).whereCondition(condition: QueryCondition.Key(key: "contentId", table: testA.self) == QueryCondition.Key(key: "contentId", table: testB.self))
+    }
+    
+    public var name: String{
+        "testABV"
+    }
 }
