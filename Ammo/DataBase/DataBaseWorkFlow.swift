@@ -234,7 +234,11 @@ public struct DBFetchContent<T:DataBaseFetchObject>{
 public struct DBFetchView<T,V:DataBaseFetchViewProtocol> where T == V.Objects{
     public var view:V
     public var work:DataBaseWorkFlow
-    public var condition:QueryCondition?
+    public var condition:QueryCondition?{
+        didSet{
+            self.param = nil
+        }
+    }
     public var param:[String:DBType]?
     public init(view:V,name:String){
         self.view = view

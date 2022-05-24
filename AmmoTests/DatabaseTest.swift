@@ -59,7 +59,14 @@ public class DatabaseTest: XCTestCase {
 
     }
     public func testABVr() throws{
-        _tab3.condition = QueryCondition.Key(key: "_contentAId") == QueryCondition.Key(key: "16531432024")
+        if self.tab3.count > 0{
+            let t = self.tab3
+            
+            _tab3.condition = QueryCondition.Key(key: "_contentAId") == QueryCondition.Key(key: "@id")
+            _tab3.param = ["@id":t[0].contentAId]
+        }
+        print(tab3)
+        _tab3.condition = nil
         print(tab3)
     }
 }
