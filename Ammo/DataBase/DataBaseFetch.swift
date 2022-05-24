@@ -185,7 +185,7 @@ extension DataBaseFetchViewProtocol{
             sql += condition.condition
         }
         let rs = try db.prepare(sql: sql)
-        if let param = param {
+        if let param = param, condition != nil{
             for i in param{
                 try rs.bind(name: i.key, value: i.value)
             }
