@@ -151,7 +151,7 @@ public struct testabv:DataBaseFetchViewProtocol{
     
     public typealias Objects = testAB
     
-    public var fetch: DataBaseFetchObject.Fetch{
+    public var viewFetch: DataBaseFetchObject.Fetch{
         testAB.fetch(table: testA.self).joinQuery(join: .join, table: testB.self).whereCondition(condition: QueryCondition.Key(key: "contentId", table: testA.self) == QueryCondition.Key(key: "contentId", table: testB.self))
     }
     

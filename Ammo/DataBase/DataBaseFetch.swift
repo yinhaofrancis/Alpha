@@ -166,14 +166,14 @@ open class DataBaseFetchObject{
 
 
 public protocol DataBaseFetchViewProtocol{
-    var fetch:DataBaseFetchObject.Fetch { get }
+    var viewFetch:DataBaseFetchObject.Fetch { get }
     var name:String { get }
     associatedtype Objects:DataBaseFetchObject
 }
 
 extension DataBaseFetchViewProtocol{
     public func createView(db:DataBase) throws {
-        let sql = "create view if not exists \(self.name) as " + self.fetch.selectCode
+        let sql = "create view if not exists \(self.name) as " + self.viewFetch.selectCode
         let rs = try db.prepare(sql: sql)
         _ = try rs.step()
         rs.close()
