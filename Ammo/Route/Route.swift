@@ -9,23 +9,23 @@ import Foundation
 
 
 public protocol Router{
-    
+    init(param:[String:String])
 }
 
 public struct Route{
     public var name:String
-    public var router:Router
-    public init(name:String,router:Router){
+    public var router:Router.Type
+    public init(name:String,router:Router.Type){
         self.router = router
         self.name = name
     }
 }
 
 public struct RouterSet{
-    public init(routes:[String:Router]){
+    public init(routes:[String:Router.Type]){
         self.routes = routes
     }
-    public var routes:[String:Router]
+    public var routes:[String:Router.Type]
 }
 
 @resultBuilder
