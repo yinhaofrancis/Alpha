@@ -232,10 +232,13 @@ public class DBObject<T:DataBaseProtocol>{
         }
         return b
     }
-    public func sync(){
-        var b:Bool = false
-        self.work.workflow({ db in
-            
+    public func sync() throws{
+        try self.work.syncWorkflow({ db in
+            do{
+                try self.originValue.tableModel.insert(db: db)
+            }catch{
+                try self.originValue.tableModel.update(db: db)
+            }
         })
     }
     public var originValue: T
