@@ -20,6 +20,7 @@
 		A95BCB98282507D8000982D0 /* TextDetect.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A95BCB91282507D8000982D0 /* TextDetect.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A95BCB9D28250846000982D0 /* TextDetect.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95BCB9C28250846000982D0 /* TextDetect.swift */; };
 		A9A3FBA8283F11BF003582F2 /* DataBaseUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A3FBA7283F11BF003582F2 /* DataBaseUpdate.swift */; };
+		A9A3FBAB283F31CF003582F2 /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A3FBAA283F31CF003582F2 /* Route.swift */; };
 		A9FB7989281A6942008CCF39 /* DataBaseBackUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB7983281A6942008CCF39 /* DataBaseBackUp.swift */; };
 		A9FB798A281A6942008CCF39 /* DataBaseFetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB7984281A6942008CCF39 /* DataBaseFetch.swift */; };
 		A9FB798B281A6942008CCF39 /* DataBaseWorkFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB7985281A6942008CCF39 /* DataBaseWorkFlow.swift */; };
@@ -90,6 +91,7 @@
 		A95BCB91282507D8000982D0 /* TextDetect.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TextDetect.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A95BCB9C28250846000982D0 /* TextDetect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextDetect.swift; sourceTree = "<group>"; };
 		A9A3FBA7283F11BF003582F2 /* DataBaseUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBaseUpdate.swift; sourceTree = "<group>"; };
+		A9A3FBAA283F31CF003582F2 /* Route.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route.swift; sourceTree = "<group>"; };
 		A9FB7976281A68B0008CCF39 /* Ammo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Ammo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9FB7983281A6942008CCF39 /* DataBaseBackUp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataBaseBackUp.swift; sourceTree = "<group>"; };
 		A9FB7984281A6942008CCF39 /* DataBaseFetch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataBaseFetch.swift; sourceTree = "<group>"; };
@@ -167,6 +169,14 @@
 			path = TextDetect;
 			sourceTree = "<group>";
 		};
+		A9A3FBA9283F31BF003582F2 /* Route */ = {
+			isa = PBXGroup;
+			children = (
+				A9A3FBAA283F31CF003582F2 /* Route.swift */,
+			);
+			path = Route;
+			sourceTree = "<group>";
+		};
 		A9FB796C281A68B0008CCF39 = {
 			isa = PBXGroup;
 			children = (
@@ -193,6 +203,7 @@
 		A9FB7978281A68B0008CCF39 /* Ammo */ = {
 			isa = PBXGroup;
 			children = (
+				A9A3FBA9283F31BF003582F2 /* Route */,
 				A9FB7982281A6942008CCF39 /* DataBase */,
 			);
 			path = Ammo;
@@ -426,6 +437,7 @@
 				A9FB798C281A6942008CCF39 /* DataBaseModel.swift in Sources */,
 				A9FB7989281A6942008CCF39 /* DataBaseBackUp.swift in Sources */,
 				A9FB798B281A6942008CCF39 /* DataBaseWorkFlow.swift in Sources */,
+				A9A3FBAB283F31CF003582F2 /* Route.swift in Sources */,
 				A9FB798E281A6942008CCF39 /* DataBase.swift in Sources */,
 				A9FB798A281A6942008CCF39 /* DataBaseFetch.swift in Sources */,
 			);
