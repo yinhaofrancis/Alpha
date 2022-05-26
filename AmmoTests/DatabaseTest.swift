@@ -55,7 +55,7 @@ public class DatabaseTest: XCTestCase {
         self.wait(for: [exp], timeout: 20000)
     }
     public func testABr() throws{
-        print(tab2)
+        print(tab)
 
     }
     public func testABVr() throws{
@@ -158,4 +158,6 @@ public struct testabv:DataBaseFetchViewProtocol{
     public var name: String{
         "testABV"
     }
+    
+    public init() {}
 }

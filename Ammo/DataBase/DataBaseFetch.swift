@@ -168,6 +168,7 @@ open class DataBaseFetchObject{
 public protocol DataBaseFetchViewProtocol{
     var viewFetch:DataBaseFetchObject.Fetch { get }
     var name:String { get }
+    init()
     associatedtype Objects:DataBaseFetchObject
 }
 
