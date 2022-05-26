@@ -294,6 +294,18 @@ public struct TableModel{
         _ = try rs.step()
         return rs.columeInt64(index: 0)
     }
+    public func InDB(db:DataBase) throws->Bool {
+        if(!self.hasPrimary){
+            throw NSError(domain: "no exist primary key", code: 0)
+        }
+        let sql = "select count (*) from \(self.name)" + self.primaryCondition
+        let rs = try db.prepare(sql: sql)
+        defer{
+            rs.close()
+        }
+        _ = try rs.step()
+        return rs.columeInt64(index: 0) > 0
+    }
     public func select(db:DataBase) throws{
         let map = self.declare.reduce(into: [:]) { partialResult, tc in
             partialResult[tc.name] = tc
@@ -758,3 +770,5 @@ fileprivate struct Version:DataBaseProtocol{
         return v.first
     }
 }
+
+

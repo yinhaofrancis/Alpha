@@ -22,21 +22,24 @@ public class DataBaseWorkFlow{
                 self.wdb.commit()
             }catch{
                 self.wdb.rollback()
-                print(error)
             }
         }))
     }
-    public func syncWorkflow(_ callback:@escaping (DataBase) throws ->Void){
+    public func syncWorkflow(_ callback:@escaping (DataBase) throws ->Void) throws{
+        var e:Error?
         self.writeQueue.sync(execute: DispatchWorkItem(qos: .userInitiated, flags: .barrier, block: {
             do{
                 self.wdb.begin()
                 try callback(self.wdb)
                 self.wdb.commit()
             }catch{
-                print(error)
+                e = error
                 self.wdb.rollback()
             }
         }))
+        if let ee = e{
+            throw ee
+        }
     }
     public func query(_ callback:@escaping (DataBase) throws ->Void) throws{
         let db = try DataBase(url: self.wdb.url, readonly: true, writeLock: false)
@@ -50,14 +53,18 @@ public class DataBaseWorkFlow{
         }
     }
     public func syncQuery(_ callback:@escaping (DataBase) throws ->Void) throws{
+        var e:Error?
         let db = try DataBase(url: self.wdb.url, readonly: true, writeLock: false)
         self.writeQueue.sync {
             do{
                 try callback(db)
             }catch{
-                print(error)
+                e = error
             }
             db.close()
+        }
+        if let ee = e{
+            throw ee
         }
     }
     deinit{
@@ -120,19 +127,19 @@ public class DBContent<T:DataBaseProtocol>{
         }
         self.lock.signal()
     }
-    public func remove(content:T){
+    public func remove(content:T) throws{
         self.lock.wait()
         var array:[T] = []
-        self.work.syncWorkflow { db in
+        try self.work.syncWorkflow { db in
             try content.tableModel.delete(db: db)
             array = try self.query(db: db)
         }
         self.origin = array
         self.lock.signal()
     }
-    public func remove(index:Int){
+    public func remove(index:Int) throws {
         if origin.count > index{
-            self.remove(content: self.origin[index])
+            try self.remove(content: self.origin[index])
         }
     }
     private func query(db:DataBase) throws ->[T]{
@@ -200,5 +207,41 @@ public struct DBFetchView<T,V:DataBaseFetchViewProtocol> where T == V.Objects{
         }
         return a
         
+    }
+}
+
+@propertyWrapper
+public class DBObject<T:DataBaseProtocol>{
+    public var wrappedValue: T{
+        get{
+            let o = originValue
+            try? self.work.syncQuery { db in
+                try o.tableModel.select(db: db)
+            }
+            return o
+        }
+        set{
+            self.originValue = newValue
+            
+        }
+    }
+    public var inDB:Bool{
+        var b:Bool = false
+        try? self.work.syncQuery { db in
+            b = try self.originValue.tableModel.InDB(db: db)
+        }
+        return b
+    }
+    public func sync(){
+        var b:Bool = false
+        self.work.workflow({ db in
+            
+        })
+    }
+    public var originValue: T
+    private var work:DataBaseWorkFlow
+    public init(wrappedValue: T,databaseName:String){
+        self.originValue = wrappedValue
+        self.work = DBWorkFlow.createWorkFlow(name: databaseName)
     }
 }
