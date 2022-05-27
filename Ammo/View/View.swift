@@ -31,6 +31,16 @@ public struct Context{
         call(self)
         self.context.restoreGState()
     }
+    @available(iOS 13.0, *)
+    public func render(_ call:@escaping (Context)->Void) async ->CGImage?{
+        return await Task {
+            self.syncRender(call)
+        }.value
+    }
+    public func syncRender(_ call:(Context)->Void) ->CGImage?{
+        self.begin(call:call)
+        return self.image
+    }
     public func drawImage(image:CGImage,rect:CGRect){
         print(rect)
         self.begin { ctx in
@@ -104,3 +114,9 @@ public struct Context{
     }
 }
 
+public protocol View{
+    
+    var frame:CGRect { get set }
+    
+    func render()
+}
