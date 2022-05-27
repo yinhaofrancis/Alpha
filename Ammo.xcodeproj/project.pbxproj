@@ -20,7 +20,6 @@
 		A95BCB98282507D8000982D0 /* TextDetect.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A95BCB91282507D8000982D0 /* TextDetect.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A95BCB9D28250846000982D0 /* TextDetect.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95BCB9C28250846000982D0 /* TextDetect.swift */; };
 		A9A3FBA8283F11BF003582F2 /* DataBaseUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A3FBA7283F11BF003582F2 /* DataBaseUpdate.swift */; };
-		A9A3FBAB283F31CF003582F2 /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A3FBAA283F31CF003582F2 /* Route.swift */; };
 		A9FB7989281A6942008CCF39 /* DataBaseBackUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB7983281A6942008CCF39 /* DataBaseBackUp.swift */; };
 		A9FB798A281A6942008CCF39 /* DataBaseFetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB7984281A6942008CCF39 /* DataBaseFetch.swift */; };
 		A9FB798B281A6942008CCF39 /* DataBaseWorkFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB7985281A6942008CCF39 /* DataBaseWorkFlow.swift */; };
@@ -30,7 +29,6 @@
 		A9FB79A4281A69CA008CCF39 /* AmmoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB79A3281A69CA008CCF39 /* AmmoTests.swift */; };
 		A9FB79A5281A69CA008CCF39 /* Ammo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9FB7976281A68B0008CCF39 /* Ammo.framework */; };
 		A9FB79AC281A6A0A008CCF39 /* DatabaseTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB79AB281A6A0A008CCF39 /* DatabaseTest.swift */; };
-		A9FF6192283FD08C006637DC /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FF6191283FD08C006637DC /* View.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -92,7 +90,6 @@
 		A95BCB91282507D8000982D0 /* TextDetect.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TextDetect.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A95BCB9C28250846000982D0 /* TextDetect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextDetect.swift; sourceTree = "<group>"; };
 		A9A3FBA7283F11BF003582F2 /* DataBaseUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBaseUpdate.swift; sourceTree = "<group>"; };
-		A9A3FBAA283F31CF003582F2 /* Route.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route.swift; sourceTree = "<group>"; };
 		A9FB7976281A68B0008CCF39 /* Ammo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Ammo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9FB7983281A6942008CCF39 /* DataBaseBackUp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataBaseBackUp.swift; sourceTree = "<group>"; };
 		A9FB7984281A6942008CCF39 /* DataBaseFetch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataBaseFetch.swift; sourceTree = "<group>"; };
@@ -103,7 +100,6 @@
 		A9FB79A1281A69CA008CCF39 /* AmmoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AmmoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9FB79A3281A69CA008CCF39 /* AmmoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmmoTests.swift; sourceTree = "<group>"; };
 		A9FB79AB281A6A0A008CCF39 /* DatabaseTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseTest.swift; sourceTree = "<group>"; };
-		A9FF6191283FD08C006637DC /* View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = View.swift; path = ../../../../../View.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -171,14 +167,6 @@
 			path = TextDetect;
 			sourceTree = "<group>";
 		};
-		A9A3FBA9283F31BF003582F2 /* Route */ = {
-			isa = PBXGroup;
-			children = (
-				A9A3FBAA283F31CF003582F2 /* Route.swift */,
-			);
-			path = Route;
-			sourceTree = "<group>";
-		};
 		A9FB796C281A68B0008CCF39 = {
 			isa = PBXGroup;
 			children = (
@@ -205,8 +193,6 @@
 		A9FB7978281A68B0008CCF39 /* Ammo */ = {
 			isa = PBXGroup;
 			children = (
-				A9FF6190283FD068006637DC /* View */,
-				A9A3FBA9283F31BF003582F2 /* Route */,
 				A9FB7982281A6942008CCF39 /* DataBase */,
 			);
 			path = Ammo;
@@ -233,14 +219,6 @@
 				A9FB79A3281A69CA008CCF39 /* AmmoTests.swift */,
 			);
 			path = AmmoTests;
-			sourceTree = "<group>";
-		};
-		A9FF6190283FD068006637DC /* View */ = {
-			isa = PBXGroup;
-			children = (
-				A9FF6191283FD08C006637DC /* View.swift */,
-			);
-			path = View;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -448,8 +426,6 @@
 				A9FB798C281A6942008CCF39 /* DataBaseModel.swift in Sources */,
 				A9FB7989281A6942008CCF39 /* DataBaseBackUp.swift in Sources */,
 				A9FB798B281A6942008CCF39 /* DataBaseWorkFlow.swift in Sources */,
-				A9FF6192283FD08C006637DC /* View.swift in Sources */,
-				A9A3FBAB283F31CF003582F2 /* Route.swift in Sources */,
 				A9FB798E281A6942008CCF39 /* DataBase.swift in Sources */,
 				A9FB798A281A6942008CCF39 /* DataBaseFetch.swift in Sources */,
 			);
@@ -681,7 +657,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -738,7 +714,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -763,7 +739,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				"IPHONEOS_DEPLOYMENT_TARGET[sdk=macosx*]" = 13.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -793,7 +769,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				"IPHONEOS_DEPLOYMENT_TARGET[sdk=macosx*]" = 13.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
