@@ -128,6 +128,12 @@ open class DataBaseFetchObject{
             self.having = "HAVING \(condition.condition)"
             return self
         }
+        @available(iOS 13.0, *)
+        public func query<T:DataBaseFetchObject>(db:DataBase,param:[String:DBType]? = nil) async throws->[T]{
+            try await Task {
+                try self.query(db: db, param: param)
+            }.value
+        }
         public func query<T:DataBaseFetchObject>(db:DataBase,param:[String:DBType]? = nil) throws->[T]{
             let sql = self.selectCode
             let rs = try db.prepare(sql: sql)
@@ -178,6 +184,12 @@ extension DataBaseFetchViewProtocol{
         let rs = try db.prepare(sql: sql)
         _ = try rs.step()
         rs.close()
+    }
+    @available(iOS 13.0, *)
+    public func query(db:DataBase,condition:QueryCondition? = nil ,param:[String:DBType]? = nil) async throws ->[Objects]{
+        try await Task {
+            try self.query(db: db, condition: condition, param: param)
+        }.value
     }
     public func query(db:DataBase,condition:QueryCondition? = nil ,param:[String:DBType]? = nil) throws ->[Objects]{
         var sql = "select * from \(self.name) "
