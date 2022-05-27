@@ -501,6 +501,16 @@ extension DataBaseProtocol{
             return m
         }
     }
+    @available(iOS 13.0.0, *)
+    public static func select<T:DataBaseProtocol>(db:DataBase,condition:QueryCondition? = nil) async throws ->[T]{
+        return try await Task {
+            try TableModel.select(db: db,keys: T().declare.querykeys,table: self.name, condition: condition).map { tm in
+                var m = T()
+                m.tableModel = tm
+                return m
+            }
+        }.value
+    }
     public static func delete(db:DataBase,condition:QueryCondition) throws{
         try TableModel.delete(db: db, table: self.name, condition: condition)
     }
