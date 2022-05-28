@@ -45,13 +45,6 @@ public class DataBaseWorkFlow{
             throw ee
         }
     }
-    @available(iOS 13.0.0, *)
-    public func asyncWorkflow(_ callback:@escaping (DataBase) throws ->Void) async throws{
-        try await Task {
-            
-            try self.runWork(callback:callback)
-        }.value
-    }
     public func query(_ callback:@escaping (DataBase) throws ->Void) throws{
         let db = try DataBase(url: self.wdb.url, readonly: true, writeLock: false)
         self.writeQueue.async {
@@ -62,12 +55,6 @@ public class DataBaseWorkFlow{
             }
             db.close()
         }
-    }
-    @available(iOS 13.0.0, *)
-    public func query(_ callback:@escaping (DataBase) throws ->Void) async throws{
-        try await Task(operation: {
-            try self.syncQuery(callback)
-        }).value
     }
     public func syncQuery(_ callback:@escaping (DataBase) throws ->Void) throws{
         var e:Error?
@@ -144,11 +131,6 @@ public class DBContent<T:DataBaseProtocol>{
         }
         self.lock.signal()
     }
-    @available(iOS 13.0.0, *)
-    public func add(content:T) async throws {
-        try await self.add(content: content)
-    }
-    
     public func remove(content:T) throws{
         self.lock.wait()
         var array:[T] = []
@@ -159,12 +141,6 @@ public class DBContent<T:DataBaseProtocol>{
         self.origin = array
         self.lock.signal()
     }
-    @available(iOS 13.0.0, *)
-    public func remove(content:T) async throws{
-        try await Task {
-            try self.remove(content:content)
-        }.value
-    }
     public func remove(index:Int) throws {
         if origin.count > index{
             try self.remove(content: self.origin[index])
@@ -172,13 +148,6 @@ public class DBContent<T:DataBaseProtocol>{
     }
     private func query(db:DataBase) throws ->[T]{
         return try T.select(db: db)
-    }
-    @available(iOS 13.0.0, *)
-    private func query(db:DataBase) async throws ->[T]{
-        try await Task {
-            return try self.query(db: db)
-        }.value
-        
     }
     public func sync(){
         var array:[T] = []

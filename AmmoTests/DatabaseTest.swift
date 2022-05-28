@@ -69,23 +69,6 @@ public class DatabaseTest: XCTestCase {
         _tab3.condition = nil
         print(tab3)
     }
-    func testExample() async throws {
-        let ctx = Context(size: CGSize(width: 100, height: 100), scale: 3)
-        
-        let view = View(frame: CGRect(x: 10, y: 10, width: 50, height: 50))
-        view.background = UIColor.red.cgColor
-        view.shadowColor = UIColor.red.cgColor
-        view.shadowRadius = 30
-        view.radius = 8
-        
-        let a = Align(content: view,
-                      frame:  CGRect(x: 10, y: 10, width: 80, height: 80)).set { a in
-            a.background = UIColor.yellow.cgColor
-        }
-        a.render(ctx: ctx)
-        let img = ctx.image!
-        print(img)
-    }
 }
 
 public class testA:DataBaseObject,CustomDebugStringConvertible{
