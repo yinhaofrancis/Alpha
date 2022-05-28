@@ -58,7 +58,7 @@ public class DatabaseTest: XCTestCase {
         print(tab)
 
     }
-    public func testABVr() async throws{
+    @ga public func testABVr() async throws{
         if self.tab3.count > 0{
             let t = self.tab3
             
@@ -68,6 +68,9 @@ public class DatabaseTest: XCTestCase {
         print(tab3)
         _tab3.condition = nil
         print(tab3)
+        
+        let a = k()
+        await a.mm()
     }
 }
 

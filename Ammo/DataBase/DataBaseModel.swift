@@ -352,12 +352,6 @@ public struct TableModel{
         rs.close()
         return models
     }
-    @available(iOS 13.0.0, *)
-    public static func select(db:DataBase,keys:[String],table:String,condition:QueryCondition? = nil) async throws -> [TableModel]{
-        try await Task {
-            try self.select(db:db,keys:keys,table:table,condition:condition)
-        }.value
-    }
     public func drop(db:DataBase){
         db.exec(sql: "drop table \(self.name)")
     }
@@ -506,16 +500,6 @@ extension DataBaseProtocol{
             m.tableModel = tm
             return m
         }
-    }
-    @available(iOS 13.0.0, *)
-    public static func select<T:DataBaseProtocol>(db:DataBase,condition:QueryCondition? = nil) async throws ->[T]{
-        return try await Task {
-            try TableModel.select(db: db,keys: T().declare.querykeys,table: self.name, condition: condition).map { tm in
-                var m = T()
-                m.tableModel = tm
-                return m
-            }
-        }.value
     }
     public static func delete(db:DataBase,condition:QueryCondition) throws{
         try TableModel.delete(db: db, table: self.name, condition: condition)
