@@ -121,3 +121,22 @@ public struct DataBaseSet<T:DataBaseProtocol>{
         
     }
 }
+@available(iOS 13.0.0, *)
+public struct DataBaseFetchSet<T:DataBaseFetchObject>{
+    @DataBaseActor
+    public var array:[T]{
+        get async throws{
+            try await self.task.select(fetch: self.fetch, param: self.param)
+        }
+    }
+    public init(database:String,fetch:DataBaseFetchObject.Fetch){
+        self.fetch = fetch
+        self.task = DataBaseConcurrency.getDatabase(name: database)
+    }
+    
+    private var task:DataBaseConcurrency
+    
+    public var fetch:DataBaseFetchObject.Fetch
+    
+    public var param:[String:DBType]?
+}

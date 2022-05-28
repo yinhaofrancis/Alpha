@@ -68,12 +68,28 @@ public class DatabaseTest: XCTestCase {
         print(tab3)
         _tab3.condition = nil
         print(tab3)
-        self.a =
-        print(try await self.a?.array)
     }
-    public lazy var a:DataBaseSet<testA> = {
-        try await DataBaseSet(database: "data")
-    } ()
+    
+    
+    public func testcc() async throws{
+        let dba:DataBaseSet<testA> = try await DataBaseSet(database: "data")
+        for i in try await dba.array{
+            print(i)
+        }
+        let start = Int(Date().timeIntervalSince1970 * 10)
+        for i in 0 ..< 10 {
+            let testa = testA()
+            testa.contentId = (start + i)
+            testa.name = "\(i) + \(Date())"
+            try await dba.add(model: testa)
+        }
+        for i in try await dba.array{
+            print(i)
+        }
+        let fetch = testAB.fetch(table: testA.self).joinQuery(join: .join, table: testB.self).whereCondition(condition: QueryCondition.Key(key: "contentId", table: testA.self) == QueryCondition.Key(key: "contentId", table: testB.self))
+        let dbf: DataBaseFetchSet<testAB> = DataBaseFetchSet(database: "data", fetch: fetch)
+        print(try await dbf.array)
+    }
 }
 
 public class testA:DataBaseObject,CustomDebugStringConvertible{
