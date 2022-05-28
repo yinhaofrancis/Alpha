@@ -30,6 +30,7 @@
 		A9FB79A5281A69CA008CCF39 /* Ammo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9FB7976281A68B0008CCF39 /* Ammo.framework */; };
 		A9FB79AC281A6A0A008CCF39 /* DatabaseTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB79AB281A6A0A008CCF39 /* DatabaseTest.swift */; };
 		A9FF619528410684006637DC /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FF619428410684006637DC /* View.swift */; };
+		A9FF619728411027006637DC /* Context.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FF619628411027006637DC /* Context.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -102,6 +103,7 @@
 		A9FB79A3281A69CA008CCF39 /* AmmoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmmoTests.swift; sourceTree = "<group>"; };
 		A9FB79AB281A6A0A008CCF39 /* DatabaseTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseTest.swift; sourceTree = "<group>"; };
 		A9FF619428410684006637DC /* View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = View.swift; sourceTree = "<group>"; };
+		A9FF619628411027006637DC /* Context.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Context.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -228,6 +230,7 @@
 			isa = PBXGroup;
 			children = (
 				A9FF619428410684006637DC /* View.swift */,
+				A9FF619628411027006637DC /* Context.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -438,6 +441,7 @@
 				A9FB798C281A6942008CCF39 /* DataBaseModel.swift in Sources */,
 				A9FB7989281A6942008CCF39 /* DataBaseBackUp.swift in Sources */,
 				A9FB798B281A6942008CCF39 /* DataBaseWorkFlow.swift in Sources */,
+				A9FF619728411027006637DC /* Context.swift in Sources */,
 				A9FB798E281A6942008CCF39 /* DataBase.swift in Sources */,
 				A9FB798A281A6942008CCF39 /* DataBaseFetch.swift in Sources */,
 			);
