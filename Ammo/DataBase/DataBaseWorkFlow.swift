@@ -74,36 +74,43 @@ public class DataBaseWorkFlow{
     deinit{
         self.wdb.close()
     }
+    
+    private static var lock:DispatchSemaphore = DispatchSemaphore(value: 1)
+    
+    private static var workFlow:[String:DataBaseWorkFlow] = [:]
+    
+    public static func getWorkFlow(name:String)->DataBaseWorkFlow{
+        defer{
+            lock.signal()
+        }
+        lock.wait()
+        guard let a = DataBaseWorkFlow.workFlow[name] else {
+            DataBaseWorkFlow.workFlow[name] = try! DataBaseWorkFlow(name: name)
+            return DataBaseWorkFlow.workFlow[name]!
+        }
+        return a
+    }
 }
 
 @propertyWrapper
 public struct DBWorkFlow{
-    private static var workFlow:[String:DataBaseWorkFlow] = [:]
     
-    private static var lock:DispatchSemaphore = DispatchSemaphore(value: 1)
+    
+    
                                  
     public var name:String
     
     public var wrappedValue:DataBaseWorkFlow{
         
-        return DBWorkFlow.createWorkFlow(name: self.name)
+        return DataBaseWorkFlow.getWorkFlow(name: self.name)
     }
     
     public init(name:String){
         self.name = name
     }
-    fileprivate static func createWorkFlow(name:String)->DataBaseWorkFlow{
-        defer{
-            lock.signal()
-        }
-        lock.wait()
-        guard let a = DBWorkFlow.workFlow[name] else {
-            DBWorkFlow.workFlow[name] = try! DataBaseWorkFlow(name: name)
-            return DBWorkFlow.workFlow[name]!
-        }
-        return a
-    }
 }
+
+
 
 @propertyWrapper
 public class DBContent<T:DataBaseProtocol>{
@@ -118,7 +125,7 @@ public class DBContent<T:DataBaseProtocol>{
     private var work:DataBaseWorkFlow
     private var lock:DispatchSemaphore = DispatchSemaphore(value: 1)
     public init(databaseName:String){
-        self.work = DBWorkFlow.createWorkFlow(name: databaseName)
+        self.work = DataBaseWorkFlow.getWorkFlow(name: databaseName)
         self.work.workflow { db in
             _ = try T.init(db: db)
         }
@@ -170,7 +177,7 @@ public struct DBFetchContent<T:DataBaseFetchObject>{
     public init(databaseName:String,fetch:DataBaseFetchObject.Fetch,param:[String:DBType]? = nil){
         self.fetch = fetch
         self.param = param
-        self.work = DBWorkFlow.createWorkFlow(name: databaseName)
+        self.work = DataBaseWorkFlow.getWorkFlow(name: databaseName)
         self.query()
     }
     public mutating func query(){
@@ -196,7 +203,7 @@ public struct DBFetchView<T,V:DataBaseFetchViewProtocol> where T == V.Objects{
     public var param:[String:DBType]?
     public init(view:V,name:String){
         self.view = view
-        self.work = DBWorkFlow.createWorkFlow(name: name)
+        self.work = DataBaseWorkFlow.getWorkFlow(name: name)
         self.work.workflow { db in
             try V().createView(db: db)
         }
@@ -249,6 +256,6 @@ public class DBObject<T:DataBaseProtocol>{
     private var work:DataBaseWorkFlow
     public init(wrappedValue: T,databaseName:String){
         self.originValue = wrappedValue
-        self.work = DBWorkFlow.createWorkFlow(name: databaseName)
+        self.work = DataBaseWorkFlow.getWorkFlow(name: databaseName)
     }
 }

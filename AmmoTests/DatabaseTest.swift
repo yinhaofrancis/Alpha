@@ -58,7 +58,7 @@ public class DatabaseTest: XCTestCase {
         print(tab)
 
     }
-    public func testABVr() throws{
+    public func testABVr() async throws{
         if self.tab3.count > 0{
             let t = self.tab3
             
