@@ -58,7 +58,7 @@ public class DatabaseTest: XCTestCase {
         print(tab)
 
     }
-    @ga public func testABVr() async throws{
+    public func testABVr() async throws{
         if self.tab3.count > 0{
             let t = self.tab3
             
@@ -68,10 +68,12 @@ public class DatabaseTest: XCTestCase {
         print(tab3)
         _tab3.condition = nil
         print(tab3)
-        
-        let a = k()
-        await a.mm()
+        self.a =
+        print(try await self.a?.array)
     }
+    public lazy var a:DataBaseSet<testA> = {
+        try await DataBaseSet(database: "data")
+    } ()
 }
 
 public class testA:DataBaseObject,CustomDebugStringConvertible{

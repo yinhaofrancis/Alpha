@@ -11,11 +11,18 @@ import TextDetect
 class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePickerControllerDelegate {
 
     @IBAction func detect(_ sender: Any) {
+        Task {
+            print("dadasa")
+        }
+        
     }
     override func viewDidLoad() {
         super.viewDidLoad()
     }
 
+    func k() async{
+        
+    }
 
 
 }

@@ -335,9 +335,22 @@ public struct TableModel{
         rs.close()
     }
     
-    public static func select(db:DataBase,keys:[String],table:String,condition:QueryCondition? = nil) throws -> [TableModel]{
+    public static func bind(rs:DataBase.ResultSet, param:[String:DBType]) throws{
+        for i in param {
+            try rs.bind(name: i.key, value: i.value)
+        }
+    }
+    
+    public static func select(db:DataBase,
+                              keys:[String],
+                              table:String,
+                              condition:QueryCondition? = nil,
+                              param:[String:DBType]? = nil) throws -> [TableModel]{
         let select = "select \(keys.joined(separator: ",")) from \(table)" + (condition == nil ? "" : " where \(condition!.condition)")
         let rs = try db.prepare(sql: select)
+        if let p = param{
+            try self.bind(rs: rs, param: p)
+        }
         var models:[TableModel] = []
         while try rs.step() == .hasColumn {
             var a:[TableColumn] = []
@@ -493,9 +506,9 @@ extension DataBaseProtocol{
         }
     }
     
-    public static func select<T:DataBaseProtocol>(db:DataBase,condition:QueryCondition? = nil) throws ->[T]{
+    public static func select<T:DataBaseProtocol>(db:DataBase,condition:QueryCondition? = nil,param:[String:DBType]? = nil) throws ->[T]{
         
-        try TableModel.select(db: db,keys: T().declare.querykeys,table: self.name, condition: condition).map { tm in
+        try TableModel.select(db: db,keys: T().declare.querykeys,table: self.name, condition: condition,param: param).map { tm in
             var m = T()
             m.tableModel = tm
             return m
