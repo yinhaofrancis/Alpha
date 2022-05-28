@@ -51,9 +51,12 @@ public class DataBase:Hashable{
         get{
             do {
                 let rs = try self.prepare(sql: "PRAGMA user_version")
+                defer{
+                    rs.close()
+                }
                 _ = try rs.step()
                 let v = rs.columeInt(index: 0)
-                rs.close()
+                
                 return v
             }catch{
                 return 0
@@ -70,9 +73,12 @@ public class DataBase:Hashable{
         get{
             do {
                 let rs = try self.prepare(sql: "PRAGMA foreign_keys")
+                defer{
+                    rs.close()
+                }
                 _ = try rs.step()
                 let v = rs.columeInt(index: 0) > 0
-                rs.close()
+                
                 return v
             }catch{
                 return false

@@ -176,8 +176,11 @@ extension DataBaseFetchViewProtocol{
     public func createView(db:DataBase) throws {
         let sql = "create view if not exists \(self.name) as " + self.viewFetch.selectCode
         let rs = try db.prepare(sql: sql)
+        defer{
+            rs.close()
+        }
         _ = try rs.step()
-        rs.close()
+        
     }
     public func query(db:DataBase,condition:QueryCondition? = nil ,param:[String:DBType]? = nil) throws ->[Objects]{
         var sql = "select * from \(self.name) "
@@ -186,6 +189,9 @@ extension DataBaseFetchViewProtocol{
             sql += condition.condition
         }
         let rs = try db.prepare(sql: sql)
+        defer{
+            rs.close()
+        }
         if let param = param, condition != nil{
             for i in param{
                 try rs.bind(name: i.key, value: i.value)
@@ -200,7 +206,7 @@ extension DataBaseFetchViewProtocol{
             }
             array.append(o)
         }
-        rs.close()
+        
         return array
     }
     public func drop(db:DataBase){

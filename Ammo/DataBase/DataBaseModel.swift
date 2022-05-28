@@ -184,8 +184,10 @@ public struct TableDeclare{
     }
     public func create(db:DataBase) throws {
         let rs = try db.prepare(sql: self.code)
+        defer{
+            rs.close()
+        }
         _ = try rs.step()
-        rs.close()
     }
     private var pkCode:String{
         let pk = self.primaryColume
@@ -260,6 +262,9 @@ public struct TableModel{
     }
     public func insert(db:DataBase) throws {
         let rs = try db.prepare(sql: self.insertCode)
+        defer{
+            rs.close()
+        }
         for i in self.declare{
             if i.autoInc == false{
                 let indx = rs.getParamIndexBy(name: "@"+i.name)
@@ -267,11 +272,14 @@ public struct TableModel{
             }
         }
         _ = try rs.step()
-        rs.close()
+       
     }
     public func update(db:DataBase) throws {
         if self.hasPrimary{
             let rs = try db.prepare(sql: self.updateCode)
+            defer{
+                rs.close()
+            }
             for i in self.declare{
                 if i.autoInc == false{
                     let indx = rs.getParamIndexBy(name: "@"+i.name)
@@ -280,7 +288,7 @@ public struct TableModel{
             }
             try self.bindPrimaryConditionData(rs: rs)
             _ = try rs.step()
-            rs.close()
+            
         }else{
             throw NSError(domain: "model don't has primary key", code: 5)
         }
@@ -311,6 +319,9 @@ public struct TableModel{
             partialResult[tc.name] = tc
         }
         let rs = try db.prepare(sql: self.selectCode)
+        defer{
+            rs.close()
+        }
         try self.bindPrimaryConditionData(rs: rs)
         while try rs.step() == .hasColumn{
             for i in 0 ..< rs.columeCount{
@@ -326,13 +337,15 @@ public struct TableModel{
                 map[name]?.origin = v
             }
         }
-        rs.close()
     }
     public func delete(db:DataBase) throws{
         let rs = try db.prepare(sql: "delete from \(self.name) \(self.primaryCondition)")
+        defer{
+            rs.close()
+        }
         try self.bindPrimaryConditionData(rs: rs)
         _ = try rs.step()
-        rs.close()
+        
     }
     
     public static func bind(rs:DataBase.ResultSet, param:[String:DBType]) throws{
@@ -348,6 +361,9 @@ public struct TableModel{
                               param:[String:DBType]? = nil) throws -> [TableModel]{
         let select = "select \(keys.joined(separator: ",")) from \(table)" + (condition == nil ? "" : " where \(condition!.condition)")
         let rs = try db.prepare(sql: select)
+        defer{
+            rs.close()
+        }
         if let p = param{
             try self.bind(rs: rs, param: p)
         }
@@ -362,17 +378,24 @@ public struct TableModel{
             }
             models.append(TableModel(name: table, declare: a))
         }
-        rs.close()
+        
         return models
     }
     public func drop(db:DataBase){
         db.exec(sql: "drop table \(self.name)")
     }
-    public static func delete(db:DataBase,table:String,condition:QueryCondition) throws{
+    public static func delete(db:DataBase,table:String,condition:QueryCondition,param:[String:DBType]? = nil) throws{
         let sql = "delete from \(table) where \(condition.condition)"
+        
         let rs = try db.prepare(sql: sql)
+        defer{
+            rs.close()
+        }
+        if let p = param{
+            try self.bind(rs: rs, param: p)
+        }
         _ = try rs.step()
-        rs.close()
+        
     }
 }
 
