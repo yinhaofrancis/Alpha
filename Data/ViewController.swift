@@ -11,10 +11,7 @@ import TextDetect
 class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePickerControllerDelegate {
 
     @IBAction func detect(_ sender: Any) {
-        Task {
-            print("dadasa")
-        }
-        
+        m().go()
     }
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,3 +43,17 @@ public class placeDecode{
     }
 }
 
+@globalActor
+public final class mm:GlobalActor{
+    public typealias ActorType = MainActor
+    
+    public static var shared: MainActor = MainActor.shared
+    
+}
+
+public class m{
+    @MainActor
+    public func go(){
+        TaskGroup
+    }
+}

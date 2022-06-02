@@ -39,10 +39,12 @@ class AmmoTests: XCTestCase {
             ctx.drawString(string: a as CFAttributedString, constaint: pathframe)
 
         }
-
         print(img)
     }
-
+    func testCon() async throws{
+        let data:DataBaseSet<testA> = try await DataBaseSet(database: "data")
+        print(try await data.array)
+    }
     func testPerformanceExample() throws {
         // This is an example of a performance test case.
         measure {

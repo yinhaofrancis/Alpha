@@ -10,8 +10,7 @@ import UIKit
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-
-
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         return true
@@ -34,3 +33,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 }
 
+@propertyWrapper
+public class State<T>{
+    public var wrappedValue: T
+    public init(wrappedValue:T){
+        self.wrappedValue = wrappedValue
+    }
+}
+
+public struct V{
+    
+    
+    @State
+    var name:String = ""
+    
+    
+    func m(){
+        self.name = "dasda"
+    }
+}
