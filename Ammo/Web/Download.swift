@@ -118,8 +118,14 @@ public class DownloadDataHandler<Box:DataBox>:NSObject,URLSessionDataDelegate{
     public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
         guard let httprep = response as? HTTPURLResponse else { completionHandler(.cancel);return }
         
-        if let headermd5 = httprep.value(forHTTPHeaderField: "Content-MD5"){
-            self.map[dataTask]?.md5 = Data(base64Encoded: headermd5)
+        if #available(iOS 13.0, *) {
+            if let headermd5 = httprep.value(forHTTPHeaderField: "Content-MD5"){
+                self.map[dataTask]?.md5 = Data(base64Encoded: headermd5)
+            }
+        } else {
+            if let headermd5 = httprep.allHeaderFields["Content-MD5"] as? String{
+                self.map[dataTask]?.md5 = Data(base64Encoded: headermd5)
+            }
         }
         completionHandler(.allow)
     }
