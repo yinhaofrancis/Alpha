@@ -45,6 +45,27 @@ class AmmoTests: XCTestCase {
         let data:DataBaseSet<testA> = try await DataBaseSet(database: "data")
         print(try await data.array)
     }
+    func testZip()throws{
+        let d = try Deflate(level: .best)
+        var data = Data()
+        for _ in 0 ..< 1000 {
+            data.append(try d.push(data: "123123123123".data(using: .utf8)!))
+            data.append(try d.push(data: "qweqweqweqweqwe".data(using: .utf8)!))
+            data.append(try d.push(data: "123123123123".data(using: .utf8)!))
+            data.append(try d.push(data: "qweqweqweqweqwe".data(using: .utf8)!))
+            print(data)
+        }
+        data.append(try d.push(data: "qweqweqweqweqwe".data(using: .utf8)!,finish: true))
+        d.reset()
+        
+        print(data)
+        let inn = Inflate()
+        var r = try inn.push(data: data.subdata(in: 0 ..< 10))
+        let r2 = try inn.push(data: data.subdata(in: 10 ..< data.count),finish: true)
+        r.append(r2)
+        let strr = String(data: r, encoding: .utf8)
+        print(strr)
+    }
     func testPerformanceExample() throws {
         // This is an example of a performance test case.
         measure {

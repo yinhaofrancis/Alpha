@@ -20,6 +20,7 @@
 		A95BCB98282507D8000982D0 /* TextDetect.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A95BCB91282507D8000982D0 /* TextDetect.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A95BCB9D28250846000982D0 /* TextDetect.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95BCB9C28250846000982D0 /* TextDetect.swift */; };
 		A95E514C2848BFB100BA7028 /* Download.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95E514B2848BFB100BA7028 /* Download.swift */; };
+		A967E03A28539C22005CF3AC /* Zip.swift in Sources */ = {isa = PBXBuildFile; fileRef = A967E03928539C22005CF3AC /* Zip.swift */; };
 		A9A3FBA8283F11BF003582F2 /* DataBaseUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A3FBA7283F11BF003582F2 /* DataBaseUpdate.swift */; };
 		A9CD687E28425CC000ABD882 /* DataBaseConcurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9CD687D28425CC000ABD882 /* DataBaseConcurrency.swift */; };
 		A9FB7989281A6942008CCF39 /* DataBaseBackUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB7983281A6942008CCF39 /* DataBaseBackUp.swift */; };
@@ -93,6 +94,7 @@
 		A95BCB91282507D8000982D0 /* TextDetect.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TextDetect.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A95BCB9C28250846000982D0 /* TextDetect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextDetect.swift; sourceTree = "<group>"; };
 		A95E514B2848BFB100BA7028 /* Download.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Download.swift; sourceTree = "<group>"; };
+		A967E03928539C22005CF3AC /* Zip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Zip.swift; path = ../../../../../Zip.swift; sourceTree = "<group>"; };
 		A9A3FBA7283F11BF003582F2 /* DataBaseUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBaseUpdate.swift; sourceTree = "<group>"; };
 		A9CD687D28425CC000ABD882 /* DataBaseConcurrency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBaseConcurrency.swift; sourceTree = "<group>"; };
 		A9FB7976281A68B0008CCF39 /* Ammo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Ammo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -181,6 +183,14 @@
 			path = Web;
 			sourceTree = "<group>";
 		};
+		A967E03828539C03005CF3AC /* Z */ = {
+			isa = PBXGroup;
+			children = (
+				A967E03928539C22005CF3AC /* Zip.swift */,
+			);
+			path = Z;
+			sourceTree = "<group>";
+		};
 		A9FB796C281A68B0008CCF39 = {
 			isa = PBXGroup;
 			children = (
@@ -207,6 +217,7 @@
 		A9FB7978281A68B0008CCF39 /* Ammo */ = {
 			isa = PBXGroup;
 			children = (
+				A967E03828539C03005CF3AC /* Z */,
 				A95E514A2848BF7B00BA7028 /* Web */,
 				A9FF619328410684006637DC /* View */,
 				A9FB7982281A6942008CCF39 /* DataBase */,
@@ -450,6 +461,7 @@
 				A9A3FBA8283F11BF003582F2 /* DataBaseUpdate.swift in Sources */,
 				A9FB798C281A6942008CCF39 /* DataBaseModel.swift in Sources */,
 				A9FB7989281A6942008CCF39 /* DataBaseBackUp.swift in Sources */,
+				A967E03A28539C22005CF3AC /* Zip.swift in Sources */,
 				A9FB798B281A6942008CCF39 /* DataBaseWorkFlow.swift in Sources */,
 				A9CD687E28425CC000ABD882 /* DataBaseConcurrency.swift in Sources */,
 				A9FF619728411027006637DC /* Context.swift in Sources */,

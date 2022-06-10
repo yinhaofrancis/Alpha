@@ -21,9 +21,6 @@
                                 <rect key="frame" x="173.5" y="432.5" width="67" height="31"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="plain" title="Button"/>
-                                <connections>
-                                    <action selector="detect:" destination="BYZ-38-t0r" eventType="touchUpInside" id="uLd-lP-GQU"/>
-                                </connections>
                             </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
@@ -33,6 +30,9 @@
                             <constraint firstItem="vFh-a0-L68" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="nbJ-3w-cXc"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="btn" destination="vFh-a0-L68" id="3KZ-Sd-ks9"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>

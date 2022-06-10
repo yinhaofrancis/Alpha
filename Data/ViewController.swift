@@ -10,16 +10,14 @@ import Ammo
 import TextDetect
 class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePickerControllerDelegate {
 
-    @IBAction func detect(_ sender: Any) {
-        m().go()
-    }
+    
+    @IBOutlet weak var btn: UIButton!
+
+    
     override func viewDidLoad() {
         super.viewDidLoad()
     }
 
-    func k() async{
-        
-    }
 
 
 }
@@ -40,20 +38,5 @@ public class placeDecode{
     }
     public static func decodeName(code:String)->String?{
         code.components(separatedBy: "communityName=").last
-    }
-}
-
-@globalActor
-public final class mm:GlobalActor{
-    public typealias ActorType = MainActor
-    
-    public static var shared: MainActor = MainActor.shared
-    
-}
-
-public class m{
-    @MainActor
-    public func go(){
-        TaskGroup
     }
 }
