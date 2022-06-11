@@ -18,6 +18,7 @@ public class Deflate{
         case fast = 1
         
         case none = 0
+        case `default` = -1
     }
     
     
@@ -67,6 +68,21 @@ public class Deflate{
     }
     deinit{
         self.zStream.deallocate()
+    }
+    
+    public class func compress(data:Data,level:Level = .default) ->Data?{
+        let a:UnsafeMutablePointer<Bytef>? = UnsafeMutablePointer.allocate(capacity: data.count)
+        var count:uLongf = uLongf(data.count)
+        
+        let s = UnsafeMutablePointer<UInt8>.allocate(capacity: data.count)
+        defer{
+            s.deallocate()
+        }
+        data.copyBytes(to: s, count: data.count)
+        let ret = compress2(a, &count, s, uLong(data.count),level.rawValue)
+        guard Z_OK == ret else { return nil}
+        guard let out = a else { return nil }
+        return Data(bytesNoCopy: out, count: Int(count), deallocator: .free)
     }
 }
 
@@ -123,5 +139,23 @@ public class Inflate{
     }
     deinit{
         self.zStream.deallocate()
+    }
+    public class func uncompress(data:Data,size:UInt = 1024) ->Data?{
+        let a:UnsafeMutablePointer<Bytef>? = UnsafeMutablePointer.allocate(capacity: Int(size))
+        var count:uLongf = size
+        var sourcelen:uLong = uLong(data.count)
+        
+        let s = UnsafeMutablePointer<UInt8>.allocate(capacity: data.count)
+        defer{
+            s.deallocate()
+        }
+        data.copyBytes(to: s, count: data.count)
+        let ret = uncompress2(a, &count, s, &sourcelen)
+        if ret == Z_BUF_ERROR{
+            return uncompress(data: data, size: size * 2)
+        }
+        guard Z_OK == ret else { return nil }
+        guard let out = a else { return nil }
+        return Data(bytesNoCopy: out, count: Int(count), deallocator: .free)
     }
 }
