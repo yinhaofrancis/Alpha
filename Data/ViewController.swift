@@ -9,11 +9,9 @@ import UIKit
 import Ammo
 import TextDetect
 class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePickerControllerDelegate {
-
     
     @IBOutlet weak var btn: UIButton!
 
-    
     override func viewDidLoad() {
         super.viewDidLoad()
     }
