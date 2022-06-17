@@ -10,8 +10,7 @@ import XCTest
 @testable import Data
 class AmmoTests: XCTestCase {
 
-    @DBWorkFlow(name: "data")
-    var queue:DataBaseWorkFlow
+
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
@@ -23,54 +22,29 @@ class AmmoTests: XCTestCase {
 
     
     func testExample() async throws {
-        let ctx = Context(size: CGSize(width: 100, height: 100), scale: 3)
-
-        let img = await ctx.render { ctx in
-            ctx.context.setFillColor(UIColor.red.cgColor)
-            ctx.context.fill(CGRect(x: 10, y:10, width: 80, height: 10))
-            let ii = UIImage(named: "i")!.cgImage
-            ctx.drawScaleImage(image: ii!, rect: CGRect(x: 30, y: 30, width: 50, height: 50),mode: .fillScaleClip)
-
-            let a = NSAttributedString(string: "dsds|dsds", attributes: [
-                .font:UIFont.systemFont(ofSize: 20),
-                .foregroundColor:UIColor.red
-            ])
-            let pathframe = CGRect(x: 30, y: 30, width: 30, height: 30)
-            ctx.drawString(string: a as CFAttributedString, constaint: pathframe)
-
-        }
-        print(img)
-    }
-    func testCon() async throws{
-        let data:DataBaseSet<testA> = try await DataBaseSet(database: "data")
-        print(try await data.array)
-    }
-    func testZip()throws{
-        let d = try Deflate(level: .best)
-        var data = Data()
-        for _ in 0 ..< 1000 {
-            data.append(try d.push(data: "123123123123".data(using: .utf8)!))
-            data.append(try d.push(data: "qweqweqweqweqwe".data(using: .utf8)!))
-            data.append(try d.push(data: "123123123123".data(using: .utf8)!))
-            data.append(try d.push(data: "qweqweqweqweqwe".data(using: .utf8)!))
-            print(data)
-        }
-        data.append(try d.push(data: "qweqweqweqweqwe".data(using: .utf8)!,finish: true))
-        d.reset()
+        let frame = Item().setChildren(items: [
+            Item().config(item: { i in
+                i.x = .value(v: 10)
+                i.y = .value(v: 10)
+                i.width = 20.0
+                i.height = 20.0
+            }),
+            Item().config(item: { i in
+                i.x = .value(v: 100)
+                i.y = .value(v: 100)
+                i.width = 20.0
+                i.height = 20.0
+            }),
+        ])
+        frame.layout()
+        frame.config { i in
+            i.width = 100
+            i.height = 100
+        }.layout()
         
-        print(data)
-        let inn = Inflate()
-        var r = try inn.push(data: data.subdata(in: 0 ..< 10))
-        let r2 = try inn.push(data: data.subdata(in: 10 ..< data.count),finish: true)
-        r.append(r2)
-        let strr = String(data: r, encoding: .utf8)
-        print(strr)
+        XCTAssert(frame.layoutFrame == CGRect(x: 0, y: 0, width: 100, height: 100),"\(frame.layoutFrame)")
     }
-    func testcomp() throws {
-        let d = Deflate.compress(data: "123123123123123".data(using: .utf8)!)
-        let p = Inflate.uncompress(data: d!)
-        print(String(data: p!, encoding: .utf8))
-    }
+   
     func testPerformanceExample() throws {
         // This is an example of a performance test case.
         measure {
