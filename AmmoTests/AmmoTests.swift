@@ -22,27 +22,7 @@ class AmmoTests: XCTestCase {
 
     
     func testExample() async throws {
-        let frame = Item().setChildren(items: [
-            Item().config(item: { i in
-                i.x = .value(v: 10)
-                i.y = .value(v: 10)
-                i.width = 20.0
-                i.height = 20.0
-            }),
-            Item().config(item: { i in
-                i.x = .value(v: 100)
-                i.y = .value(v: 100)
-                i.width = 20.0
-                i.height = 20.0
-            }),
-        ])
-        frame.layout()
-        frame.config { i in
-            i.width = 100
-            i.height = 100
-        }.layout()
         
-        XCTAssert(frame.layoutFrame == CGRect(x: 0, y: 0, width: 100, height: 100),"\(frame.layoutFrame)")
     }
    
     func testPerformanceExample() throws {

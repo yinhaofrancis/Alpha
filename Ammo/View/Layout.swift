@@ -8,132 +8,134 @@
 import Foundation
 import QuartzCore
 
-public enum Dimension{
-    case value(v:Double)
-    case percent(p:Double)
-    public func valueInContext(relateValue:Double)->Double{
-        switch(self){
-            
-        case .value(v: let v):
-            return v
-        case .percent(p: let p):
-            return relateValue * p
-        }
-    }
+public protocol LayoutValue{
+    func valueInContext(value:Double)->Double
 }
 
-public struct RangeDimension:ExpressibleByFloatLiteral,ExpressibleByIntegerLiteral{
+public struct ValueNumber:ExpressibleByFloatLiteral,LayoutValue {
+    public func valueInContext(value: Double)->Double {
+        switch(mode){
+        case .pt:
+            return self.value
+        case .per:
+            return self.value * value
+        }
+    }
     
+    
+    public typealias FloatLiteralType = Double
+    
+    public var value:Double
+    
+    public var mode:ValueMode
+    
+    public enum ValueMode{
+        case pt
+        case per
+    }
+    
+    public init(value:FloatLiteralType,mode:ValueMode){
+        self.value = value
+        self.mode = mode
+    }
     
     public init(floatLiteral value: Double) {
-        self.min = nil
-        self.max = nil
-        self.value = .value(v: value)
+        self.init(value: value, mode: .pt)
     }
-    public init(integerLiteral value: Int) {
-        self.min = nil
-        self.max = nil
-        self.value = .value(v: Double(value))
+}
+public struct ValueRange:LayoutValue,ExpressibleByFloatLiteral{
+    
+    public init(floatLiteral value: Double) {
+        self.init(value: ValueNumber(floatLiteral: value))
+    }
+    
+    public init(value:ValueNumber,min:ValueNumber? = nil,max:ValueNumber? = nil){
+        self.value = value
+        self.min = min
+        self.max = max
     }
     
     public typealias FloatLiteralType = Double
-    public typealias IntegerLiteralType = Int
-    
-    public var min:Dimension?
-    public var max:Dimension?
-    public var value:Dimension
-    
-    public init(value:Dimension,max:Dimension? = nil,min:Dimension? = nil){
-        self.min = min
-        self.max = max
-        self.value = value
-    }
-    public func valueInContextLimitValue(relateValue:Double,constant:Double)->Double{
-        var temp = constant
-        if let max = self.max {
-            let r = max.valueInContext(relateValue: relateValue)
-            if temp > r{
-                temp = r
-            }
+
+    public func valueInContext(value: Double) -> Double {
+        var re:Double = self.value.valueInContext(value: value)
+        if let m = self.max{
+            re = Swift.min(m.valueInContext(value: value), re)
         }
-        
-        if let min = self.min {
-            let r = min.valueInContext(relateValue: relateValue)
-            if temp < r{
-                temp = r
-            }
+        if let m = self.min{
+            re = Swift.max(m.valueInContext(value: value), re)
         }
-        return temp
+        return re
     }
     
-    public func valueInContext(relateValue:Double)->Double{
-        let v = self.value.valueInContext(relateValue: relateValue)
-        return self.valueInContextLimitValue(relateValue: relateValue, constant: v)
-    }
+    
+    public var min:ValueNumber?
+    
+    public var max:ValueNumber?
+    
+    public var value:ValueNumber
+    
 }
 
-public class Item{
-    public var x:Dimension?
-    public var y:Dimension?
-    public var width:RangeDimension?
-    public var height:RangeDimension?
-    public var flex:Double = 0
-    public var parent:Item?
-    public var children:[Item] = []
+
+public class Item {
+    public var width:ValueRange?
+    public var height:ValueRange?
     
-    
-    public var layoutFrame:CGRect = .zero
-    
-    var defineContentSize:CGSize = .zero
-    public var contentSize:CGSize{
-        CGSize(width: self.width?.valueInContext(relateValue: Double(self.parent?.layoutFrame.width ?? 0)) ?? self.defineContentSize.width,
-               height: self.height?.valueInContext(relateValue: Double(self.parent?.layoutFrame.height ?? 0)) ?? self.defineContentSize.height)
+    public var contentSize:CGSize {
+        let w = CGFloat(width?.valueInContext(value: 0) ?? self.childContentSize.width)
+        let h = CGFloat(height?.valueInContext(value: 0) ?? self.childContentSize.height)
+        return CGSize(width: w, height: h)
     }
-    public var layoutLocation:CGPoint{
-        let x = self.x?.valueInContext(relateValue: Double(self.parent?.layoutFrame.width ?? 0)) ?? 0
-        let y = self.y?.valueInContext(relateValue: Double(self.parent?.layoutFrame.height ?? 0)) ?? 0
-        return CGPoint(x: x, y: y)
+    public var childContentSize:CGSize{
+        return .zero
     }
-    public init() {}
+    public var resultFrame:CGRect?
+    
+    public var resultSize:CGSize{
+        return self.resultFrame?.size ?? .zero
+    }
+    
     public func layout(){
-        self.children.forEach { i in
-            i.layout()
+        if self.resultFrame == nil{
+            self.resultFrame = CGRect(origin: .zero, size: self.contentSize)
         }
-        self.layoutFrame = CGRect(origin: self.layoutLocation, size: self.contentSize)
     }
-}
-extension Item{
-    public func setDefaultContentSize(size:CGSize)->Self{
-        self.defineContentSize = size
-        return self
+    public func relayout(){
+        self.resultFrame = nil
+        for i in self.children{
+            i.relayout()
+        }
+        self.layout()
     }
     
-    public func setChildren(items:[Item])->Self{
+    public var grow:Double
+    
+    public var shrink:Double
+    
+    public var parent:Item?
+    
+    public var children:[Item]
+    
+    public init(items:[Item],width:ValueRange? = nil,height:ValueRange? = nil,grow:Double = 0,shrink:Double = 0){
         self.children = items
-        return self
+        self.width = width
+        self.height = height
+        self.grow = grow
+        self.shrink = shrink
+        for i in items{
+            i.parent = self
+        }
     }
-    public func config(item:(Self)->Void)->Self{
-        item(self)
+    public func config(block:(Self)->Void)->Self{
+        block(self)
         return self
     }
 }
 
-public class Frame:Item{
-    public override var contentSize: CGSize{
-        let w = self.children.reduce(0) { partialResult, i in
-            max(partialResult, i.layoutFrame.maxX)
-        }
-        let h = self.children.reduce(0) { partialResult, i in
-            max(partialResult, i.layoutFrame.maxY)
-        }
-        self.defineContentSize = CGSize(width: w, height: h)
-        return super.contentSize
-    }
-}
-// 10 + 10 + 10 + x =
-public class Stack:Item{
-
-    public enum Direction{
+public class Stack:Item {
+    
+    public enum Axis{
         case vertical
         case horizental
     }
@@ -142,10 +144,11 @@ public class Stack:Item{
         case start
         case center
         case end
-        case between
+        case around
         case evenly
-        case arround
+        case between
     }
+    
     public enum Align{
         case start
         case center
@@ -153,56 +156,247 @@ public class Stack:Item{
         case fill
     }
     
-    public var direction:Direction = .horizental
+    public var axis:Axis = .horizental
+    
     public var justify:Justify = .start
+    
     public var align:Align = .start
     
-    var innerContentSize:CGSize{
-        switch(self.direction){
-            
-        case .vertical:
-            let h = self.children.reduce(0) { partialResult, i in
-                partialResult + i.layoutFrame.height
-            }
-            let w = children.reduce(0) { partialResult, i in
-                max(partialResult, i.layoutFrame.width)
-            }
-            return CGSize(width: w, height: h)
-        case .horizental:
-            let w = self.children.reduce(0) { partialResult, i in
-                partialResult + i.layoutFrame.width
-            }
-            let h = children.reduce(0) { partialResult, i in
-                max(partialResult, i.layoutFrame.height)
-            }
-            return CGSize(width: w, height: h)
-        }
-    }
-    public override var contentSize: CGSize{
-        self.defineContentSize = innerContentSize
-        return super.contentSize
-    }
     public override func layout() {
+        for i in self.children{
+            i.layout()
+        }
         super.layout()
-        self.fullfillSize()
+        let delta = self.resize()
+        self.resizeCross()
+        self.layoutLocation(extra: delta)
     }
-    private func fullfillSize(){
-        switch(self.direction){
+    public override var childContentSize:CGSize{
+        switch(self.axis){
             
         case .vertical:
-            let deltaY = self.layoutFrame.height - self.contentSize.height
+            return self.children.reduce(CGSize.zero) { partialResult, i in
+                let h = partialResult.height + i.resultSize.height
+                let w = max(partialResult.width, i.resultSize.width)
+                return CGSize(width: w, height: h)
+            }
         case .horizental:
-            let deltaX = self.layoutFrame.width - self.contentSize.width
+            return self.children.reduce(CGSize.zero) { partialResult, i in
+                let w = partialResult.width + i.resultSize.width
+                let h = max(partialResult.height, i.resultSize.height)
+                return CGSize(width: w, height: h)
+            }
         }
     }
-    private func next(after:Item)->CGPoint{
-        switch(self.direction){
-            
+    
+    func resize()->CGFloat{
+        switch(self.axis){
         case .vertical:
-            return CGPoint(x: 0, y: after.layoutFrame.maxY)
+            let delta = self.contentSize.height - self.childContentSize.height
+            return self.resizeV(delta: delta)
         case .horizental:
-            return CGPoint(x: after.layoutFrame.maxX, y: 0)
+            let delta = self.contentSize.width - self.childContentSize.width
+            return self.resizeH(delta: delta)
+        }
+    }
+    func resizeCross(){
+        switch(self.axis){
+        case .vertical:
+            self.resizeCrossV()
+            break
+        case .horizental:
+            self.resizeCrossH()
+            break
+        }
+    }
+    public var sumGrow:Double{
+        self.children.reduce(0) { partialResult, i in
+            partialResult + i.grow
+        }
+    }
+    
+    public var sumShrink:Double{
+        self.children.reduce(0) { partialResult, i in
+            partialResult + i.shrink
+        }
+    }
+    func layoutLocation(extra:CGFloat){
+        switch(self.axis){
+        case .vertical:
+            self.layoutVAxis(extra: extra)
+            self.layoutVCross()
+            break
+        case .horizental:
+            self.layoutHAxis(extra: extra)
+            self.layoutHCross()
+            break
+        }
+    }
+    func makeParam(extra:CGFloat)->(start:CGFloat,step:CGFloat){
+        var start:CGFloat = 0
+        var step:CGFloat = 0
+        switch(self.justify){
+            
+        case .start:
+            start = 0
+            step = 0
+            break
+        case .center:
+            start = extra / 2
+            step = 0
+            break
+        case .end:
+            start = extra / 2
+            step = 0
+            break
+        case .around:
+            start = (extra / CGFloat(2 * self.children.count))
+            step = start * 2
+        case .evenly:
+            start = (extra / CGFloat(1 + self.children.count))
+            step = start
+        case .between:
+            if self.children.count - 1 == 0{
+                start = 0
+                step = 0
+            }else{
+                start = (extra / CGFloat(self.children.count - 1))
+                step = start
+            }
+            break
+            
+        }
+        return (start,step)
+    }
+    func layoutHAxis(extra:CGFloat){
+        let param = self.makeParam(extra: extra)
+        var point = param.start
+        for i in self.children{
+            i.resultFrame?.origin.x = point
+            point = point + param.step + (i.resultFrame?.width ?? 0)
+        }
+    }
+    func layoutVAxis(extra:CGFloat){
+        let param = self.makeParam(extra: extra)
+        var point = param.start
+        for i in self.children{
+            i.resultFrame?.origin.y = point
+            point = point + param.step + (i.resultFrame?.height ?? 0)
+        }
+    }
+    func layoutHCross(){
+        for i in self.children{
+            switch(self.align){
+            case .start:
+                i.resultFrame?.origin.y = 0
+                break
+            case .center:
+                let ex = (self.contentSize.height - (i.resultFrame?.height ?? 0)) / 2
+                i.resultFrame?.origin.y = ex
+            case .end:
+                let ex = (self.contentSize.height - (i.resultFrame?.height ?? 0))
+                i.resultFrame?.origin.y = ex
+            case .fill:
+                i.resultFrame?.origin.y = 0
+                break
+            }
+        }
+    }
+    
+    func layoutVCross(){
+        for i in self.children{
+            switch(self.align){
+            case .start:
+                i.resultFrame?.origin.x = 0
+                break
+            case .center:
+                let ex = (self.contentSize.height - (i.resultFrame?.height ?? 0)) / 2
+                i.resultFrame?.origin.x = ex
+            case .end:
+                let ex = (self.contentSize.height - (i.resultFrame?.height ?? 0))
+                i.resultFrame?.origin.x = ex
+            case .fill:
+                i.resultFrame?.origin.x = 0
+                break
+            }
+        }
+    }
+    func resizeH(delta:CGFloat)->CGFloat{
+        var result:Bool = false
+        if delta > 0{
+            for i in self.children{
+                if (i.resultFrame == nil){
+                    i.resultFrame = .zero
+                }
+                if i.grow != 0{
+                    let r = i.resultFrame!.size.height + (delta * i.grow / sumGrow)
+                    i.resultFrame?.size.height = i.height?.valueInContext(value: r) ?? r
+                    i.layout()
+                    result = true
+                }
+            }
+        }else if delta < 0{
+            for i in self.children{
+                if (i.resultFrame == nil){
+                    i.resultFrame = .zero
+                }
+                if i.shrink != 0{
+                    let r = i.resultFrame!.size.height + (delta * i.shrink / sumShrink)
+                    i.resultFrame?.size.height = i.height?.valueInContext(value: r) ?? r
+                    i.layout()
+                    result = true
+                }
+                
+            }
+        }
+        return result ? 0 : delta
+    }
+    
+    func resizeV(delta:CGFloat)->CGFloat{
+        var result:Bool = false
+        if delta > 0{
+            for i in self.children{
+                if (i.resultFrame == nil){
+                    i.resultFrame = .zero
+                }
+                if i.grow != 0{
+                    let r = i.resultFrame!.size.width + (delta * i.grow / sumGrow)
+                    i.resultFrame?.size.width = i.width?.valueInContext(value: r) ?? r
+                    i.layout()
+                    result = true
+                }
+            }
+        }else if delta < 0{
+            for i in self.children{
+                if (i.resultFrame == nil){
+                    i.resultFrame = .zero
+                }
+                if i.shrink != 0{
+                    let r = i.resultFrame!.size.width + (delta * i.shrink / sumShrink)
+                    i.resultFrame?.size.width = i.width?.valueInContext(value: r) ?? r
+                    i.layout()
+                    result = true
+                }
+            }
+        }
+        return result ? 0 : delta
+    }
+    
+    func resizeCrossH(){
+        for i in children{
+            if i.height == nil && self.align == .fill{
+                i.resultFrame?.size.height = self.contentSize.height
+                i.layout()
+            }
+        }
+    }
+    
+    func resizeCrossV(){
+        for i in children{
+            if i.width == nil && self.align == .fill{
+                i.resultFrame?.size.width = self.contentSize.width
+                i.layout()
+            }
         }
     }
 }
-
