@@ -46,9 +46,9 @@ class AmmoTests: XCTestCase {
         print(try await data.array)
     }
     func testZip()throws{
-        let d = try Deflate(level: .best)
+        let d = try Deflate()
         var data = Data()
-        for _ in 0 ..< 1000 {
+        for _ in 0 ..< 100 {
             data.append(try d.push(data: "123123123123".data(using: .utf8)!))
             data.append(try d.push(data: "qweqweqweqweqwe".data(using: .utf8)!))
             data.append(try d.push(data: "123123123123".data(using: .utf8)!))
@@ -66,10 +66,14 @@ class AmmoTests: XCTestCase {
         let strr = String(data: r, encoding: .utf8)
         print(strr)
     }
-    func testcomp() throws {
-        let d = Deflate.compress(data: "123123123123123".data(using: .utf8)!)
-        let p = Inflate.uncompress(data: d!)
-        print(String(data: p!, encoding: .utf8))
+    func testcomp() async throws {
+        let u = self.queue.wdb.url
+        let uu = URL(string: u.absoluteString.appending("2"))
+        FileManager.default.createFile(atPath: uu!.path, contents: nil)
+        await try Deflate.compress(source: u, destination: uu!)
+        
+        
+        
     }
     func testPerformanceExample() throws {
         // This is an example of a performance test case.

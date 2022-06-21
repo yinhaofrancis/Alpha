@@ -9,6 +9,7 @@ import Foundation
 
 import zlib
 
+public let bufferSize:Int = 1024
 
 
 public class Deflate{
@@ -24,7 +25,7 @@ public class Deflate{
     
     private var zStream:z_streamp
     
-    public init(level:Level) throws{
+    public init(level:Level = .default) throws{
         self.zStream = z_streamp.allocate(capacity: 1)
         self.zStream.pointee.zfree = nil
         self.zStream.pointee.zalloc = nil
@@ -68,6 +69,21 @@ public class Deflate{
     }
     deinit{
         self.zStream.deallocate()
+    }
+    
+    @available(iOS 13.4, *)
+    public class func compress(source:URL,destination:URL) async throws{
+        try await Task {
+            let fh = try FileHandle(forReadingFrom: source)
+            let dh = try FileHandle(forWritingTo: destination)
+            var current:Data?
+            let def = try Deflate()
+            repeat{
+                guard let data = try fh.read(upToCount: bufferSize) else { throw NSError(domain: "error", code: 0)}
+                current = data
+                try dh.write(contentsOf: try def.push(data: data,finish: data.count < bufferSize))
+            }while(current != nil && current!.count == bufferSize)
+        }.value
     }
 }
 
@@ -124,5 +140,19 @@ public class Inflate{
     }
     deinit{
         self.zStream.deallocate()
+    }
+    @available(iOS 13.4, *)
+    public class func uncompress(source:URL,destination:URL) async throws{
+        try await Task {
+            let fh = try FileHandle(forReadingFrom: source)
+            let dh = try FileHandle(forWritingTo: destination)
+            var current:Data?
+            let inf = Inflate()
+            repeat{
+                guard let data = try fh.read(upToCount: bufferSize) else { throw NSError(domain: "error", code: 0)}
+                current = data
+                try dh.write(contentsOf: inf.push(data: data,finish: data.count < bufferSize))
+            }while(current != nil && current!.count == bufferSize)
+        }.value
     }
 }
