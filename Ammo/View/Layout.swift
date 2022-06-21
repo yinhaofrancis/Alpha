@@ -12,7 +12,7 @@ public protocol LayoutValue{
     func valueInContext(value:Double)->Double
 }
 
-public struct ValueNumber:ExpressibleByFloatLiteral,LayoutValue {
+public struct ValueNumber:ExpressibleByFloatLiteral,ExpressibleByIntegerLiteral,LayoutValue {
     public func valueInContext(value: Double)->Double {
         switch(mode){
         case .pt:
@@ -24,6 +24,8 @@ public struct ValueNumber:ExpressibleByFloatLiteral,LayoutValue {
     
     
     public typealias FloatLiteralType = Double
+    
+    public typealias IntegerLiteralType = Int
     
     public var value:Double
     
@@ -42,9 +44,19 @@ public struct ValueNumber:ExpressibleByFloatLiteral,LayoutValue {
     public init(floatLiteral value: Double) {
         self.init(value: value, mode: .pt)
     }
+    public init(integerLiteral value: Int) {
+        self.init(floatLiteral: Double(value))
+    }
 }
-public struct ValueRange:LayoutValue,ExpressibleByFloatLiteral{
+public struct ValueRange:LayoutValue,ExpressibleByFloatLiteral,ExpressibleByIntegerLiteral{
     
+    public typealias FloatLiteralType = Double
+    
+    public typealias IntegerLiteralType = Int
+    
+    public init(integerLiteral value: Int) {
+        self.init(floatLiteral: Double(value))
+    }
     public init(floatLiteral value: Double) {
         self.init(value: ValueNumber(floatLiteral: value))
     }
@@ -55,7 +67,7 @@ public struct ValueRange:LayoutValue,ExpressibleByFloatLiteral{
         self.max = max
     }
     
-    public typealias FloatLiteralType = Double
+    
 
     public func valueInContext(value: Double) -> Double {
         var re:Double = self.value.valueInContext(value: value)
@@ -76,7 +88,11 @@ public struct ValueRange:LayoutValue,ExpressibleByFloatLiteral{
     public var value:ValueNumber
     
 }
-public class Item{
+public class Item:CustomDebugStringConvertible{
+    public var debugDescription: String{
+        return "\(Self.self),\(String(describing: self.resultFrame))"
+    }
+    
     public var width:ValueRange?
     
     public var height:ValueRange?
@@ -110,10 +126,6 @@ public class Item{
             self.resultFrame = CGRect(origin: .zero, size: self.contentSize)
         }
     }
-    public func config(block:(Self)->Void)->Self{
-        block(self)
-        return self
-    }
     public init(width:ValueRange? = nil,height:ValueRange? = nil,grow:Double = 0,shrink:Double = 0){
         self.width = width
         self.height = height
@@ -124,6 +136,9 @@ public class Item{
 
 public class Container:Item {
     
+    public override var debugDescription: String{
+        return super.debugDescription + "\n\(self.children)"
+    }
 
     public override func relayout(){
         super.relayout()
@@ -337,7 +352,7 @@ public class Stack:Container{
             }
         }
     }
-    func resizeH(delta:CGFloat)->CGFloat{
+    func resizeV(delta:CGFloat)->CGFloat{
         var result:Bool = false
         if delta > 0{
             for i in self.children{
@@ -346,7 +361,7 @@ public class Stack:Container{
                 }
                 if i.grow != 0{
                     let r = i.resultFrame!.size.height + (delta * i.grow / sumGrow)
-                    i.resultFrame?.size.height = i.height?.valueInContext(value: r) ?? r
+                    i.resultFrame?.size.height = r
                     i.layout()
                     result = true
                 }
@@ -358,7 +373,7 @@ public class Stack:Container{
                 }
                 if i.shrink != 0{
                     let r = i.resultFrame!.size.height + (delta * i.shrink / sumShrink)
-                    i.resultFrame?.size.height = i.height?.valueInContext(value: r) ?? r
+                    i.resultFrame?.size.height = r
                     i.layout()
                     result = true
                 }
@@ -368,7 +383,7 @@ public class Stack:Container{
         return result ? 0 : delta
     }
     
-    func resizeV(delta:CGFloat)->CGFloat{
+    func resizeH(delta:CGFloat)->CGFloat{
         var result:Bool = false
         if delta > 0{
             for i in self.children{
@@ -377,7 +392,7 @@ public class Stack:Container{
                 }
                 if i.grow != 0{
                     let r = i.resultFrame!.size.width + (delta * i.grow / sumGrow)
-                    i.resultFrame?.size.width = i.width?.valueInContext(value: r) ?? r
+                    i.resultFrame?.size.width = r
                     i.layout()
                     result = true
                 }
@@ -389,7 +404,7 @@ public class Stack:Container{
                 }
                 if i.shrink != 0{
                     let r = i.resultFrame!.size.width + (delta * i.shrink / sumShrink)
-                    i.resultFrame?.size.width = i.width?.valueInContext(value: r) ?? r
+                    i.resultFrame?.size.width = r
                     i.layout()
                     result = true
                 }

@@ -21,58 +21,16 @@ class AmmoTests: XCTestCase {
 
 
     
-    func testExample() async throws {
-        let ctx = Context(size: CGSize(width: 100, height: 100), scale: 3)
-
-        let img = await ctx.render { ctx in
-            ctx.context.setFillColor(UIColor.red.cgColor)
-            ctx.context.fill(CGRect(x: 10, y:10, width: 80, height: 10))
-            let ii = UIImage(named: "i")!.cgImage
-            ctx.drawScaleImage(image: ii!, rect: CGRect(x: 30, y: 30, width: 50, height: 50),mode: .fillScaleClip)
-
-            let a = NSAttributedString(string: "dsds|dsds", attributes: [
-                .font:UIFont.systemFont(ofSize: 20),
-                .foregroundColor:UIColor.red
-            ])
-            let pathframe = CGRect(x: 30, y: 30, width: 30, height: 30)
-            ctx.drawString(string: a as CFAttributedString, constaint: pathframe)
-
-        }
-        print(img)
-    }
-    func testCon() async throws{
-        let data:DataBaseSet<testA> = try await DataBaseSet(database: "data")
-        print(try await data.array)
-    }
-    func testZip()throws{
-        let d = try Deflate()
-        var data = Data()
-        for _ in 0 ..< 100 {
-            data.append(try d.push(data: "123123123123".data(using: .utf8)!))
-            data.append(try d.push(data: "qweqweqweqweqwe".data(using: .utf8)!))
-            data.append(try d.push(data: "123123123123".data(using: .utf8)!))
-            data.append(try d.push(data: "qweqweqweqweqwe".data(using: .utf8)!))
-            print(data)
-        }
-        data.append(try d.push(data: "qweqweqweqweqwe".data(using: .utf8)!,finish: true))
-        d.reset()
-        
-        print(data)
-        let inn = Inflate()
-        var r = try inn.push(data: data.subdata(in: 0 ..< 10))
-        let r2 = try inn.push(data: data.subdata(in: 10 ..< data.count),finish: true)
-        r.append(r2)
-        let strr = String(data: r, encoding: .utf8)
-        print(strr)
-    }
-    func testcomp() async throws {
-        let u = self.queue.wdb.url
-        let uu = URL(string: u.absoluteString.appending("2"))
-        FileManager.default.createFile(atPath: uu!.path, contents: nil)
-        await try Deflate.compress(source: u, destination: uu!)
-        
-        
-        
+    func testExample() throws {
+        let s:Stack = Stack(items: [
+            Item(width: 10, height: 10, grow: 0, shrink: 0),
+            Item(width: nil, height: nil, grow: 1, shrink: 1),
+            Item(width: nil, height: nil, grow: 1, shrink: 1),
+            Item(width: nil, height: nil, grow: 1, shrink: 1)
+        ], width: 100, height: 100, grow: 0, shrink: 0)
+        s.align = .fill
+        s.relayout()
+        print(s)
     }
    
     func testPerformanceExample() throws {
