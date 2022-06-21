@@ -23,6 +23,7 @@
 		A967E03A28539C22005CF3AC /* Zip.swift in Sources */ = {isa = PBXBuildFile; fileRef = A967E03928539C22005CF3AC /* Zip.swift */; };
 		A9A3FBA8283F11BF003582F2 /* DataBaseUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A3FBA7283F11BF003582F2 /* DataBaseUpdate.swift */; };
 		A9CD687E28425CC000ABD882 /* DataBaseConcurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9CD687D28425CC000ABD882 /* DataBaseConcurrency.swift */; };
+		A9E037CB285C2DD7008EDA71 /* Layout.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9E037CA285C2DD7008EDA71 /* Layout.swift */; };
 		A9FB7989281A6942008CCF39 /* DataBaseBackUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB7983281A6942008CCF39 /* DataBaseBackUp.swift */; };
 		A9FB798A281A6942008CCF39 /* DataBaseFetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB7984281A6942008CCF39 /* DataBaseFetch.swift */; };
 		A9FB798B281A6942008CCF39 /* DataBaseWorkFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB7985281A6942008CCF39 /* DataBaseWorkFlow.swift */; };
@@ -97,6 +98,7 @@
 		A967E03928539C22005CF3AC /* Zip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zip.swift; sourceTree = "<group>"; };
 		A9A3FBA7283F11BF003582F2 /* DataBaseUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBaseUpdate.swift; sourceTree = "<group>"; };
 		A9CD687D28425CC000ABD882 /* DataBaseConcurrency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBaseConcurrency.swift; sourceTree = "<group>"; };
+		A9E037CA285C2DD7008EDA71 /* Layout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Layout.swift; sourceTree = "<group>"; };
 		A9FB7976281A68B0008CCF39 /* Ammo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Ammo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9FB7983281A6942008CCF39 /* DataBaseBackUp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataBaseBackUp.swift; sourceTree = "<group>"; };
 		A9FB7984281A6942008CCF39 /* DataBaseFetch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataBaseFetch.swift; sourceTree = "<group>"; };
@@ -253,6 +255,7 @@
 			isa = PBXGroup;
 			children = (
 				A9FF619628411027006637DC /* Context.swift */,
+				A9E037CA285C2DD7008EDA71 /* Layout.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -462,6 +465,7 @@
 				A9FB798C281A6942008CCF39 /* DataBaseModel.swift in Sources */,
 				A9FB7989281A6942008CCF39 /* DataBaseBackUp.swift in Sources */,
 				A967E03A28539C22005CF3AC /* Zip.swift in Sources */,
+				A9E037CB285C2DD7008EDA71 /* Layout.swift in Sources */,
 				A9FB798B281A6942008CCF39 /* DataBaseWorkFlow.swift in Sources */,
 				A9CD687E28425CC000ABD882 /* DataBaseConcurrency.swift in Sources */,
 				A9FF619728411027006637DC /* Context.swift in Sources */,

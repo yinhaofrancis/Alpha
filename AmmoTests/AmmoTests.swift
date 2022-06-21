@@ -10,8 +10,7 @@ import XCTest
 @testable import Data
 class AmmoTests: XCTestCase {
 
-    @DBWorkFlow(name: "data")
-    var queue:DataBaseWorkFlow
+
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
@@ -75,6 +74,7 @@ class AmmoTests: XCTestCase {
         
         
     }
+   
     func testPerformanceExample() throws {
         // This is an example of a performance test case.
         measure {
