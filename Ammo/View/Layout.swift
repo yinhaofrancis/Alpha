@@ -134,6 +134,63 @@ public class Item:CustomDebugStringConvertible{
     }
 }
 
+public protocol FillContentProtocol:AnyObject{
+    var size:CGSize { get }
+}
+public class FillItem:Item{
+    
+    public weak var fillContent:FillContentProtocol?
+    
+    public override var childContentSize: CGSize{
+        return self.fillContent?.size ?? .zero
+    }
+}
+public class Resize:Item{
+    public enum Mode{
+        case scale
+        case scaleToFill
+        case scaleToFit
+    }
+    public var content:Item
+    public var mode:Mode
+    public init(content:Item, width: ValueRange, height: ValueRange,mode:Mode,grow: Double = 0, shrink: Double = 0) {
+        self.content = content
+        self.mode = mode
+        super.init(width: width, height: height, grow: grow, shrink: shrink)
+    }
+    public override func layout() {
+        super.layout()
+        content.layout()
+        if content.resultSize.width == 0 || content.resultSize.height == 0{
+            return
+        }
+        switch(self.mode){
+        case .scale:
+            self.content.resultFrame = CGRect(x: 0, y: 0, width:self.resultSize.width , height: self.resultSize.height)
+            content.layout()
+            break;
+        case .scaleToFit:
+            let ratio = min(self.resultSize.width / content.resultSize.width, self.resultSize.height / content.resultSize.height)
+            let size = CGSize(width: content.resultSize.width * ratio, height: content.resultSize.height * ratio)
+            let x = (self.resultSize.width - size.width) / 2
+            let y = (self.resultSize.height - size.height) / 2
+            content.resultFrame = CGRect(x: x, y: y, width: size.width, height: size.height)
+            content.layout()
+            break
+        case .scaleToFill:
+            let ratio = max(self.resultSize.width / content.resultSize.width, self.resultSize.height / content.resultSize.height)
+            let size = CGSize(width: content.resultSize.width * ratio, height: content.resultSize.height * ratio)
+            let x = (self.resultSize.width - size.width) / 2
+            let y = (self.resultSize.height - size.height) / 2
+            content.resultFrame = CGRect(x: x, y: y, width: size.width, height: size.height)
+            content.layout()
+            break
+        }
+    }
+    public override var debugDescription: String{
+        return super.debugDescription + "{\(content.debugDescription)}"
+    }
+}
 public class Container:Item {
     
     public override var debugDescription: String{
