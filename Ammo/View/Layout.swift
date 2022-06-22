@@ -154,13 +154,43 @@ public class Container:Item {
     public init(items:[Item],width:ValueRange? = nil,height:ValueRange? = nil,grow:Double = 0,shrink:Double = 0){
         self.children = items
         super.init(width: width, height: height, grow: grow, shrink: shrink)
-        for i in items{
-            i.parent = self
-        }
     }
-    
 }
-
+public struct Edge{
+    public var left:Double
+    public var right:Double
+    public var top:Double
+    public var bottom:Double
+    public init(left:Double,right:Double,top:Double,bottom:Double){
+        self.left = left
+        self.right = right
+        self.top = top
+        self.bottom = bottom
+    }
+    public static let zero:Edge = Edge(left: 0, right: 0, top: 0, bottom: 0)
+}
+public class Padding:Item{
+    public var content:Item
+    public var pading:Edge
+    public init(content:Item,padding:Edge = .zero,grow:Double = 0,shrink:Double = 0){
+        self.content = content
+        self.pading = padding
+        super.init(width: nil, height: nil, grow: grow, shrink: shrink)
+    }
+    public override func layout() {
+        content.layout()
+        if self.resultFrame == nil{
+            content.resultFrame = CGRect(x: self.pading.left, y: self.pading.top, width: content.resultSize.width, height: content.resultSize.height)
+            self.resultFrame = CGRect(origin: .zero, size: CGSize(width: content.resultSize.width + self.pading.left + self.pading.right, height: content.resultSize.height + self.pading.top + self.pading.bottom))
+        }else{
+            content.resultFrame = CGRect(x: self.pading.left, y: self.pading.top, width: self.resultSize.width - self.pading.left - self.pading.right, height: self.resultSize.height - self.pading.top - self.pading.bottom)
+        }
+        
+    }
+    public override var debugDescription: String{
+        return super.debugDescription + "{\(content.debugDescription)}"
+    }
+}
 public class Stack:Container{
     
     public enum Axis{
@@ -192,6 +222,7 @@ public class Stack:Container{
     
     public override func layout() {
         for i in self.children{
+            i.parent = self
             i.layout()
         }
         super.layout()
