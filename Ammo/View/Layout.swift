@@ -156,7 +156,7 @@ public class Container:Item {
         super.init(width: width, height: height, grow: grow, shrink: shrink)
     }
 }
-public struct Edge{
+public struct Edge:Equatable{
     public var left:Double
     public var right:Double
     public var top:Double
@@ -169,6 +169,42 @@ public struct Edge{
     }
     public static let zero:Edge = Edge(left: 0, right: 0, top: 0, bottom: 0)
 }
+public class Align:Item{
+    public var content:Item
+    public var alignX:Double
+    public var alignY:Double
+    public init(content:Item,
+                width: ValueRange,
+                height: ValueRange,
+                alignX:Double,
+                alignY:Double,
+                grow: Double = 0,
+                shrink: Double = 0) {
+        self.alignX = alignX
+        self.alignY = alignY
+        self.content = content
+        super.init(width: width, height: height, grow: grow, shrink: shrink)
+        self.content.parent = self
+        
+    }
+    public static func center(content:Item,
+                              width: ValueRange,
+                              height: ValueRange,
+                              grow: Double = 0,
+                              shrink: Double = 0)->Align{
+        return Align(content: content, width: width, height: height, alignX: 0.5, alignY: 0.5, grow: grow, shrink: shrink)
+    }
+    public override func layout() {
+        if self.resultFrame == nil{
+            super.layout()
+            content.layout()
+        }
+        let x = (self.resultSize.width - content.resultSize.width) * alignX
+        let y = (self.resultSize.height - content.resultSize.height) * alignX
+        content.resultFrame?.origin.y = y
+        content.resultFrame?.origin.x = x
+    }
+}
 public class Padding:Item{
     public var content:Item
     public var pading:Edge
@@ -176,16 +212,50 @@ public class Padding:Item{
         self.content = content
         self.pading = padding
         super.init(width: nil, height: nil, grow: grow, shrink: shrink)
+        self.content.parent = self
     }
     public override func layout() {
+        
         content.layout()
         if self.resultFrame == nil{
             content.resultFrame = CGRect(x: self.pading.left, y: self.pading.top, width: content.resultSize.width, height: content.resultSize.height)
             self.resultFrame = CGRect(origin: .zero, size: CGSize(width: content.resultSize.width + self.pading.left + self.pading.right, height: content.resultSize.height + self.pading.top + self.pading.bottom))
         }else{
-            content.resultFrame = CGRect(x: self.pading.left, y: self.pading.top, width: self.resultSize.width - self.pading.left - self.pading.right, height: self.resultSize.height - self.pading.top - self.pading.bottom)
+            
+            content.resultFrame = Padding.paddingRect(content: content.resultSize , edge: self.pading, container: self.resultSize)
         }
         
+    }
+    public static func paddingRect(content:CGSize,edge:Edge,container:CGSize)->CGRect{
+        var result = CGRect.zero
+        if edge.left == 0 && edge.right == 0{
+            result.origin.x = (container.width - content.width) / 2
+            result.size.width = content.width
+        }else if edge.left == 0{
+            result.origin.x = container.width - content.width
+            result.size.width = content.width
+        }else if edge.right == 0{
+            result.origin.x = edge.left
+            result.size.width = content.width
+        }else{
+            result.origin.x = edge.left
+            result.size.width = container.width - edge.left - edge.right
+        }
+        
+        if edge.top == 0 && edge.bottom == 0{
+            result.origin.y = (container.height - content.height) / 2
+            result.size.height = content.height
+        }else if edge.top == 0{
+            result.origin.y = container.height - content.height
+            result.size.height = content.height
+        }else if edge.bottom == 0{
+            result.origin.y = edge.top
+            result.size.height = content.height
+        }else{
+            result.origin.y = edge.top
+            result.size.height = container.height - edge.left - edge.right
+        }
+        return result
     }
     public override var debugDescription: String{
         return super.debugDescription + "{\(content.debugDescription)}"
