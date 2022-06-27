@@ -22,18 +22,7 @@ class AmmoTests: XCTestCase {
 
     
     func testExample() throws {
-        let s:Stack = Stack(items: [
-            Padding(
-                content: Item(width: 8, height: 8, grow: 0, shrink: 0), grow: 1, shrink: 1),
-            Resize(
-                content: Item(width: nil, height: nil, grow: 1, shrink: 1),
-                width: 20, height: 20, mode: .scaleToFit),
-            Item(width: nil, height: nil, grow: 1, shrink: 1),
-            Item(width: nil, height: nil, grow: 1, shrink: 1)
-        ], width: 100, height: 100, grow: 0, shrink: 0)
-        s.align = .fill
-        s.relayout()
-        print(s)
+        
     }
    
     func testPerformanceExample() throws {
