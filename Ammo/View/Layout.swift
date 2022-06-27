@@ -135,15 +135,26 @@ public class Item:CustomDebugStringConvertible{
 }
 
 public protocol FillContentProtocol:AnyObject{
-    var size:CGSize { get }
+    
+    func constaintSize(size:CGSize)->CGSize
 }
 public class FillItem:Item{
     
     public weak var fillContent:FillContentProtocol?
     
     public override var childContentSize: CGSize{
-        return self.fillContent?.size ?? .zero
+        if resultFrame == nil{
+            var cs = self.contentSize
+            cs.width = self.width == nil ? CGFloat.infinity : cs.width
+            cs.height = self.height == nil ? CGFloat.infinity : cs.height
+            return self.fillContent?.constaintSize(size: cs) ?? .zero
+        }else{
+            return self.fillContent?.constaintSize(size: self.resultSize) ?? .zero
+        }
+        
     }
+    
+    
 }
 public class Resize:Item{
     public enum Mode{
