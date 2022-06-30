@@ -133,6 +133,18 @@ public class Item:CustomDebugStringConvertible{
         self.shrink = shrink
     }
 }
+extension Item{
+    public var windowFrame:CGRect{
+        var parent = self.parent
+        var rect = self.resultFrame ?? .zero
+        while(parent != nil){
+            rect.origin.x += parent?.resultFrame?.origin.x ?? 0
+            rect.origin.y += parent?.resultFrame?.origin.y ?? 0
+            parent = parent?.parent
+        }
+        return rect
+    }
+}
 
 public protocol FillContentProtocol:AnyObject{
     
