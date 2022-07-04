@@ -104,11 +104,13 @@ public class Item:CustomDebugStringConvertible{
     public var parent:Item?
     
     public var contentSize:CGSize {
-        let w = CGFloat(width?.valueInContext(value: 0) ?? 0)
-        let h = CGFloat(height?.valueInContext(value: 0) ?? 0)
+        let w = CGFloat(width?.valueInContext(value: 0) ?? self.childContentSize.width)
+        let h = CGFloat(height?.valueInContext(value: 0) ?? self.childContentSize.height)
         return CGSize(width: w, height: h)
     }
-    
+    var defineSize:CGSize{
+        CGSize(width: width?.valueInContext(value: 0) ?? 0, height: height?.valueInContext(value: 0) ?? 0)
+    }
     public var childContentSize:CGSize{
         return .zero
     }
@@ -159,7 +161,7 @@ public class FillItem:Item{
     
     public override var childContentSize: CGSize{
         if resultFrame == nil{
-            var cs = super.contentSize
+            var cs = self.defineSize
             cs.width = self.width == nil ? CGFloat.infinity : cs.width
             cs.height = self.height == nil ? CGFloat.infinity : cs.height
             return self.fillContent?.constaintSize(size: cs) ?? .zero
