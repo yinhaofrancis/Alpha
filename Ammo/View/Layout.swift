@@ -104,8 +104,8 @@ public class Item:CustomDebugStringConvertible{
     public var parent:Item?
     
     public var contentSize:CGSize {
-        let w = CGFloat(width?.valueInContext(value: 0) ?? self.childContentSize.width)
-        let h = CGFloat(height?.valueInContext(value: 0) ?? self.childContentSize.height)
+        let w = CGFloat(width?.valueInContext(value: 0) ?? 0)
+        let h = CGFloat(height?.valueInContext(value: 0) ?? 0)
         return CGSize(width: w, height: h)
     }
     
@@ -149,14 +149,17 @@ extension Item{
 public protocol FillContentProtocol:AnyObject{
     
     func constaintSize(size:CGSize)->CGSize
+    
+    var frame:CGRect { get set }
 }
 public class FillItem:Item{
     
     public weak var fillContent:FillContentProtocol?
     
+    
     public override var childContentSize: CGSize{
         if resultFrame == nil{
-            var cs = self.contentSize
+            var cs = super.contentSize
             cs.width = self.width == nil ? CGFloat.infinity : cs.width
             cs.height = self.height == nil ? CGFloat.infinity : cs.height
             return self.fillContent?.constaintSize(size: cs) ?? .zero
@@ -164,6 +167,11 @@ public class FillItem:Item{
             return self.fillContent?.constaintSize(size: self.resultSize) ?? .zero
         }
         
+    }
+    public override var resultFrame: CGRect?{
+        didSet{
+            self.fillContent?.frame = self.resultFrame ?? .zero
+        }
     }
     
     
@@ -214,7 +222,7 @@ public class Resize:Item{
         return super.debugDescription + "{\(content.debugDescription)}"
     }
 }
-public class Container:Item {
+public class Container:FillItem {
     
     public override var debugDescription: String{
         return super.debugDescription + "\n\(self.children)"
