@@ -7,14 +7,17 @@ public protocol CacheContent{
     func detach(name:String)
     static func name(url:String)->String?
     func write(name:String,data:Data)
-    func exist(name:String,complete:Bool)->Bool
+    func exist(name:String)->Bool
     func close(name:String)
     func copy(name:String,local:URL)
     func queryAllData(name:String)->Data?
     func queryMd5(name:String)->String?
 }
 
-public class Cache:CacheContent{
+public class Cache:CacheContent,CustomDebugStringConvertible{
+    public var debugDescription: String{
+        return self.dictionaryUrl?.path ?? ""
+    }
  
     private var dispatchSem:DispatchSemaphore = DispatchSemaphore(value: 1)
     private var map:[String:FileHandle] = [:]
@@ -156,13 +159,13 @@ public class Cache:CacheContent{
         guard let handle = writeToFile(name: name) else { return }
         Cache.write(handle: handle, data: data)
     }
-    public func exist(name:String,complete:Bool = false)->Bool{
+    public func exist(name:String)->Bool{
         self.dispatchSem.wait()
         defer{
             self.dispatchSem.signal()
         }
         if self.map[name] != nil{
-            return complete ? false : true
+            return true
         }
         guard let file = self.fileUrl(name: name) else { return false }
         if FileManager.default.fileExists(atPath: file.path){
@@ -291,6 +294,12 @@ public class Downloader:NSObject,URLSessionDataDelegate,URLSessionDownloadDelega
         }else{
             self.cache.detach(name: name)
         }
+        self.lock.wait()
+        
+        defer{
+            self.lock.signal()
+        }
+        self.urls.remove(name)
         self.notificationCenter.post(name: .DownloadTaskEnd, object: name)
     }
     lazy private var configuration:URLSessionConfiguration = {
@@ -302,27 +311,46 @@ public class Downloader:NSObject,URLSessionDataDelegate,URLSessionDownloadDelega
         URLSession(configuration: self.configuration, delegate:self, delegateQueue: self.queue)
     }()
     
-    public func download(url:URL)->String?{
+   private func download(url:URL)->String?{
         guard let name = Cache.name(url: url.absoluteString) else { return nil }
-        if !self.cache.exist(name: name, complete: false){
+        if self.needDownload(name: name){
             self.session.dataTask(with: url).resume()
+            self.urls.insert(name)
+            print("launch download")
         }
         return name
     }
     public func download(url:URL,callback:@escaping (Data?)->Void){
+        self.lock.wait()
+        
+        defer{
+            self.lock.signal()
+        }
+        print("try download")
         guard let name = self.download(url: url) else {callback(nil);return}
-        if self.cache.exist(name: name, complete: true){
+        if !self.hasDownload(name: name){
             callback(self.cache.queryAllData(name: name))
+            print("read cache")
         }else{
+            print("wait download")
             self.observerDownload(name:name) { [weak self] i in
                 callback(self?.cache.queryAllData(name: name))
+                print("handle download")
             }
         }
     }
     
     public var cache:CacheContent
     public var notificationCenter = NotificationCenter()
+    private var lock:DispatchSemaphore = DispatchSemaphore(value: 1)
     public var queue:OperationQueue = OperationQueue()
+    public func needDownload(name:String)->Bool{
+        if(!urls.contains(name) && !self.cache.exist(name: name)){
+            return true
+        }
+        return false
+    }
+    private var urls:Set<String> = Set()
     public init(cache:CacheContent = Cache.shared){
         self.cache = cache
         super.init()
@@ -340,9 +368,12 @@ public class Downloader:NSObject,URLSessionDataDelegate,URLSessionDownloadDelega
             }
         }
     }
-    public func hasContent(url:URL)->Bool{
-        guard let name = Cache.name(url: url.absoluteString) else { return false }
-        return self.cache.exist(name: name, complete: false)
+    public func delete(url:URL){
+        guard let name = Cache.name(url: url.absoluteString) else { return }
+        self.cache.delete(name: name)
+    }
+    public func hasDownload(name:String)->Bool{
+        self.urls.contains(name)
     }
 }
 extension Notification.Name{

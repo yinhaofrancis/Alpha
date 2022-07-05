@@ -20,6 +20,10 @@ class AmmoTests: XCTestCase {
     }
 
 
+    func testFF(){
+        
+    }
+    
     
     func testExample() throws {
         let a = [UIColor.red,UIColor.yellow,UIColor.blue]
@@ -38,6 +42,7 @@ class AmmoTests: XCTestCase {
         svi.draw(ctx: c)
         let img = c.image!
         print(img)
+        
     }
    
     func testPerformanceExample() throws {

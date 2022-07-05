@@ -18,22 +18,49 @@ class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePic
 
 
 }
-public class placeDecode{
-    public static func decode(o:[String])->[String]{
-        let a:[[String:String]] = o.map { i in
-            URLComponents(string: i)?.queryItems
-        }.compactMap({$0}).map { i in
-            let a:[String:String] = i.reduce(into: [:]) { partialResult, o in
-                guard let v = o.value else { return }
-                partialResult[o.name] = v
-            }
-            return a
-        }
-        return a.map { i in
-            i["query"]
-        }.compactMap({$0})
+
+
+class CollectionCell:UICollectionViewCell{
+    @IBOutlet weak var imageView:UIImageView!
+}
+
+class collectionViewController:UICollectionViewController{
+    
+    
+    public var images:[UIImage] = []
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.load()
     }
-    public static func decodeName(code:String)->String?{
-        code.components(separatedBy: "communityName=").last
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView .dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! CollectionCell
+        cell.imageView.image = images[indexPath.item]
+        return cell
+    }
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return self.images.count
+    }
+    
+    @IBAction public func load(){
+        let url = URL(string: "https://www.haose.xxx/contents/ymqeeqlopose/theme/logo.png")!
+        self.images.removeAll()
+        ImageDownloader.shared.downloader.delete(url: url)
+        for i in 0 ..< 100{
+            
+            DispatchQueue.global().async {
+                ImageDownloader.shared.downloadImage(url:url) {[weak self] img in
+                    guard let im = img else { return }
+                    self?.images.append(UIImage(cgImage: im))
+                    guard let ws = self else { return }
+               
+                    if(ws.images.count > 99){
+                        DispatchQueue.main.async {
+                            ws.collectionView.reloadData()
+                        }
+                    }
+                }
+            }
+        }
     }
 }
