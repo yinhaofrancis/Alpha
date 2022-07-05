@@ -300,6 +300,7 @@ public class Downloader:NSObject,URLSessionDataDelegate,URLSessionDownloadDelega
             self.lock.signal()
         }
         self.urls.remove(name)
+        print("downloaded")
         self.notificationCenter.post(name: .DownloadTaskEnd, object: name)
     }
     lazy private var configuration:URLSessionConfiguration = {
