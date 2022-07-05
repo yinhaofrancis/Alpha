@@ -43,7 +43,7 @@ class collectionViewController:UICollectionViewController{
     }
     
     @IBAction public func load(){
-        let url = URL(string: "https://www.haose.xxx/contents/ymqeeqlopose/theme/logo.png")!
+        let url = URL(string: "https://qrimg.jd.com/https%3A%2F%2Fitem.m.jd.com%2Fproduct%2F10050608187053.html%3Fpc_source%3Dpc_productDetail_10050608187053-118-1-4-2.png?ltype=0")!
         self.images.removeAll()
         ImageDownloader.shared.downloader.delete(url: url)
         for i in 0 ..< 100{
