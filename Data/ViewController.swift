@@ -10,12 +10,9 @@ import Ammo
 import TextDetect
 class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePickerControllerDelegate {
     
-    @IBOutlet weak var btn: UIButton!
-    @IBOutlet weak var text: UITextView!
     override func viewDidLoad() {
         super.viewDidLoad()
-        let ps = try! PrettyJSON(code: Data(contentsOf: Bundle.main.url(forResource: "data", withExtension: "json")!))
-        self.text.attributedText = ps.attribute
+        self.view.layout()
     }
 
 

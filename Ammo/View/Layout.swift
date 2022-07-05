@@ -170,13 +170,6 @@ public class FillItem:Item{
         }
         
     }
-    public override var resultFrame: CGRect?{
-        didSet{
-            self.fillContent?.frame = self.resultFrame ?? .zero
-        }
-    }
-    
-    
 }
 public class Resize:Item{
     public enum Mode{
@@ -378,7 +371,7 @@ public class Stack:Container{
     
     public var justify:Justify = .start
     
-    public var align:Align = .start
+    public var align:Align = .fill
     
     public override func layout() {
         for i in self.children{
