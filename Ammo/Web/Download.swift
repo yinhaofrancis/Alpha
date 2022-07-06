@@ -326,17 +326,13 @@ public class Downloader<T:DataTransform,R>:NSObject,URLSessionDataDelegate,URLSe
             self.cache.detach(name: name)
         }
         self.lock.wait()
-        
-        defer{
-            self.lock.signal()
-        }
         self.urls.remove(name)
+        self.lock.signal()
         print("downloaded")
         self.callbackLock.wait()
-        defer{
-            self.callbackLock.signal()
-        }
-        self.callbacks.removeValue(forKey: name)?.forEach({ c in
+        let a = self.callbacks.removeValue(forKey: name)
+        self.callbackLock.signal()
+        a?.forEach({ c in
             c()
         })
     }
@@ -360,12 +356,9 @@ public class Downloader<T:DataTransform,R>:NSObject,URLSessionDataDelegate,URLSe
     }
     public func download(url:URL,callback:@escaping (R?)->Void){
         self.lock.wait()
-        
-        defer{
-            self.lock.signal()
-        }
         print("try download")
-        guard let name = self.download(url: url) else {callback(nil);return}
+        guard let name = self.download(url: url) else {self.lock.signal();callback(nil);return}
+        self.lock.signal()
         if !self.hasDownload(name: name){
             callback(self.createContent(name: name))
             print("read cache")
@@ -411,7 +404,6 @@ public class Downloader<T:DataTransform,R>:NSObject,URLSessionDataDelegate,URLSe
         var calls:[()->Void] = (self.callbacks[name] == nil ? [] : self.callbacks[name]!)
         calls.append(callback)
         self.callbacks[name] = calls
-        
     }
     public func delete(url:URL){
         guard let name = Cache.name(url: url.absoluteString) else { return }

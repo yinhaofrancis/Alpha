@@ -54,7 +54,10 @@ class collectionViewController:UICollectionViewController{
                     guard let im = img else { return }
                     self?.images.append(UIImage(cgImage: im))
                     guard let ws = self else { return }
-               
+                    StaticImageDownloader.shared.downloadImage(url: url) { i in
+                        guard let im = img else { return }
+                        self?.images.append(UIImage(cgImage: im))
+                    }
                     if(ws.images.count > n - 1){
                         ws.collectionView.reloadData()
                     }
