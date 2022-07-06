@@ -458,54 +458,7 @@ public let imageSourceDownload = Downloader<DataImageDataSource,CGImageSource>()
 
 
 public let imageDownload = Downloader<DataCGImage,CGImage>()
-//
-//public class ImageDownloader{
-//    public var downloader:Downloader
-//
-//    public init(downloader:Downloader = Downloader(){
-//        self.downloader = downloader
-//    }
-//    public func download(url:URL,callback:@escaping (CGImageSource?)->Void){
-//        self.downloader.download(url: url) { d in
-//
-//        }
-//    }
-//
-//    public func downloadImage(url:URL,callback:@escaping (CGImage?)->Void){
-//        self.downloadImages(url: url) { imgs in
-//            callback(imgs.first)
-//        }
-//    }
-//    public func downloadImages(url:URL,callback:@escaping ([CGImage])->Void){
-//        self.download(url: url) { i in
-//            guard let imgsource = i else { callback([]);return }
-//            let count = CGImageSourceGetCount(imgsource)
-//            if count > 0 {
-//                CGImageSourceGetType(imgsource)
-//                let imgs:[CGImage] = (0 ..< count).reduce(into: []) { partialResult, i in
-//                    guard let img = CGImageSourceCreateImageAtIndex(imgsource, i, nil) else { return }
-//                    partialResult.append(img)
-//                }
-//                callback(imgs)
-//            }else{
-//                guard let name =  Cache.name(url: url.absoluteString) else { callback([]);return }
-//                self.downloader.cache.delete(name:name)
-//                callback([])
-//            }
-//        }
-//    }
-//    public func imageSource(url:URL)->CGImageSource?{
-//        guard let name = Cache.name(url: url.absoluteString) else { return nil }
-//        guard let data = self.downloader.cache.queryAllData(name: name) else { return nil }
-//        return CGImageSourceCreateWithData(data as CFData, nil)
-//    }
-//    public func image(url:URL)->CGImage?{
-//        guard let source = self.imageSource(url: url) else { return nil }
-//        return CGImageSourceCreateImageAtIndex(source, 0, nil)
-//    }
-//
-//    public static let shared:ImageDownloader = ImageDownloader()
-//}
+
 public class StaticImageDownloader{
     public init?(){
     }
