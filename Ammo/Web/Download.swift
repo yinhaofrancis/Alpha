@@ -332,7 +332,13 @@ public class Downloader<T:DataTransform,R>:NSObject,URLSessionDataDelegate,URLSe
         }
         self.urls.remove(name)
         print("downloaded")
-        self.notificationCenter.post(name: .DownloadTaskEnd, object: name)
+        self.callbackLock.wait()
+        defer{
+            self.callbackLock.signal()
+        }
+        self.callbacks.removeValue(forKey: name)?.forEach({ c in
+            c()
+        })
     }
     lazy private var configuration:URLSessionConfiguration = {
         let config = URLSessionConfiguration.default
@@ -365,7 +371,7 @@ public class Downloader<T:DataTransform,R>:NSObject,URLSessionDataDelegate,URLSe
             print("read cache")
         }else{
             print("wait download")
-            self.observerDownload(name:name) { [weak self] i in
+            self.observerDownload(name:name) { [weak self] in
                 callback(self?.createContent(name: name))
                 print("handle download")
             }
@@ -383,7 +389,9 @@ public class Downloader<T:DataTransform,R>:NSObject,URLSessionDataDelegate,URLSe
     public var cache:CacheContent
     public var notificationCenter = NotificationCenter()
     private var lock:DispatchSemaphore = DispatchSemaphore(value: 1)
+    private var callbackLock:DispatchSemaphore = DispatchSemaphore(value: 1)
     public var queue:OperationQueue = OperationQueue()
+    public var callbacks:[String:[()->Void]] = [:]
     public func needDownload(name:String)->Bool{
         if(!urls.contains(name) && !self.cache.exist(name: name)){
             return true
@@ -395,15 +403,15 @@ public class Downloader<T:DataTransform,R>:NSObject,URLSessionDataDelegate,URLSe
         self.cache = cache
         super.init()
     }
-    public func observerDownload(name:String,callback:@escaping (Any?)->Void){
-        var observer:Any?
-        observer = self.notificationCenter.addObserver(forName: .DownloadTaskEnd, object: nil, queue: .main) { [weak self] info in
-            if info.object as? String == name{
-                guard let ob = observer else { return }
-                self?.notificationCenter.removeObserver(ob)
-                callback(info.object)
-            }
+    public func observerDownload(name:String,callback:@escaping ()->Void){
+        self.callbackLock.wait()
+        defer{
+            self.callbackLock.signal()
         }
+        var calls:[()->Void] = (self.callbacks[name] == nil ? [] : self.callbacks[name]!)
+        calls.append(callback)
+        self.callbacks[name] = calls
+        
     }
     public func delete(url:URL){
         guard let name = Cache.name(url: url.absoluteString) else { return }
@@ -467,6 +475,10 @@ public class StaticImageDownloader{
     }()!
     public func downloadImage(url:URL,callback:@escaping (CGImage?)->Void){
 
-        imageDownload.download(url: url, callback: callback)
+        imageDownload.download(url: url) { i in
+            DispatchQueue.main.async {
+                callback(i)
+            }
+        }
     }
 }
