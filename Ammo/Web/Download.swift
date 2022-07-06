@@ -63,28 +63,12 @@ public class Cache:CacheContent,CustomDebugStringConvertible{
     }
     public func copy(name:String,local:URL){
         self.dispatchSem.wait()
-        guard let handle = writeToFile(name: name) else { return }
         defer{
-            
             self.map.removeValue(forKey: name)
             self.dispatchSem.signal()
-            Cache.close(handle: handle)
         }
-        Cache.truncate(handle: handle)
-        do{
-            let from = try FileHandle(forReadingFrom: local)
-            repeat{
-                let data = Cache.read(handle: from, len: 200 * 1024)
-                if(data.count == 0){
-                    break
-                }else{
-                    Cache.write(handle: handle, data: data)
-                }
-            }while(true)
-        }catch{
-            return
-        }
-        
+        guard let path = self.fileUrl(name: name)?.path else { return }
+        try? FileManager.default.copyItem(atPath: local.path, toPath: path)
     }
     public func queryAllData(name:String)->Data?{
 
@@ -274,8 +258,55 @@ public struct Lock<T>{
     }
 }
 
+public protocol DataTransform{
+    associatedtype Result
+    
+    static func makeContent(data:Data?)->Result?
+}
+public class DataOrigin:DataTransform{
+    public typealias Result = Data
+    
+    public static func makeContent(data: Data?) -> Data? {
+        return data
+    }
+}
 
-public class Downloader:NSObject,URLSessionDataDelegate,URLSessionDownloadDelegate {
+public class DataImageDataSource:DataTransform{
+    public typealias Result = CGImageSource
+    
+    public static func makeContent(data: Data?) -> CGImageSource? {
+        guard let rdata = data else { return nil }
+        if let source = CGImageSourceCreateWithData(rdata as CFData, nil){
+            if CGImageSourceGetStatus(source) == .statusComplete{
+                return source
+            }else{
+                return nil
+            }
+        }else{
+            return nil
+        }
+    }
+}
+
+public class DataCGImage:DataTransform{
+    public typealias Result = CGImage
+    
+    public static func makeContent(data: Data?) -> CGImage? {
+        guard let rdata = data else { return nil }
+        if let source = CGImageSourceCreateWithData(rdata as CFData, nil){
+            if CGImageSourceGetStatus(source) == .statusComplete{
+                return CGImageSourceCreateImageAtIndex(source, 0, nil);
+            }else{
+                return nil
+            }
+        }else{
+            return nil
+        }
+    }
+}
+
+public class Downloader<T:DataTransform,R>:NSObject,URLSessionDataDelegate,URLSessionDownloadDelegate where T.Result == R {
+    
     public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         guard let rep = downloadTask.originalRequest?.url?.absoluteString else { return }
         guard let name = Cache.name(url: rep) else { return }
@@ -321,7 +352,7 @@ public class Downloader:NSObject,URLSessionDataDelegate,URLSessionDownloadDelega
         }
         return name
     }
-    public func download(url:URL,callback:@escaping (Data?)->Void){
+    public func download(url:URL,callback:@escaping (R?)->Void){
         self.lock.wait()
         
         defer{
@@ -330,15 +361,23 @@ public class Downloader:NSObject,URLSessionDataDelegate,URLSessionDownloadDelega
         print("try download")
         guard let name = self.download(url: url) else {callback(nil);return}
         if !self.hasDownload(name: name){
-            callback(self.cache.queryAllData(name: name))
+            callback(self.createContent(name: name))
             print("read cache")
         }else{
             print("wait download")
             self.observerDownload(name:name) { [weak self] i in
-                callback(self?.cache.queryAllData(name: name))
+                callback(self?.createContent(name: name))
                 print("handle download")
             }
         }
+    }
+    private func createContent(name:String)->R?{
+        let data = self.cache.queryAllData(name: name)
+        let r = T.makeContent(data:data)
+        if r == nil && data != nil{
+            self.cache.delete(name:name)
+        }
+        return r
     }
     
     public var cache:CacheContent
@@ -356,9 +395,6 @@ public class Downloader:NSObject,URLSessionDataDelegate,URLSessionDownloadDelega
         self.cache = cache
         super.init()
     }
-    public static var shared:Downloader = {
-        Downloader()
-    }()
     public func observerDownload(name:String,callback:@escaping (Any?)->Void){
         var observer:Any?
         observer = self.notificationCenter.addObserver(forName: .DownloadTaskEnd, object: nil, queue: .main) { [weak self] info in
@@ -414,70 +450,70 @@ extension Data{
         }
     }
 }
-public class ImageDownloader{
-    public var downloader:Downloader
-    
-    public init(downloader:Downloader = Downloader.shared){
-        self.downloader = downloader
-    }
-    public func download(url:URL,callback:@escaping (CGImageSource?)->Void){
-        self.downloader.download(url: url) { d in
-            guard let data = d else { return callback(nil) }
-            if let source = CGImageSourceCreateWithData(data as CFData, nil){
-                if CGImageSourceGetStatus(source) == .statusComplete{
-                    callback(source)
-                }else{
-                    if let name = Cache.name(url: url.absoluteString){
-                        self.downloader.cache.delete(name: name)
-                    }
-                    callback(nil)
-                }
-            }else{
-                callback(nil)
-            }
-        }
-    }
-    
-    public func downloadImage(url:URL,callback:@escaping (CGImage?)->Void){
-        self.downloadImages(url: url) { imgs in
-            callback(imgs.first)
-        }
-    }
-    public func downloadImages(url:URL,callback:@escaping ([CGImage])->Void){
-        self.download(url: url) { i in
-            guard let imgsource = i else { callback([]);return }
-            let count = CGImageSourceGetCount(imgsource)
-            if count > 0 {
-                CGImageSourceGetType(imgsource)
-                let imgs:[CGImage] = (0 ..< count).reduce(into: []) { partialResult, i in
-                    guard let img = CGImageSourceCreateImageAtIndex(imgsource, i, nil) else { return }
-                    partialResult.append(img)
-                }
-                callback(imgs)
-            }else{
-                guard let name =  Cache.name(url: url.absoluteString) else { callback([]);return }
-                self.downloader.cache.delete(name:name)
-                callback([])
-            }
-        }
-    }
-    public func imageSource(url:URL)->CGImageSource?{
-        guard let name = Cache.name(url: url.absoluteString) else { return nil }
-        guard let data = self.downloader.cache.queryAllData(name: name) else { return nil }
-        return CGImageSourceCreateWithData(data as CFData, nil)
-    }
-    public func image(url:URL)->CGImage?{
-        guard let source = self.imageSource(url: url) else { return nil }
-        return CGImageSourceCreateImageAtIndex(source, 0, nil)
-    }
-    
-    public static let shared:ImageDownloader = ImageDownloader()
-}
-public class StaticImageDownloader:ImageDownloader{
+
+public let dataDownload = Downloader<DataOrigin,Data>()
+
+
+public let imageSourceDownload = Downloader<DataImageDataSource,CGImageSource>()
+
+
+public let imageDownload = Downloader<DataCGImage,CGImage>()
+//
+//public class ImageDownloader{
+//    public var downloader:Downloader
+//
+//    public init(downloader:Downloader = Downloader(){
+//        self.downloader = downloader
+//    }
+//    public func download(url:URL,callback:@escaping (CGImageSource?)->Void){
+//        self.downloader.download(url: url) { d in
+//
+//        }
+//    }
+//
+//    public func downloadImage(url:URL,callback:@escaping (CGImage?)->Void){
+//        self.downloadImages(url: url) { imgs in
+//            callback(imgs.first)
+//        }
+//    }
+//    public func downloadImages(url:URL,callback:@escaping ([CGImage])->Void){
+//        self.download(url: url) { i in
+//            guard let imgsource = i else { callback([]);return }
+//            let count = CGImageSourceGetCount(imgsource)
+//            if count > 0 {
+//                CGImageSourceGetType(imgsource)
+//                let imgs:[CGImage] = (0 ..< count).reduce(into: []) { partialResult, i in
+//                    guard let img = CGImageSourceCreateImageAtIndex(imgsource, i, nil) else { return }
+//                    partialResult.append(img)
+//                }
+//                callback(imgs)
+//            }else{
+//                guard let name =  Cache.name(url: url.absoluteString) else { callback([]);return }
+//                self.downloader.cache.delete(name:name)
+//                callback([])
+//            }
+//        }
+//    }
+//    public func imageSource(url:URL)->CGImageSource?{
+//        guard let name = Cache.name(url: url.absoluteString) else { return nil }
+//        guard let data = self.downloader.cache.queryAllData(name: name) else { return nil }
+//        return CGImageSourceCreateWithData(data as CFData, nil)
+//    }
+//    public func image(url:URL)->CGImage?{
+//        guard let source = self.imageSource(url: url) else { return nil }
+//        return CGImageSourceCreateImageAtIndex(source, 0, nil)
+//    }
+//
+//    public static let shared:ImageDownloader = ImageDownloader()
+//}
+public class StaticImageDownloader{
     public init?(){
     }
-    public func downloadImage(url:String,callback:@escaping (CGImage?)->Void){
-        guard let u = URL(string: url) else { callback(nil);return }
-        self.downloadImage(url: u, callback: callback)
+    public static let shared:StaticImageDownloader = {
+        StaticImageDownloader()
+    }()!
+    public func downloadImage(url:URL,callback:@escaping (CGImage?)->Void){
+
+        imageDownload.download(url: url, callback: callback)
     }
 }
