@@ -26,25 +26,29 @@ class AmmoTests: XCTestCase {
     
     
     func testExample() throws {
-        let a = [UIColor.red,UIColor.yellow,UIColor.blue]
-        let svi = StackViewItem(viewItems: (0 ..< 3).map { i in
-            let vt = ViewItem()
-            vt.color = a[i].cgColor
-            vt.item.grow = Double(i + 1)
-            return vt
-        })
-        svi.stack.width = 100
-        svi.stack.height = 50
-        svi.stack.align = .fill
-        
-        let c = Context(size: CGSize(width: 100, height: 50), scale: 3)
-        svi.item.layout()
-        svi.draw(ctx: c)
-        let img = c.image!
-        print(img)
-        
+  
+        let ns:[Node] = (0 ..< 5).map { _ in
+            createNode()
+        }
+        let a = Node()
+        a.width = Value(constant: 1000, mode: .absoluteValue)
+        a.height = Value(constant: 1000, mode: .absoluteValue)
+        a.children = ns
+        a.layout()
+        print(a)
     }
    
+    func createNode()->Node{
+        let ns:[Node] = (0 ..< 5).map { _ in
+            let n = Node()
+            n.width = Value(constant: 10, mode: .absoluteValue)
+            n.height = Value(constant: 10, mode: .absoluteValue)
+            return n
+        }
+        let a = Node()
+        a.children = ns
+        return a
+    }
     func testPerformanceExample() throws {
         // This is an example of a performance test case.
         measure {

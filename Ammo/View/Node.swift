@@ -49,7 +49,7 @@ public enum Align{
     case fill
 }
 
-public class LayoutItem{
+public class Node{
     
     // 布局定义 当设置contentsize时width,height为contentSize 的 约束
     public weak var layoutContent:LayoutContent?
@@ -57,41 +57,81 @@ public class LayoutItem{
     public var width:Value?
     public var direction:Direction = .horizental
     public var defineWidth:CGFloat?{
-        let relate = self.parent?.resultFrame?.width ?? 0
-        if let layoutContent = layoutContent {
-            return layoutContent.contentSize.width
-        }else{
-            return self.width?.realValue(parent: relate)
-        }
+        let relate = self.parent?.resultFrame.width
+        return self.width?.realValue(parent: relate ?? 0)
     }
     public var height:Value?
     public var defineHeight:CGFloat?{
-        let relate = self.parent?.resultFrame?.height ?? 0
-        if let layoutContent = layoutContent {
-            return layoutContent.contentSize.height
-        }else{
-            return self.height?.realValue(parent: relate)
-        }
+        let relate = self.parent?.resultFrame.height
+        return self.height?.realValue(parent: relate ?? 0)
     }
 
     public var crossDefineSize:CGFloat?{
         guard let p = self.parent else { return nil }
+        var value:CGFloat?
         switch(p.direction){
             
         case .horizental:
-            return self.defineHeight
+            value = self.defineHeight
+            break
         case .vertical:
-            return self.defineWidth
+            value = self.defineWidth
+            break
+        }
+        if let v = value{
+            return v
+        }else{
+            return self.crossContentSize
         }
     }
     public var axisDefineSize:CGFloat?{
         guard let p = self.parent else { return nil }
+        var value:CGFloat?
         switch(p.direction){
             
         case .horizental:
-            return self.defineWidth
+            value = self.defineWidth
+            break
         case .vertical:
-            return self.defineHeight
+            value = self.defineHeight
+            break
+        }
+        if let v = value{
+            return v
+        }else{
+            return self.axisContentSize
+        }
+    }
+    public var crossContentSize:CGFloat?{
+        if self.children.count > 0{
+            return self.childCrossSize
+        }else{
+            if let c = self.layoutContent{
+                guard let p = parent else { return nil }
+                switch(p.direction){
+                case .horizental:
+                    return c.contentSize.width
+                case .vertical:
+                    return c.contentSize.height
+                }
+            }
+            return nil
+        }
+    }
+    public var axisContentSize:CGFloat?{
+        if self.children.count > 0{
+            return self.childAxisSize
+        }else{
+            if let c = self.layoutContent{
+                guard let p = parent else { return nil }
+                switch(p.direction){
+                case .horizental:
+                    return c.contentSize.height
+                case .vertical:
+                    return c.contentSize.width
+                }
+            }
+            return nil
         }
     }
     //resize 指数
@@ -102,21 +142,21 @@ public class LayoutItem{
     public var justify:Justify = .start
     
     // 布局结果
-    public var resultFrame:CGRect?
+    public var resultFrame:CGRect = .zero
     public var crossSize:CGFloat{
         get{
             guard let p = self.parent else { return 0 }
             switch(p.direction){
                 
             case .horizental:
-                return self.resultFrame?.height ?? 0
+                return self.resultFrame.height
             case .vertical:
-                return self.resultFrame?.width ?? 0
+                return self.resultFrame.width
             }
         }
         set{
             guard let p = self.parent else { return }
-            var frame = self.resultFrame ?? .zero
+            var frame = self.resultFrame
             switch(p.direction){
                 
             case .horizental:
@@ -135,14 +175,14 @@ public class LayoutItem{
             switch(p.direction){
                 
             case .horizental:
-                return self.resultFrame?.width ?? 0
+                return self.resultFrame.width
             case .vertical:
-                return self.resultFrame?.height ?? 0
+                return self.resultFrame.height
             }
         }
         set{
             guard let p = self.parent else { return }
-            var frame = self.resultFrame ?? .zero
+            var frame = self.resultFrame
             switch(p.direction){
                 
             case .horizental:
@@ -162,14 +202,14 @@ public class LayoutItem{
             switch(p.direction){
                 
             case .horizental:
-                return self.resultFrame?.origin.y ?? 0
+                return self.resultFrame.origin.y
             case .vertical:
-                return self.resultFrame?.origin.x ?? 0
+                return self.resultFrame.origin.x
             }
         }
         set{
             guard let p = self.parent else { return }
-            var frame = self.resultFrame ?? .zero
+            var frame = self.resultFrame
             switch(p.direction){
                 
             case .horizental:
@@ -188,14 +228,14 @@ public class LayoutItem{
             switch(p.direction){
                 
             case .horizental:
-                return self.resultFrame?.origin.x ?? 0
+                return self.resultFrame.origin.x
             case .vertical:
-                return self.resultFrame?.origin.y ?? 0
+                return self.resultFrame.origin.y
             }
         }
         set{
             guard let p = self.parent else { return }
-            var frame = self.resultFrame ?? .zero
+            var frame = self.resultFrame
             switch(p.direction){
                 
             case .horizental:
@@ -213,9 +253,9 @@ public class LayoutItem{
             switch(self.direction){
                 
             case .horizental:
-                return self.resultFrame?.height ?? 0
+                return self.resultFrame.height
             case .vertical:
-                return self.resultFrame?.width ?? 0
+                return self.resultFrame.width
             }
         }
     
@@ -225,19 +265,25 @@ public class LayoutItem{
             switch(self.direction){
                 
             case .horizental:
-                return self.resultFrame?.width ?? 0
+                return self.resultFrame.width
             case .vertical:
-                return self.resultFrame?.height ?? 0
+                return self.resultFrame.height
             }
         }
     }
-    public var parent:LayoutItem?
+    public var parent:Node?
     
     
     
     // 作为集合时
     // 子节点不可以影响父节点，父节点可以影响子节点
-    public var children:[LayoutItem] = []
+    public var children:[Node] = []{
+        didSet{
+            self.children.forEach { n in
+                n.parent = self
+            }
+        }
+    }
     
     //子节点轴向尺寸
     public var childAxisSize:CGFloat{
@@ -264,16 +310,21 @@ public class LayoutItem{
     public var extraSize:CGFloat{
         self.axisSize - childAxisSize
     }
-    func selfSize(){
-        self.crossSize = self.crossDefineSize ?? 0
-        self.axisSize = self.axisDefineSize ?? 0
+    private func selfSize(){
         for  i in self.children{
             i.selfSize()
+        }
+        if self.parent != nil{
+            self.crossSize = self.crossDefineSize ?? 0
+            self.axisSize = self.axisDefineSize ?? 0
+        }else{
+            self.resultFrame.size.width = self.defineWidth ?? 0
+            self.resultFrame.size.height = self.defineHeight ?? 0
         }
     }
     
     
-    func resize(){
+    private func resize(){
         let extra = self.extraSize
         
         if extra > 0{
@@ -297,7 +348,7 @@ public class LayoutItem{
             }
         }
     }
-    func layoutAxis(){
+    private func layoutAxis(){
         let extra = self.extraSize
         var start:CGFloat = 0
         var step:CGFloat = 0
@@ -336,7 +387,7 @@ public class LayoutItem{
         }
     }
     
-    func layoutCross(){
+    private func layoutCross(){
         let height = self.crossAsParentSize
         for i in self.children{
             switch(self.align){
@@ -356,9 +407,18 @@ public class LayoutItem{
             }
         }
     }
-    func layout(){
+    private func childLayout(){
         self.resize()
         self.layoutAxis()
         self.layoutCross()
+        for i in self.children{
+            i.childLayout()
+        }
     }
+    public func layout(){
+        self.selfSize()
+        self.childLayout()
+    }
+    
+    public init(){ }
 }
