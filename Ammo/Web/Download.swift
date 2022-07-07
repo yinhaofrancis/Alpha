@@ -13,7 +13,61 @@ public protocol CacheContent{
     func queryAllData(name:String)->Data?
     func queryMd5(name:String)->String?
 }
-
+public class DiskCache{
+    public var lock:DispatchSemaphore = DispatchSemaphore(value: 1)
+    public class MemoryItem{
+        public var data:Data
+        public var time:TimeInterval = 0
+        public var count:Int = 0
+        public var key:String
+        init(data:Data,key:String){
+            self.data = data
+            self.key = key
+        }
+    }
+    
+    public var map:[String:MemoryItem] = [:]
+    
+    public func insert(data:Data,key:String){
+        self.lock.wait()
+        let mi = MemoryItem(data: data, key: key)
+        mi.time = Date().timeIntervalSince1970
+        mi.count = 1
+        self.map[key] = mi
+        self.lock.signal()
+    }
+    public func query(name:String)->Data?{
+        self.lock.wait()
+        defer{
+            self.lock.signal()
+        }
+        guard let data = self.map[name] else { return nil }
+        data.count += 1;
+        return data.data
+        
+    }
+    public func remove(name:String){
+        self.lock.wait()
+        self.map.removeValue(forKey: name)
+        self.lock.signal()
+    }
+    func remove(count:Int){
+        self.lock.wait()
+        let v = self.map.values.sorted { l, r in
+            if l.count < r.count{
+                return true
+            }else if l.count == r.count{
+                return l.time < r.time
+            }else{
+                return false
+            }
+        }
+        v[0 ..< count].forEach { i in
+            self.map.removeValue(forKey: i.key)
+        }
+        self.lock.signal()
+    }
+}
 public class Cache:CacheContent,CustomDebugStringConvertible{
     public var debugDescription: String{
         return self.dictionaryUrl?.path ?? ""

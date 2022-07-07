@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A922C3EE2876CFC800FB05E7 /* LayoutItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A922C3ED2876CFC800FB05E7 /* LayoutItem.swift */; };
 		A95BCB732824C491000982D0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95BCB722824C491000982D0 /* AppDelegate.swift */; };
 		A95BCB752824C491000982D0 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95BCB742824C491000982D0 /* SceneDelegate.swift */; };
 		A95BCB772824C491000982D0 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95BCB762824C491000982D0 /* ViewController.swift */; };
@@ -25,7 +26,6 @@
 		A97623912869AEC100BAC1FC /* data.json in Resources */ = {isa = PBXBuildFile; fileRef = A97623902869AEC100BAC1FC /* data.json */; };
 		A9A3FBA8283F11BF003582F2 /* DataBaseUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A3FBA7283F11BF003582F2 /* DataBaseUpdate.swift */; };
 		A9CD687E28425CC000ABD882 /* DataBaseConcurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9CD687D28425CC000ABD882 /* DataBaseConcurrency.swift */; };
-		A9E037CB285C2DD7008EDA71 /* Layout.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9E037CA285C2DD7008EDA71 /* Layout.swift */; };
 		A9FB7989281A6942008CCF39 /* DataBaseBackUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB7983281A6942008CCF39 /* DataBaseBackUp.swift */; };
 		A9FB798A281A6942008CCF39 /* DataBaseFetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB7984281A6942008CCF39 /* DataBaseFetch.swift */; };
 		A9FB798B281A6942008CCF39 /* DataBaseWorkFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB7985281A6942008CCF39 /* DataBaseWorkFlow.swift */; };
@@ -35,7 +35,6 @@
 		A9FB79A4281A69CA008CCF39 /* AmmoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB79A3281A69CA008CCF39 /* AmmoTests.swift */; };
 		A9FB79A5281A69CA008CCF39 /* Ammo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9FB7976281A68B0008CCF39 /* Ammo.framework */; };
 		A9FB79AC281A6A0A008CCF39 /* DatabaseTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB79AB281A6A0A008CCF39 /* DatabaseTest.swift */; };
-		A9FC50B5286ECFB0008D9D3D /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FC50B4286ECFB0008D9D3D /* View.swift */; };
 		A9FF619728411027006637DC /* Context.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FF619628411027006637DC /* Context.swift */; };
 /* End PBXBuildFile section */
 
@@ -86,6 +85,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		A922C3ED2876CFC800FB05E7 /* LayoutItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutItem.swift; sourceTree = "<group>"; };
 		A95BCB702824C491000982D0 /* Data.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Data.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A95BCB722824C491000982D0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A95BCB742824C491000982D0 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -103,7 +103,6 @@
 		A97623902869AEC100BAC1FC /* data.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = data.json; sourceTree = "<group>"; };
 		A9A3FBA7283F11BF003582F2 /* DataBaseUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBaseUpdate.swift; sourceTree = "<group>"; };
 		A9CD687D28425CC000ABD882 /* DataBaseConcurrency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBaseConcurrency.swift; sourceTree = "<group>"; };
-		A9E037CA285C2DD7008EDA71 /* Layout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Layout.swift; sourceTree = "<group>"; };
 		A9FB7976281A68B0008CCF39 /* Ammo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Ammo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9FB7983281A6942008CCF39 /* DataBaseBackUp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataBaseBackUp.swift; sourceTree = "<group>"; };
 		A9FB7984281A6942008CCF39 /* DataBaseFetch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataBaseFetch.swift; sourceTree = "<group>"; };
@@ -114,7 +113,6 @@
 		A9FB79A1281A69CA008CCF39 /* AmmoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AmmoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9FB79A3281A69CA008CCF39 /* AmmoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmmoTests.swift; sourceTree = "<group>"; };
 		A9FB79AB281A6A0A008CCF39 /* DatabaseTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseTest.swift; sourceTree = "<group>"; };
-		A9FC50B4286ECFB0008D9D3D /* View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = View.swift; sourceTree = "<group>"; };
 		A9FF619628411027006637DC /* Context.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Context.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -262,9 +260,8 @@
 			isa = PBXGroup;
 			children = (
 				A9FF619628411027006637DC /* Context.swift */,
-				A9FC50B4286ECFB0008D9D3D /* View.swift */,
-				A9E037CA285C2DD7008EDA71 /* Layout.swift */,
 				A976238E2869A5B600BAC1FC /* Pretty.swift */,
+				A922C3ED2876CFC800FB05E7 /* LayoutItem.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -470,19 +467,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A922C3EE2876CFC800FB05E7 /* LayoutItem.swift in Sources */,
 				A9FB798D281A6942008CCF39 /* DataBaseJSON.swift in Sources */,
 				A9A3FBA8283F11BF003582F2 /* DataBaseUpdate.swift in Sources */,
 				A9FB798C281A6942008CCF39 /* DataBaseModel.swift in Sources */,
 				A9FB7989281A6942008CCF39 /* DataBaseBackUp.swift in Sources */,
 				A967E03A28539C22005CF3AC /* Zip.swift in Sources */,
-				A9E037CB285C2DD7008EDA71 /* Layout.swift in Sources */,
 				A976238F2869A5B600BAC1FC /* Pretty.swift in Sources */,
 				A9FB798B281A6942008CCF39 /* DataBaseWorkFlow.swift in Sources */,
 				A9CD687E28425CC000ABD882 /* DataBaseConcurrency.swift in Sources */,
 				A9FF619728411027006637DC /* Context.swift in Sources */,
 				A9FB798E281A6942008CCF39 /* DataBase.swift in Sources */,
 				A9FB798A281A6942008CCF39 /* DataBaseFetch.swift in Sources */,
-				A9FC50B5286ECFB0008D9D3D /* View.swift in Sources */,
 				A95E514C2848BFB100BA7028 /* Download.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
