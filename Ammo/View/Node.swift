@@ -31,7 +31,7 @@ public enum Direction{
     case vertical
 }
 public protocol LayoutContent:AnyObject{
-    var contentSize:CGSize { get }
+    func fitSize(constaint:CGSize)->CGSize
 }
 
 public enum Justify{
@@ -107,12 +107,13 @@ public class Node{
             return self.childCrossSize
         }else{
             if let c = self.layoutContent{
+                let size = c.fitSize(constaint: self.resultFrame.size)
                 guard let p = parent else { return nil }
                 switch(p.direction){
                 case .horizental:
-                    return c.contentSize.width
+                    return size.width
                 case .vertical:
-                    return c.contentSize.height
+                    return size.height
                 }
             }
             return nil
@@ -124,11 +125,13 @@ public class Node{
         }else{
             if let c = self.layoutContent{
                 guard let p = parent else { return nil }
+                let dsize = CGSize(width: self.defineWidth ?? -1, height: self.defineHeight ?? -1)
+                let size = c.fitSize(constaint: dsize)
                 switch(p.direction){
                 case .horizental:
-                    return c.contentSize.height
+                    return size.height < 0 ? nil : size.height
                 case .vertical:
-                    return c.contentSize.width
+                    return size.width < 0 ? nil : size.width
                 }
             }
             return nil
@@ -308,7 +311,7 @@ public class Node{
         }
     }
     public var extraSize:CGFloat{
-        self.axisSize - childAxisSize
+        self.axisAsParentSize - childAxisSize
     }
     private func selfSize(){
         for  i in self.children{

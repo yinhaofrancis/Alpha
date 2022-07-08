@@ -12,6 +12,7 @@ class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePic
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.view.layout()
     }
 
 

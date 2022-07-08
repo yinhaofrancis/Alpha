@@ -113,3 +113,46 @@ public struct Context{
         return self.context.makeImage()
     }
 }
+
+public var nodeKey:String = "nodeKey"
+
+extension UIView:LayoutContent{
+    public func layout(){
+        self.loadNode()
+        self.node.width = Value(constant: self.frame.width, mode: .absoluteValue)
+        self.node.height = Value(constant: self.frame.height, mode: .absoluteValue)
+        self.node.layout()
+        self.active()
+    }
+    
+    private func active(){
+        self.frame = self.node.resultFrame
+        for i in self.subviews{
+            i.active()
+        }
+    }
+    private func loadNode(){
+        self.node.children = self.subviews.map({$0.node})
+        for i in self.subviews{
+            i.loadNode()
+        }
+    }
+    public var node:Node{
+        var current = objc_getAssociatedObject(self, &nodeKey)
+        if current == nil{
+            let node = Node()
+            current = node
+            node.grows = 1
+            node.shrink = 1
+            node.align = .fill
+            node.justify = .start
+            node.direction = .vertical
+            node.layoutContent = self
+        }
+        objc_setAssociatedObject(self, &nodeKey, current, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        return current as! Node
+    }
+    public func fitSize(constaint: CGSize) -> CGSize {
+        self.systemLayoutSizeFitting(constaint)
+    }
+}
