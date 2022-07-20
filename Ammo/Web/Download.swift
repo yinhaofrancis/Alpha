@@ -1,10 +1,3 @@
-//
-//  Cache.swift
-//  Render
-//
-//  Created by hao yin on 2021/12/9.
-//
-
 import Foundation
 import CommonCrypto
 import ImageIO
@@ -20,7 +13,61 @@ public protocol CacheContent{
     func queryAllData(name:String)->Data?
     func queryMd5(name:String)->String?
 }
-
+public class DiskCache{
+    public var lock:DispatchSemaphore = DispatchSemaphore(value: 1)
+    public class MemoryItem{
+        public var data:Data
+        public var time:TimeInterval = 0
+        public var count:Int = 0
+        public var key:String
+        init(data:Data,key:String){
+            self.data = data
+            self.key = key
+        }
+    }
+    
+    public var map:[String:MemoryItem] = [:]
+    
+    public func insert(data:Data,key:String){
+        self.lock.wait()
+        let mi = MemoryItem(data: data, key: key)
+        mi.time = Date().timeIntervalSince1970
+        mi.count = 1
+        self.map[key] = mi
+        self.lock.signal()
+    }
+    public func query(name:String)->Data?{
+        self.lock.wait()
+        defer{
+            self.lock.signal()
+        }
+        guard let data = self.map[name] else { return nil }
+        data.count += 1;
+        return data.data
+        
+    }
+    public func remove(name:String){
+        self.lock.wait()
+        self.map.removeValue(forKey: name)
+        self.lock.signal()
+    }
+    func remove(count:Int){
+        self.lock.wait()
+        let v = self.map.values.sorted { l, r in
+            if l.count < r.count{
+                return true
+            }else if l.count == r.count{
+                return l.time < r.time
+            }else{
+                return false
+            }
+        }
+        v[0 ..< count].forEach { i in
+            self.map.removeValue(forKey: i.key)
+        }
+        self.lock.signal()
+    }
+}
 public class Cache:CacheContent,CustomDebugStringConvertible{
     public var debugDescription: String{
         return self.dictionaryUrl?.path ?? ""
@@ -40,7 +87,7 @@ public class Cache:CacheContent,CustomDebugStringConvertible{
     @discardableResult
     public static func cacheDictionary(name:String,refresh:Bool)->URL?{
         do {
-            let url = try FileManager.default.url(for: .cachesDirectory, in: .allDomainsMask, appropriateFor: nil, create: true).appendingPathComponent("Cache").appendingPathComponent(name)
+            let url = try FileManager.default.url(for: .cachesDirectory, in: .allDomainsMask, appropriateFor: nil, create: true).appendingPathComponent("Beta").appendingPathComponent(name)
             var b:ObjCBool = .init(false)
             if refresh{
                 try? FileManager.default.removeItem(at: url)
@@ -70,28 +117,12 @@ public class Cache:CacheContent,CustomDebugStringConvertible{
     }
     public func copy(name:String,local:URL){
         self.dispatchSem.wait()
-        guard let handle = writeToFile(name: name) else { return }
         defer{
-            
             self.map.removeValue(forKey: name)
             self.dispatchSem.signal()
-            Cache.close(handle: handle)
         }
-        Cache.truncate(handle: handle)
-        do{
-            let from = try FileHandle(forReadingFrom: local)
-            repeat{
-                let data = Cache.read(handle: from, len: 200 * 1024)
-                if(data.count == 0){
-                    break
-                }else{
-                    Cache.write(handle: handle, data: data)
-                }
-            }while(true)
-        }catch{
-            return
-        }
-        
+        guard let path = self.fileUrl(name: name)?.path else { return }
+        try? FileManager.default.copyItem(atPath: local.path, toPath: path)
     }
     public func queryAllData(name:String)->Data?{
 
@@ -281,8 +312,55 @@ public struct Lock<T>{
     }
 }
 
+public protocol DataTransform{
+    associatedtype Result
+    
+    static func makeContent(data:Data?)->Result?
+}
+public class DataOrigin:DataTransform{
+    public typealias Result = Data
+    
+    public static func makeContent(data: Data?) -> Data? {
+        return data
+    }
+}
 
-public class Downloader:NSObject,URLSessionDataDelegate,URLSessionDownloadDelegate {
+public class DataImageDataSource:DataTransform{
+    public typealias Result = CGImageSource
+    
+    public static func makeContent(data: Data?) -> CGImageSource? {
+        guard let rdata = data else { return nil }
+        if let source = CGImageSourceCreateWithData(rdata as CFData, nil){
+            if CGImageSourceGetStatus(source) == .statusComplete{
+                return source
+            }else{
+                return nil
+            }
+        }else{
+            return nil
+        }
+    }
+}
+
+public class DataCGImage:DataTransform{
+    public typealias Result = CGImage
+    
+    public static func makeContent(data: Data?) -> CGImage? {
+        guard let rdata = data else { return nil }
+        if let source = CGImageSourceCreateWithData(rdata as CFData, nil){
+            if CGImageSourceGetStatus(source) == .statusComplete{
+                return CGImageSourceCreateImageAtIndex(source, 0, nil);
+            }else{
+                return nil
+            }
+        }else{
+            return nil
+        }
+    }
+}
+
+public class Downloader<T:DataTransform,R>:NSObject,URLSessionDataDelegate,URLSessionDownloadDelegate where T.Result == R {
+    
     public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         guard let rep = downloadTask.originalRequest?.url?.absoluteString else { return }
         guard let name = Cache.name(url: rep) else { return }
@@ -304,8 +382,13 @@ public class Downloader:NSObject,URLSessionDataDelegate,URLSessionDownloadDelega
         self.lock.wait()
         self.urls.remove(name)
         self.lock.signal()
-       
-        self.notificationCenter.post(name: .DownloadTaskEnd, object: name)
+        print("downloaded")
+        self.callbackLock.wait()
+        let a = self.callbacks.removeValue(forKey: name)
+        self.callbackLock.signal()
+        a?.forEach({ c in
+            c()
+        })
     }
     lazy private var configuration:URLSessionConfiguration = {
         let config = URLSessionConfiguration.default
@@ -321,30 +404,41 @@ public class Downloader:NSObject,URLSessionDataDelegate,URLSessionDownloadDelega
         if self.needDownload(name: name){
             self.session.dataTask(with: url).resume()
             self.urls.insert(name)
+            print("launch download")
         }
         return name
     }
-    public func download(url:URL,callback:@escaping (Data?)->Void){
+    public func download(url:URL,callback:@escaping (R?)->Void){
         self.lock.wait()
-        guard let name = self.download(url: url) else {
-            self.lock.signal()
-            callback(nil)
-            return
-        }
+        print("try download")
+        guard let name = self.download(url: url) else {self.lock.signal();callback(nil);return}
         self.lock.signal()
         if !self.hasDownload(name: name){
-            callback(self.cache.queryAllData(name: name))
+            callback(self.createContent(name: name))
+            print("read cache")
         }else{
-            self.observerDownload(name:name) { [weak self] i in
-                callback(self?.cache.queryAllData(name: name))
+            print("wait download")
+            self.observerDownload(name:name) { [weak self] in
+                callback(self?.createContent(name: name))
+                print("handle download")
             }
         }
+    }
+    private func createContent(name:String)->R?{
+        let data = self.cache.queryAllData(name: name)
+        let r = T.makeContent(data:data)
+        if r == nil && data != nil{
+            self.cache.delete(name:name)
+        }
+        return r
     }
     
     public var cache:CacheContent
     public var notificationCenter = NotificationCenter()
     private var lock:DispatchSemaphore = DispatchSemaphore(value: 1)
+    private var callbackLock:DispatchSemaphore = DispatchSemaphore(value: 1)
     public var queue:OperationQueue = OperationQueue()
+    public var callbacks:[String:[()->Void]] = [:]
     public func needDownload(name:String)->Bool{
         if(!urls.contains(name) && !self.cache.exist(name: name)){
             return true
@@ -356,18 +450,14 @@ public class Downloader:NSObject,URLSessionDataDelegate,URLSessionDownloadDelega
         self.cache = cache
         super.init()
     }
-    public static var shared:Downloader = {
-        Downloader()
-    }()
-    public func observerDownload(name:String,callback:@escaping (Any?)->Void){
-        var observer:Any?
-        observer = self.notificationCenter.addObserver(forName: .DownloadTaskEnd, object: nil, queue: .main) { [weak self] info in
-            if info.object as? String == name{
-                guard let ob = observer else { return }
-                self?.notificationCenter.removeObserver(ob)
-                callback(info.object)
-            }
+    public func observerDownload(name:String,callback:@escaping ()->Void){
+        self.callbackLock.wait()
+        defer{
+            self.callbackLock.signal()
         }
+        var calls:[()->Void] = (self.callbacks[name] == nil ? [] : self.callbacks[name]!)
+        calls.append(callback)
+        self.callbacks[name] = calls
     }
     public func delete(url:URL){
         guard let name = Cache.name(url: url.absoluteString) else { return }
@@ -414,69 +504,27 @@ extension Data{
         }
     }
 }
-public class ImageDownloader{
-    public var downloader:Downloader
-    
-    public init(downloader:Downloader = Downloader.shared){
-        self.downloader = downloader
+
+public let dataDownload = Downloader<DataOrigin,Data>()
+
+
+public let imageSourceDownload = Downloader<DataImageDataSource,CGImageSource>()
+
+
+public let imageDownload = Downloader<DataCGImage,CGImage>()
+
+public class StaticImageDownloader{
+    public init?(){
     }
-    public func download(url:URL,callback:@escaping (CGImageSource?)->Void){
-        self.downloader.download(url: url) { d in
-            guard let data = d else { return callback(nil) }
-            if let source = CGImageSourceCreateWithData(data as CFData, nil){
-                if CGImageSourceGetStatus(source) == .statusComplete{
-                    callback(source)
-                }else{
-                    if let name = Cache.name(url: url.absoluteString){
-                        self.downloader.cache.delete(name: name)
-                    }
-                    callback(nil)
-                }
-            }else{
-                callback(nil)
-            }
-        }
-    }
-    
+    public static let shared:StaticImageDownloader = {
+        StaticImageDownloader()
+    }()!
     public func downloadImage(url:URL,callback:@escaping (CGImage?)->Void){
-        self.downloadImages(url: url) { imgs in
-            callback(imgs.first)
-        }
-    }
-    public func downloadImages(url:URL,callback:@escaping ([CGImage])->Void){
-        self.download(url: url) { i in
-            guard let imgsource = i else { callback([]);return }
-            let count = CGImageSourceGetCount(imgsource)
-            if count > 0 {
-                CGImageSourceGetType(imgsource)
-                let imgs:[CGImage] = (0 ..< count).reduce(into: []) { partialResult, i in
-                    guard let img = CGImageSourceCreateImageAtIndex(imgsource, i, nil) else { return }
-                    partialResult.append(img)
-                }
-                callback(imgs)
-            }else{
-                guard let name =  Cache.name(url: url.absoluteString) else { callback([]);return }
-                self.downloader.cache.delete(name:name)
-                callback([])
+
+        imageDownload.download(url: url) { i in
+            DispatchQueue.main.async {
+                callback(i)
             }
         }
-    }
-    public func imageSource(url:URL)->CGImageSource?{
-        guard let name = Cache.name(url: url.absoluteString) else { return nil }
-        guard let data = self.downloader.cache.queryAllData(name: name) else { return nil }
-        return CGImageSourceCreateWithData(data as CFData, nil)
-    }
-    public func image(url:URL)->CGImage?{
-        guard let source = self.imageSource(url: url) else { return nil }
-        return CGImageSourceCreateImageAtIndex(source, 0, nil)
-    }
-    
-    public static let shared:ImageDownloader = ImageDownloader()
-}
-public class StaticImageDownloader:ImageDownloader{
-    public init?(){}
-    public func downloadImage(url:String,callback:@escaping (CGImage?)->Void){
-        guard let u = URL(string: url) else { callback(nil);return }
-        self.downloadImage(url: u, callback: callback)
     }
 }
