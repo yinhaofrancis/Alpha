@@ -1,6 +1,7 @@
 import Foundation
 import CommonCrypto
 import ImageIO
+import JavaScriptCore
 
 public protocol CacheContent{
     func delete(name:String)
@@ -312,23 +313,51 @@ public struct Lock<T>{
     }
 }
 
-public protocol DataTransform{
+public protocol DataTransformAdaptor{
     associatedtype Result
     
-    static func makeContent(data:Data?)->Result?
+    func makeContent(data:Data?)->Result?
 }
-public class DataOrigin:DataTransform{
+public class DataOriginAdaptor:DataTransformAdaptor{
     public typealias Result = Data
     
-    public static func makeContent(data: Data?) -> Data? {
+    public func makeContent(data: Data?) -> Data? {
         return data
     }
 }
+public class StringTransformAdaptor:DataTransformAdaptor{
+    public typealias Result = String
+    public func makeContent(data: Data?) -> String? {
+        guard let dat = data else { return nil }
+        return String(data: dat, encoding: .utf8)
+    }
+}
+public class JSONTransformAdaptor:DataTransformAdaptor{
+    public typealias Result = JSValue
+    
+    public init(ctx:JSContext){
+        self.jsCtx = ctx
+        self.inner = PlainJSONTransformAdaptor()
+    }
+    public var jsCtx:JSContext
+    private var inner:PlainJSONTransformAdaptor
+    public func makeContent(data: Data?) -> JSValue? {
+        guard let json = self.inner.makeContent(data: data) else { return nil }
+        return JSValue(object: json, in: self.jsCtx)
+    }
+}
+public class PlainJSONTransformAdaptor:DataTransformAdaptor{
+    public typealias Result = Any
 
-public class DataImageDataSource:DataTransform{
+    public func makeContent(data: Data?) -> Any? {
+        guard let dat = data else { return nil }
+        return try? JSONSerialization.jsonObject(with: dat)
+    }
+}
+public class ImageSourceTransformAdaptor:DataTransformAdaptor{
     public typealias Result = CGImageSource
     
-    public static func makeContent(data: Data?) -> CGImageSource? {
+    public func makeContent(data: Data?) -> CGImageSource? {
         guard let rdata = data else { return nil }
         if let source = CGImageSourceCreateWithData(rdata as CFData, nil){
             if CGImageSourceGetStatus(source) == .statusComplete{
@@ -342,10 +371,10 @@ public class DataImageDataSource:DataTransform{
     }
 }
 
-public class DataCGImage:DataTransform{
+public class ImageTransformAdaptor:DataTransformAdaptor{
     public typealias Result = CGImage
     
-    public static func makeContent(data: Data?) -> CGImage? {
+    public func makeContent(data: Data?) -> CGImage? {
         guard let rdata = data else { return nil }
         if let source = CGImageSourceCreateWithData(rdata as CFData, nil){
             if CGImageSourceGetStatus(source) == .statusComplete{
@@ -358,22 +387,40 @@ public class DataCGImage:DataTransform{
         }
     }
 }
-
-public class Downloader<T:DataTransform,R>:NSObject,URLSessionDataDelegate,URLSessionDownloadDelegate where T.Result == R {
+extension HTTPURLResponse{
+    public func header(key:String)->String?{
+        if #available(iOS 13.0, *) {
+            return self.value(forHTTPHeaderField: key)
+        } else {
+            return self.allHeaderFields[key] as? String
+        }
+    }
+}
+public class Downloader<T:DataTransformAdaptor,R>:NSObject,URLSessionDataDelegate,URLSessionDownloadDelegate where T.Result == R {
     
     public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-        guard let rep = downloadTask.originalRequest?.url?.absoluteString else { return }
-        guard let name = Cache.name(url: rep) else { return }
+        guard let rep = downloadTask.originalRequest else { return }
+        guard let name = self.buildName(request: rep) else { return }
         self.cache.copy(name: name, local: location)
     }
     public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        guard let rep = dataTask.originalRequest?.url?.absoluteString else { return }
-        guard let name = Cache.name(url: rep) else { return }
+        guard let rep = dataTask.originalRequest else { return }
+        guard let name = self.buildName(request: rep) else { return }
         self.cache.write(name: name, data: data)
     }
+    public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void){
+        guard let rep = response as? HTTPURLResponse else { completionHandler(.cancel);return }
+        guard let strSize = rep.header(key: "Content-Length") else { completionHandler(.allow);return }
+        guard let size = UInt64(strSize) else { completionHandler(.allow);return }
+        if(size > 4 * 1024){
+            completionHandler(.becomeDownload)
+        }else{
+            completionHandler(.allow)
+        }
+    }
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        guard let rep = task.originalRequest?.url?.absoluteString else { return }
-        guard let name = Cache.name(url: rep) else { return }
+        guard let rep = task.originalRequest else { return }
+        guard let name = self.buildName(request: rep) else { return }
         if error != nil {
             self.cache.delete(name: name)
         }else{
@@ -399,19 +446,30 @@ public class Downloader<T:DataTransform,R>:NSObject,URLSessionDataDelegate,URLSe
         URLSession(configuration: self.configuration, delegate:self, delegateQueue: self.queue)
     }()
     
-   private func download(url:URL)->String?{
-        guard let name = Cache.name(url: url.absoluteString) else { return nil }
+    public func buildName(request:URLRequest)->String?{
+        guard let url = request.url else { return nil }
+        let head = request.allHTTPHeaderFields?.reduce("", { partialResult, kv in
+            partialResult + "," + kv.key + ":" + kv.value
+        }) ?? ""
+        return Cache.name(url: request.httpMethod ?? "GET" + url.absoluteString + head)
+    }
+    private func download(url:URL)->String?{
+       self.download(request: URLRequest(url: url))
+    }
+    private func download(request:URLRequest)->String?{
+        guard let name = self.buildName(request: request) else { return nil }
         if self.needDownload(name: name){
-            self.session.dataTask(with: url).resume()
+            self.session.dataTask(with: request).resume()
             self.urls.insert(name)
             print("launch download")
         }
         return name
+            
     }
-    public func download(url:URL,callback:@escaping (R?)->Void){
+    public func download(request:URLRequest,callback:@escaping (R?)->Void){
         self.lock.wait()
         print("try download")
-        guard let name = self.download(url: url) else {self.lock.signal();callback(nil);return}
+        guard let name = self.download(request: request) else {self.lock.signal();callback(nil);return}
         self.lock.signal()
         if !self.hasDownload(name: name){
             callback(self.createContent(name: name))
@@ -424,15 +482,18 @@ public class Downloader<T:DataTransform,R>:NSObject,URLSessionDataDelegate,URLSe
             }
         }
     }
+    public func download(url:URL,callback:@escaping (R?)->Void){
+        self.download(request: URLRequest(url: url), callback: callback)
+    }
     private func createContent(name:String)->R?{
         let data = self.cache.queryAllData(name: name)
-        let r = T.makeContent(data:data)
+        let r = self.transformAdaptor.makeContent(data:data)
         if r == nil && data != nil{
             self.cache.delete(name:name)
         }
         return r
     }
-    
+    public var transformAdaptor:T
     public var cache:CacheContent
     public var notificationCenter = NotificationCenter()
     private var lock:DispatchSemaphore = DispatchSemaphore(value: 1)
@@ -446,8 +507,9 @@ public class Downloader<T:DataTransform,R>:NSObject,URLSessionDataDelegate,URLSe
         return false
     }
     private var urls:Set<String> = Set()
-    public init(cache:CacheContent = Cache.shared){
+    public init(cache:CacheContent = Cache.shared,transforAdaptor:T){
         self.cache = cache
+        self.transformAdaptor = transforAdaptor
         super.init()
     }
     public func observerDownload(name:String,callback:@escaping ()->Void){
@@ -459,16 +521,12 @@ public class Downloader<T:DataTransform,R>:NSObject,URLSessionDataDelegate,URLSe
         calls.append(callback)
         self.callbacks[name] = calls
     }
-    public func delete(url:URL){
-        guard let name = Cache.name(url: url.absoluteString) else { return }
+    public func delete(name:String){
         self.cache.delete(name: name)
     }
     public func hasDownload(name:String)->Bool{
         self.urls.contains(name)
     }
-}
-extension Notification.Name{
-    public static var DownloadTaskEnd = Notification.Name.init(rawValue: "DownloadTaskEnd")
 }
 
 public class Md5{
@@ -505,13 +563,15 @@ extension Data{
     }
 }
 
-public let dataDownload = Downloader<DataOrigin,Data>()
+public let dataDownload = Downloader<DataOriginAdaptor,Data>(transforAdaptor: DataOriginAdaptor())
 
+public let imageSourceDownload = Downloader<ImageSourceTransformAdaptor,CGImageSource>(transforAdaptor: ImageSourceTransformAdaptor())
 
-public let imageSourceDownload = Downloader<DataImageDataSource,CGImageSource>()
+public let imageDownload = Downloader<ImageTransformAdaptor,CGImage>(transforAdaptor: ImageTransformAdaptor())
 
+public let stringDownload = Downloader<StringTransformAdaptor,String>(transforAdaptor: StringTransformAdaptor())
 
-public let imageDownload = Downloader<DataCGImage,CGImage>()
+public let jsonDownload = Downloader<PlainJSONTransformAdaptor,Any>(transforAdaptor: PlainJSONTransformAdaptor())
 
 public class StaticImageDownloader{
     public init?(){
@@ -522,6 +582,36 @@ public class StaticImageDownloader{
     public func downloadImage(url:URL,callback:@escaping (CGImage?)->Void){
 
         imageDownload.download(url: url) { i in
+            DispatchQueue.main.async {
+                callback(i)
+            }
+        }
+    }
+}
+public class StaticStringDownloader{
+    public init?(){
+    }
+    public static let shared:StaticStringDownloader = {
+        StaticStringDownloader()
+    }()!
+    public func downloadImage(url:URL,callback:@escaping (String?)->Void){
+
+        stringDownload.download(url: url) { i in
+            DispatchQueue.main.async {
+                callback(i)
+            }
+        }
+    }
+}
+public class StaticJSONDownloader{
+    public init?(){
+    }
+    public static let shared:StaticJSONDownloader = {
+        StaticJSONDownloader()
+    }()!
+    public func downloadImage(url:URL,callback:@escaping (Any?)->Void){
+
+        jsonDownload.download(url: url) { i in
             DispatchQueue.main.async {
                 callback(i)
             }

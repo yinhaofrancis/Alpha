@@ -8,6 +8,7 @@
 import XCTest
 @testable import Ammo
 @testable import Data
+import JavaScriptCore
 class AmmoTests: XCTestCase {
 
 
@@ -21,7 +22,19 @@ class AmmoTests: XCTestCase {
 
 
     func testFF(){
-        
+        let m = XCTestExpectation(description: "mark")
+        let m2 = XCTestExpectation(description: "mark2")
+        StaticStringDownloader.shared.downloadImage(url: URL(string: "https://app.5eplay.com/api/csgo/tournament/game_session_info/65456")!) { string in
+            print(string)
+            m.fulfill()
+            
+        }
+        StaticJSONDownloader.shared.downloadImage(url: URL(string: "https://app.5eplay.com/api/csgo/tournament/game_session_info/65456")!) { string in
+            print(string)
+            m2.fulfill()
+            
+        }
+        self.wait(for: [m,m2], timeout: 10)
     }
     
     

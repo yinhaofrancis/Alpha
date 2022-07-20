@@ -8,11 +8,11 @@
 import UIKit
 import Ammo
 import TextDetect
+import WebKit
 class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePickerControllerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.layout()
     }
 
 
@@ -46,9 +46,9 @@ class collectionViewController:UICollectionViewController{
         let url = URL(string: "https://qrimg.jd.com/https%3A%2F%2Fitem.m.jd.com%2Fproduct%2F10050608187053.html%3Fpc_source%3Dpc_productDetail_10050608187053-118-1-4-2.png?ltype=0")!
         self.images.removeAll()
 //        ImageDownloader.shared.downloader.delete(url: url)
-        let n = 100
+        
         self.t = DispatchSource.makeTimerSource(flags: DispatchSource.TimerFlags.strict, queue: .global())
-        t?.schedule(deadline: .now(), repeating: 0.01)
+        t?.schedule(deadline: .now(), repeating: 10)
         t?.setEventHandler(handler: {
             StaticImageDownloader.shared.downloadImage(url:url) {[weak self] img in
                 guard let im = img else { return }
@@ -58,5 +58,9 @@ class collectionViewController:UICollectionViewController{
             }
         })
         self.t?.activate()
+        self.collectionView.setValue(UIColor.red, forKey: "backgroundColor")
+    }
+    deinit{
+        self.t?.cancel()
     }
 }
