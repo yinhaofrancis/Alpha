@@ -563,17 +563,17 @@ extension Data{
     }
 }
 
-public let dataDownload = Downloader<DataOriginAdaptor,Data>(transforAdaptor: DataOriginAdaptor())
+public let dataDownloader = Downloader<DataOriginAdaptor,Data>(transforAdaptor: DataOriginAdaptor())
 
-public let imageSourceDownload = Downloader<ImageSourceTransformAdaptor,CGImageSource>(transforAdaptor: ImageSourceTransformAdaptor())
+public let imageSourceDownloader = Downloader<ImageSourceTransformAdaptor,CGImageSource>(transforAdaptor: ImageSourceTransformAdaptor())
 
-public let imageDownload = Downloader<ImageTransformAdaptor,CGImage>(transforAdaptor: ImageTransformAdaptor())
+public let imageDownloader = Downloader<ImageTransformAdaptor,CGImage>(transforAdaptor: ImageTransformAdaptor())
 
-public let stringDownload = Downloader<StringTransformAdaptor,String>(transforAdaptor: StringTransformAdaptor())
+public let stringDownloader = Downloader<StringTransformAdaptor,String>(transforAdaptor: StringTransformAdaptor())
 
-public let jsonDownload = Downloader<PlainJSONTransformAdaptor,Any>(transforAdaptor: PlainJSONTransformAdaptor())
+public let jsonDownloader = Downloader<PlainJSONTransformAdaptor,Any>(transforAdaptor: PlainJSONTransformAdaptor())
 
-public func JSValueDownload(context:JSContext)->Downloader<JSONTransformAdaptor,JSValue>{
+public func JSValueDownloader(context:JSContext)->Downloader<JSONTransformAdaptor,JSValue>{
     Downloader(transforAdaptor: JSONTransformAdaptor(ctx: context))
 }
 
@@ -585,7 +585,7 @@ public class StaticImageDownloader{
     }()!
     public func downloadImage(url:URL,callback:@escaping (CGImage?)->Void){
 
-        imageDownload.download(url: url) { i in
+        imageDownloader.download(url: url) { i in
             DispatchQueue.main.async {
                 callback(i)
             }
@@ -600,7 +600,7 @@ public class StaticStringDownloader{
     }()!
     public func downloadImage(url:URL,callback:@escaping (String?)->Void){
 
-        stringDownload.download(url: url) { i in
+        stringDownloader.download(url: url) { i in
             DispatchQueue.main.async {
                 callback(i)
             }
@@ -615,7 +615,7 @@ public class StaticJSONDownloader{
     }()!
     public func downloadImage(url:URL,callback:@escaping (Any?)->Void){
 
-        jsonDownload.download(url: url) { i in
+        jsonDownloader.download(url: url) { i in
             DispatchQueue.main.async {
                 callback(i)
             }
