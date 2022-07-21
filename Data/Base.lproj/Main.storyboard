@@ -32,7 +32,7 @@
         <scene sceneID="tzF-H7-ukN">
             <objects>
                 <viewController id="Jua-zr-Lbg" customClass="ViewController" customModule="Data" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="5bg-pH-VNy" customClass="ScrollView" customModule="Ammo">
+                    <view key="view" contentMode="scaleToFill" id="5bg-pH-VNy">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>

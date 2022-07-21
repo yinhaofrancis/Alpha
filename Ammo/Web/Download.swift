@@ -573,6 +573,10 @@ public let stringDownload = Downloader<StringTransformAdaptor,String>(transforAd
 
 public let jsonDownload = Downloader<PlainJSONTransformAdaptor,Any>(transforAdaptor: PlainJSONTransformAdaptor())
 
+public func JSValueDownload(context:JSContext)->Downloader<JSONTransformAdaptor,JSValue>{
+    Downloader(transforAdaptor: JSONTransformAdaptor(ctx: context))
+}
+
 public class StaticImageDownloader{
     public init?(){
     }
