@@ -573,9 +573,13 @@ public let stringDownloader = Downloader<StringTransformAdaptor,String>(transfor
 
 public let jsonDownloader = Downloader<PlainJSONTransformAdaptor,Any>(transforAdaptor: PlainJSONTransformAdaptor())
 
-public func JSValueDownloader(context:JSContext)->Downloader<JSONTransformAdaptor,JSValue>{
+public let jsContext:JSContext = JSContext()
+
+public func JSValueDownloaderCreate(context:JSContext)->Downloader<JSONTransformAdaptor,JSValue>{
     Downloader(transforAdaptor: JSONTransformAdaptor(ctx: context))
 }
+
+public let JSValueDownloader = JSValueDownloaderCreate(context: jsContext)
 
 public class StaticImageDownloader{
     public init?(){
@@ -622,3 +626,18 @@ public class StaticJSONDownloader{
         }
     }
 }
+
+@objc public protocol pub:NSObjectProtocol,JSExport{
+    func go()
+    init(m:String)
+}
+public class mm:NSObject,pub{
+    public func go() {
+        print(go)
+    }
+    public required init(m: String) {
+        print(m)
+    }
+}
+
+
