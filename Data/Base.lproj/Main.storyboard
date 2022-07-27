@@ -35,8 +35,18 @@
                     <view key="view" contentMode="scaleToFill" id="5bg-pH-VNy">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mTQ-jv-1mP" customClass="AMButton" customModule="Ammo">
+                                <rect key="frame" x="87" y="327" width="240" height="128"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                            </view>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="rWh-7K-dG8"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="mTQ-jv-1mP" firstAttribute="centerY" secondItem="5bg-pH-VNy" secondAttribute="centerY" constant="-57" id="ndw-CZ-vC3"/>
+                            <constraint firstItem="mTQ-jv-1mP" firstAttribute="centerX" secondItem="5bg-pH-VNy" secondAttribute="centerX" id="tAI-ZP-xvK"/>
+                        </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="M8F-56-Hg9">
                         <barButtonItem key="rightBarButtonItem" title="Item" id="kTk-FO-Rxi">
@@ -45,6 +55,9 @@
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <outlet property="amo" destination="mTQ-jv-1mP" id="S4Z-2x-4bF"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="YuY-Oc-qQ8" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>

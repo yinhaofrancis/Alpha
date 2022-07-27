@@ -29,11 +29,14 @@ a.go()
         a?.duration = 3
         self.view.layer.addSublayer(self.lay)
         self.lay.add(self.a!, forKey: nil)
+        self.amo.content = [.text(UIFont.systemFont(ofSize: 14), .red, "dadasd"),.space(4),.imageUrl(URL(string: "https://t10.baidu.com/it/u=2705807134,179606683&fm=30&app=106&f=JPEG?w=312&h=208&s=4E980AC150503BC654B94019030090C1")!, nil)]
     }
 
     var lay:CALayer = CALayer()
     
     var a:CABasicAnimation?
+    
+    @IBOutlet var amo:AMButton!
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         self.lay.speed = 0.5
     }

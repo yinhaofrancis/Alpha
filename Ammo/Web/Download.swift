@@ -418,6 +418,9 @@ public class Downloader<T:DataTransformAdaptor,R>:NSObject,URLSessionDataDelegat
             completionHandler(.allow)
         }
     }
+    public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didBecome downloadTask: URLSessionDownloadTask) {
+        
+    }
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         guard let rep = task.originalRequest else { return }
         guard let name = self.buildName(request: rep) else { return }
@@ -429,7 +432,7 @@ public class Downloader<T:DataTransformAdaptor,R>:NSObject,URLSessionDataDelegat
         self.lock.wait()
         self.urls.remove(name)
         self.lock.signal()
-        print("downloaded")
+//        print("downloaded")
         self.callbackLock.wait()
         let a = self.callbacks.removeValue(forKey: name)
         self.callbackLock.signal()
@@ -451,34 +454,35 @@ public class Downloader<T:DataTransformAdaptor,R>:NSObject,URLSessionDataDelegat
         let head = request.allHTTPHeaderFields?.reduce("", { partialResult, kv in
             partialResult + "," + kv.key + ":" + kv.value
         }) ?? ""
-        return Cache.name(url: request.httpMethod ?? "GET" + url.absoluteString + head)
+        return Cache.name(url: (request.httpMethod ?? "GET") + url.absoluteString + head)
     }
     private func download(url:URL)->String?{
        self.download(request: URLRequest(url: url))
     }
     private func download(request:URLRequest)->String?{
         guard let name = self.buildName(request: request) else { return nil }
+        print(name)
         if self.needDownload(name: name){
             self.session.dataTask(with: request).resume()
             self.urls.insert(name)
-            print("launch download")
+//            print("launch download")
         }
         return name
             
     }
     public func download(request:URLRequest,callback:@escaping (R?)->Void){
         self.lock.wait()
-        print("try download")
+//        print("try download")
         guard let name = self.download(request: request) else {self.lock.signal();callback(nil);return}
         self.lock.signal()
         if !self.hasDownload(name: name){
             callback(self.createContent(name: name))
-            print("read cache")
+//            print("read cache")
         }else{
-            print("wait download")
+//            print("wait download")
             self.observerDownload(name:name) { [weak self] in
                 callback(self?.createContent(name: name))
-                print("handle download")
+//                print("handle download")
             }
         }
     }

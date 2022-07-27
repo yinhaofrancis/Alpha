@@ -600,3 +600,84 @@ public class AMPageContainerView:UIView,UIGestureRecognizerDelegate {
         self.dequeueView(index: self.page  + 1)
     }
 }
+
+public enum AMButtonContent{
+    case image(UIImage)
+    case imageUrl(URL,UIImage?)
+    case attributedText(NSAttributedString)
+    case text(UIFont,UIColor,String)
+    case space(CGFloat)
+}
+
+public class AMButton:UIControl{
+    public var content:[AMButtonContent] = []{
+        didSet{
+            self.layoutContent()
+        }
+    }
+    public var axis:NSLayoutConstraint.Axis = .horizontal{
+        didSet{
+            self.stack?.axis = self.axis
+        }
+    }
+    private var stack:UIStackView?
+    
+    private func layoutContent(){
+        let vs = content.map { c -> UIView in
+            switch(c){
+                
+            case let .image(img):
+                return UIImageView(image: img, highlightedImage: nil)
+            case let .imageUrl(url,image):
+                let uim = UIImageView()
+                uim.am_imageUrl(url: url,placeholdImage: image)
+                return uim
+            case let .attributedText(text):
+                let l = UILabel()
+                l.attributedText = text
+                return l
+            case let .space(value):
+                let v = UIView()
+                v.translatesAutoresizingMaskIntoConstraints = false
+                v.addConstraints([
+                    v.widthAnchor.constraint(equalToConstant: value),
+                    v.heightAnchor.constraint(equalToConstant: value)
+                ])
+                return v
+            case let .text(font,color,text):
+                let l = UILabel()
+                l.font = font
+                l.textColor = color
+                l.text = text
+                return l
+            }
+        }
+        let new = UIStackView(arrangedSubviews: vs)
+        self.addSubview(new)
+        self.addConstraints([
+            new.leftAnchor.constraint(equalTo: self.leftAnchor),
+            new.rightAnchor.constraint(equalTo: self.rightAnchor),
+            new.topAnchor.constraint(equalTo: self.topAnchor),
+            new.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+        ])
+        new.translatesAutoresizingMaskIntoConstraints = false;
+        new.distribution = .equalSpacing
+        new.axis = self.axis
+        new.alignment = .center
+        guard let old = self.stack else { self.stack = new;return }
+        UIView.transition(from: old, to: new, duration: 0.3, options: [UIView.AnimationOptions.transitionCrossDissolve]) { b in
+            old.removeFromSuperview()
+        }
+        self.stack = new
+    }
+}
+extension UIImageView{
+    public func am_imageUrl(url:URL,placeholdImage:UIImage? = nil){
+        self.image = placeholdImage
+        StaticImageDownloader.shared.downloadImage(url: url) {[weak self] img in
+            guard let image = img else { return }
+            let uiimg = UIImage(cgImage: image)
+            self?.image = uiimg
+        }
+    }
+}
