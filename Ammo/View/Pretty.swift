@@ -610,20 +610,31 @@ public enum AMButtonContent{
 }
 
 public class AMButton:UIControl{
-    public var content:[AMButtonContent] = []{
+    public var normalContent:[AMButtonContent] = []{
         didSet{
-            self.layoutContent()
+            self.displayContent(display: self.normalContent)
+            self.addTarget(self, action: #selector(handleClickDown), for: .touchDown)
+            self.addTarget(self, action: #selector(handleClick), for: .touchUpInside)
+            self.addTarget(self, action: #selector(handleClick), for: .touchUpOutside)
+            self.addTarget(self, action: #selector(handleClick), for: .touchCancel)
         }
     }
+    public var highlightContent:[AMButtonContent] = []
     public var axis:NSLayoutConstraint.Axis = .horizontal{
         didSet{
             self.stack?.axis = self.axis
         }
     }
+    @objc private func handleClickDown(){
+        self.displayContent(display: self.highlightContent)
+    }
+    @objc private func handleClick(){
+        self.displayContent(display: self.normalContent)
+    }
     private var stack:UIStackView?
     
-    private func layoutContent(){
-        let vs = content.map { c -> UIView in
+    private func displayContent(display:[AMButtonContent]) {
+        let vs = display.map { c -> UIView in
             switch(c){
                 
             case let .image(img):
@@ -664,10 +675,12 @@ public class AMButton:UIControl{
         new.distribution = .equalSpacing
         new.axis = self.axis
         new.alignment = .center
-        guard let old = self.stack else { self.stack = new;return }
-        UIView.transition(from: old, to: new, duration: 0.3, options: [UIView.AnimationOptions.transitionCrossDissolve]) { b in
+        new.isUserInteractionEnabled = false
+        guard let old = self.stack else { self.stack = new; return }
+        UIView.transition(from: old, to: new, duration: 0.1, options: [UIView.AnimationOptions.transitionCrossDissolve]) { b in
             old.removeFromSuperview()
         }
+        
         self.stack = new
     }
 }

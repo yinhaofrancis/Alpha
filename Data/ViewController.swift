@@ -29,7 +29,8 @@ a.go()
         a?.duration = 3
         self.view.layer.addSublayer(self.lay)
         self.lay.add(self.a!, forKey: nil)
-        self.amo.content = [.text(UIFont.systemFont(ofSize: 14), .red, "dadasd"),.space(4),.imageUrl(URL(string: "https://t10.baidu.com/it/u=2705807134,179606683&fm=30&app=106&f=JPEG?w=312&h=208&s=4E980AC150503BC654B94019030090C1")!, nil)]
+        self.amo.normalContent = [.text(UIFont.systemFont(ofSize: 14), .red, "abc"),.space(4),.imageUrl(URL(string: "https://img1.baidu.com/it/u=504762381,3391209024&fm=253&app=138&size=w43&n=0&f=JPEG&fmt=auto?sec=1659114000&t=5fd238c759ee939afc00a342cd18a70c")!, nil)]
+        self.amo.highlightContent = [.text(UIFont.systemFont(ofSize: 14), .yellow, "abc"),.space(4),.imageUrl(URL(string: "https://img1.baidu.com/it/u=504762381,3391209024&fm=253&app=138&size=w43&n=0&f=JPEG&fmt=auto?sec=1659114000&t=5fd238c759ee939afc00a342cd18a70c")!, nil)]
     }
 
     var lay:CALayer = CALayer()
