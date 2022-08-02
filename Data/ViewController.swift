@@ -9,6 +9,9 @@ import UIKit
 import Ammo
 import TextDetect
 import WebKit
+extension Icon{
+    public static var make = Icon(text: "\u{e687}", color: UIColor.yellow, size: 43)
+}
 class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePickerControllerDelegate {
    
     
@@ -17,8 +20,9 @@ class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePic
     let font:IconFont = try! IconFont()
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.iamgev.image = font.uiIcon(charactor: "\u{e687}", size: 42, color: UIColor.yellow)
-        self.text.attributedText = font.attribute(charactor: "\u{e687}", size: 42, color: UIColor.red)
+        
+        self.iamgev.image = Icon.make.image
+        self.text.attributedText = Icon.make.string
         
     }
     

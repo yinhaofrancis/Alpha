@@ -144,6 +144,9 @@ public class IconFont{
         guard let char = charactor.first else { throw NSError(domain: "no char", code: 2)}
         return try self.charIcon(chars: char.utf16.map({$0}), size: size,color: color)
     }
+    public func icon(icon:Icon)throws ->CGImage{
+        return try self.icon(charactor: icon.text, size: icon.size, color: icon.color.cgColor)
+    }
     public func attribute(charactor:String,size:CGFloat,color:UIColor) ->NSAttributedString?{
         guard let img = self.uiIcon(charactor: charactor, size: size, color: color) else { return nil }
         let att = NSTextAttachment()
@@ -151,9 +154,19 @@ public class IconFont{
         att.bounds = CGRect(x: 0, y: 0, width: img.size.width, height: img.size.height)
         return NSAttributedString(attachment: att)
     }
+    public func attribute(icon:Icon) ->NSAttributedString?{
+        self.attribute(charactor: icon.text, size: icon.size, color: icon.color)
+    }
     public func uiIcon(charactor:String,size:CGFloat,color:UIColor)->UIImage?{
         do{
             return UIImage(cgImage:try self.icon(charactor: charactor, size: size, color: color.cgColor),scale: self.scale,orientation: .up)
+        }catch{
+            return nil
+        }
+    }
+    public func uiIcon(icon:Icon)->UIImage?{
+        do{
+            return UIImage(cgImage:try self.icon(icon: icon),scale: self.scale,orientation: .up)
         }catch{
             return nil
         }
@@ -180,4 +193,24 @@ public class IconFont{
         guard let imag = ctx.makeImage() else { throw NSError(domain: "create image error", code: 6)}
         return imag
     }
+}
+
+public struct Icon{
+ 
+    public var text:String
+    public var color:UIColor
+    public var size:CGFloat
+    
+    public init(text:String, color:UIColor,size:CGFloat){
+        self.text = text
+        self.color = color
+        self.size = size
+    }
+    public var image:UIImage?{
+        Icon.iconfont.uiIcon(icon: self)
+    }
+    public var string:NSAttributedString?{
+        Icon.iconfont.attribute(icon: self)
+    }
+    public static var iconfont:IconFont = try! IconFont()
 }
