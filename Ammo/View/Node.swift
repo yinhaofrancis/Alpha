@@ -7,6 +7,7 @@
 
 import Foundation
 import QuartzCore
+import UIKit
 
 public enum ValueMode{
     case percentRelateParent
@@ -424,4 +425,151 @@ public class Node{
     }
     
     public init(){ }
+}
+
+public class Element{
+    
+    public enum ElementProperty{
+        case left
+        case right
+        case centerX
+        case width
+        case top
+        case bottom
+        case centerY
+        case height
+    }
+    
+    public struct ElementHAnchor{
+        public var element:Element
+        public var property:ElementProperty
+        
+    }
+    
+    public struct ElementVAnchor{
+        public var element:Element
+        public var property:ElementProperty
+    }
+    
+    public struct ElementSizeAnchor{
+        public var element:Element
+        public var property:ElementProperty
+    }
+    
+    public var left:ElementHAnchor{
+        return ElementHAnchor(element: self, property: .left)
+    }
+    public var right:ElementHAnchor{
+        return ElementHAnchor(element: self, property: .right)
+    }
+    public var top:ElementVAnchor{
+        return ElementVAnchor(element: self, property: .top)
+    }
+    public var bottom:ElementVAnchor{
+        return ElementVAnchor(element: self, property: .bottom)
+    }
+    public var width:ElementSizeAnchor{
+        return ElementSizeAnchor(element: self, property: .width)
+    }
+    public var height:ElementSizeAnchor{
+        return ElementSizeAnchor(element: self, property: .width)
+    }
+}
+
+public struct Constaint{
+    public var left:Element
+    public var leftProperty:Element.ElementProperty
+    public var releate:Constaint.Releate
+    
+    public var right:Element?
+    public var rightProperty:Element.ElementProperty
+    public var muti:CGFloat
+    public var constant:CGFloat
+//    public var poria
+    
+    public enum Releate{
+        case equal
+        case greatAndEqual
+        case lessAndEqual
+    }
+}
+
+
+public let PADDING:CGFloat = 10
+public let MARGIN:CGFloat = 8
+
+extension UIView{
+    private struct viewLayout{
+        static var padding = "padding"
+        static var margin = "margin"
+        static var width = "width"
+        static var height = "height"
+    }
+    public var padding:UILayoutGuide{
+        self.get(key: &viewLayout.padding) {
+            let guide = UILayoutGuide()
+            self.addLayoutGuide(guide)
+            let c = [
+                guide.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: PADDING),
+                guide.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: PADDING),
+                guide.topAnchor.constraint(equalTo: self.topAnchor, constant: PADDING),
+                guide.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: PADDING),
+            ]
+            self.translatesAutoresizingMaskIntoConstraints = false
+            self.addConstraints(c)
+            return guide
+        }
+    }
+    public var margin:UILayoutGuide{
+        return self.get(key: &viewLayout.margin) {
+            let guide = UILayoutGuide()
+            self.addLayoutGuide(guide)
+            let c = [
+                guide.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: MARGIN),
+                guide.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: MARGIN),
+                guide.topAnchor.constraint(equalTo: self.topAnchor, constant: MARGIN),
+                guide.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: MARGIN),
+            ]
+            self.translatesAutoresizingMaskIntoConstraints = false
+            self.addConstraints(c)
+            return guide
+        }
+    }
+    public var width:CGFloat{
+        get{
+            self.get(key: &viewLayout.width) {
+                NSLayoutConstraint(item: self, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .width, multiplier: 1, constant: 0)
+            }.constant
+        }
+        set{
+            self.get(key: &viewLayout.width) {
+                NSLayoutConstraint(item: self, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .width, multiplier: 1, constant: newValue)
+            }.constant = newValue
+        }
+    }
+    
+    public var height:CGFloat{
+        get{
+            self.get(key: &viewLayout.height) {
+                NSLayoutConstraint(item: self, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .width, multiplier: 1, constant: 0)
+            }.constant
+        }
+        set{
+            self.get(key: &viewLayout.height) {
+                NSLayoutConstraint(item: self, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .width, multiplier: 1, constant: newValue)
+            }.constant = newValue
+        }
+    }
+}
+extension NSObject{
+    @discardableResult
+    public func get<T:NSObject>(key:UnsafeRawPointer,call:()->T)->T{
+        if let p = objc_getAssociatedObject(self, key) as? T{
+            return p
+        }else{
+            let a = call()
+            objc_setAssociatedObject(self, key, a, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            return a
+        }
+    }
 }

@@ -13,24 +13,19 @@ class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePic
    
     override func viewDidLoad() {
         super.viewDidLoad()
-        jsContext.setObject(mm.self, forKeyedSubscript: "Mm" as NSString)
-        jsContext.exceptionHandler = { a,b in
-            print(b)
-        }
-        jsContext.evaluateScript("""
-var a = new Mm("dd")
-a.go()
-""")
-        self.lay.frame = CGRect(x: 0, y: 0, width: 100, height: 100);
-        self.lay.backgroundColor = UIColor.red.cgColor;
-        self.a = CABasicAnimation(keyPath: "transform.translation.x")
-        a?.fromValue = 0
-        a?.toValue = 100
-        a?.duration = 3
-        self.view.layer.addSublayer(self.lay)
-        self.lay.add(self.a!, forKey: nil)
-        self.amo.normalContent = [.text(UIFont.systemFont(ofSize: 14), .red, "abc"),.space(4),.imageUrl(URL(string: "https://img1.baidu.com/it/u=504762381,3391209024&fm=253&app=138&size=w43&n=0&f=JPEG&fmt=auto?sec=1659114000&t=5fd238c759ee939afc00a342cd18a70c")!, nil)]
-        self.amo.highlightContent = [.text(UIFont.systemFont(ofSize: 14), .yellow, "abc"),.space(4),.imageUrl(URL(string: "https://img1.baidu.com/it/u=504762381,3391209024&fm=253&app=138&size=w43&n=0&f=JPEG&fmt=auto?sec=1659114000&t=5fd238c759ee939afc00a342cd18a70c")!, nil)]
+        
+        let c = UIView()
+        self.view.addSubview(c)
+        c.translatesAutoresizingMaskIntoConstraints = false
+        
+        self.view .addConstraints([
+            self.view.padding.leftAnchor.constraint(equalTo: c.leftAnchor),
+            self.view.padding.topAnchor.constraint(equalTo: c.topAnchor)])
+        c.addConstraints([
+            c.widthAnchor.constraint(equalToConstant: 50),
+            c.heightAnchor.constraint(equalToConstant: 50)
+        ])
+        c.backgroundColor = UIColor.red
     }
 
     var lay:CALayer = CALayer()
@@ -39,7 +34,7 @@ a.go()
     
     @IBOutlet var amo:AMButton!
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        self.lay.speed = 0.5
+     
     }
 }
 
