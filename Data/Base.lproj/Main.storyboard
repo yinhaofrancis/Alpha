@@ -36,16 +36,23 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mTQ-jv-1mP" customClass="AMButton" customModule="Ammo">
-                                <rect key="frame" x="87" y="327" width="240" height="128"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                            </view>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="efJ-N4-X58">
+                                <rect key="frame" x="87" y="384" width="240" height="128"/>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZMz-UA-v9U">
+                                <rect key="frame" x="186" y="575" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="rWh-7K-dG8"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="mTQ-jv-1mP" firstAttribute="centerY" secondItem="5bg-pH-VNy" secondAttribute="centerY" constant="-57" id="ndw-CZ-vC3"/>
-                            <constraint firstItem="mTQ-jv-1mP" firstAttribute="centerX" secondItem="5bg-pH-VNy" secondAttribute="centerX" id="tAI-ZP-xvK"/>
+                            <constraint firstItem="ZMz-UA-v9U" firstAttribute="top" secondItem="efJ-N4-X58" secondAttribute="bottom" constant="63" id="9sb-Ik-lir"/>
+                            <constraint firstItem="efJ-N4-X58" firstAttribute="centerX" secondItem="5bg-pH-VNy" secondAttribute="centerX" id="CEf-YW-ZOI"/>
+                            <constraint firstItem="efJ-N4-X58" firstAttribute="centerY" secondItem="5bg-pH-VNy" secondAttribute="centerY" id="DYB-Rm-4xq"/>
+                            <constraint firstItem="ZMz-UA-v9U" firstAttribute="centerX" secondItem="5bg-pH-VNy" secondAttribute="centerX" id="XXD-1n-0O6"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="M8F-56-Hg9">
@@ -56,7 +63,8 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
-                        <outlet property="amo" destination="mTQ-jv-1mP" id="S4Z-2x-4bF"/>
+                        <outlet property="iamgev" destination="efJ-N4-X58" id="qyF-4x-Jd1"/>
+                        <outlet property="text" destination="ZMz-UA-v9U" id="RGx-nc-Hb9"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="YuY-Oc-qQ8" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -125,25 +133,10 @@
                     <view key="view" contentMode="scaleToFill" id="rtv-Vv-Zl1">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="btb-LV-3ut" customClass="AMPageContainerView" customModule="Ammo">
-                                <rect key="frame" x="0.0" y="88" width="414" height="808"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                            </view>
-                        </subviews>
                         <viewLayoutGuide key="safeArea" id="BsQ-Bh-S8d"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <constraints>
-                            <constraint firstItem="btb-LV-3ut" firstAttribute="top" secondItem="BsQ-Bh-S8d" secondAttribute="top" id="Ove-sw-ZmZ"/>
-                            <constraint firstAttribute="bottom" secondItem="btb-LV-3ut" secondAttribute="bottom" id="a3c-T0-Y2N"/>
-                            <constraint firstItem="btb-LV-3ut" firstAttribute="leading" secondItem="rtv-Vv-Zl1" secondAttribute="leading" id="sQe-40-TQU"/>
-                            <constraint firstAttribute="trailing" secondItem="btb-LV-3ut" secondAttribute="trailing" id="stN-xp-zcH"/>
-                        </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="TgM-df-3Ti"/>
-                    <connections>
-                        <outlet property="pageView" destination="btb-LV-3ut" id="tZI-MU-nrL"/>
-                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="U1z-ED-hJX" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>

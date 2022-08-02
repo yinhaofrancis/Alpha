@@ -11,28 +11,17 @@ import TextDetect
 import WebKit
 class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePickerControllerDelegate {
    
+    
+    @IBOutlet weak var text: UILabel!
+    @IBOutlet weak var iamgev: UIImageView!
+    let font:IconFont = try! IconFont()
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.iamgev.image = font.uiIcon(charactor: "\u{e687}", size: 42, color: UIColor.yellow)
+        self.text.attributedText = font.attribute(charactor: "\u{e687}", size: 42, color: UIColor.red)
         
-        let c = UIView()
-        self.view.addSubview(c)
-        c.translatesAutoresizingMaskIntoConstraints = false
-        
-        self.view .addConstraints([
-            self.view.padding.leftAnchor.constraint(equalTo: c.leftAnchor),
-            self.view.padding.topAnchor.constraint(equalTo: c.topAnchor)])
-        c.addConstraints([
-            c.widthAnchor.constraint(equalToConstant: 50),
-            c.heightAnchor.constraint(equalToConstant: 50)
-        ])
-        c.backgroundColor = UIColor.red
     }
-
-    var lay:CALayer = CALayer()
     
-    var a:CABasicAnimation?
-    
-    @IBOutlet var amo:AMButton!
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
      
     }
@@ -83,7 +72,7 @@ class collectionViewController:UICollectionViewController{
 }
 
 
-public class PageViewController:UIViewController,AMPageViewDelegate{
+public class PageViewController:UIViewController{
     public var numberOfPage: Int{
         return 10
     }
@@ -104,10 +93,7 @@ public class PageViewController:UIViewController,AMPageViewDelegate{
       
             self.vcs.append(vc)
         }
-        self.pageView.pageDelegate = self
-        self.pageView.reloadData()
-        
     }
     public var vcs:[UIViewController] = []
-    @IBOutlet public var pageView:AMPageContainerView!
+
 }
