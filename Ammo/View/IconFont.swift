@@ -10,7 +10,7 @@ import CoreText
 import UIKit
 
 public class IconFont{
-    let scale:CGFloat = 3
+    public let scale:CGFloat = 3
     public var data:Data
     public var descriptor:[CTFontDescriptor]
     public init(fontUrl:URL) throws{
@@ -67,7 +67,7 @@ public class IconFont{
     public func charIcon(chars:[UInt16],size:CGFloat,color:CGColor)throws ->CGImage{
         let path = try self.charIconPath(chars: chars, size: size, color: color)
         let rect = path.boundingBoxOfPath
-        guard let ctx = RenderContext.context(size:rect.size, scale: 1) else { throw NSError(domain: "ctx error", code: 5)}
+        let ctx = try self.createContext(rect:rect)
         ctx.translateBy(x:-rect.origin.x, y: -rect.origin.y)
         ctx.setFillColor(color)
         ctx.addPath(path)
@@ -86,6 +86,25 @@ public class IconFont{
         guard CTFontGetGlyphsForCharacters(font, charactor, &g, chars.count) else { throw NSError(domain: "get glyphs error", code: 4)}
         guard let path = CTFontCreatePathForGlyph(font, g, nil) else { throw NSError(domain: "create path error", code: 0)}
         return path
+    }
+    public func charMaskImage(background:CGImage,icon:Icon,clipFillMode:CGPathFillRule = .winding) throws -> CGImage{
+        let path = try self.iconPath(icon: icon)
+        let rect = path.boundingBoxOfPath
+        let ctx = try self.createContext(rect:rect)
+        ctx.translateBy(x:-rect.origin.x, y: -rect.origin.y)
+        ctx.addPath(path)
+        ctx.clip(using: clipFillMode)
+        ctx.draw(background, in: rect)
+        return try createImage(ctx: ctx)
+    }
+
+    private func createContext(rect:CGRect) throws->CGContext{
+        guard let ctx = RenderContext.context(size:rect.size, scale: 1) else { throw NSError(domain: "ctx error", code: 5)}
+        return ctx
+    }
+    private func createImage(ctx:CGContext) throws->CGImage{
+        guard let imag = ctx.makeImage() else { throw NSError(domain: "create image error", code: 6)}
+        return imag
     }
 }
 
@@ -106,11 +125,20 @@ public struct Icon{
     public var string:NSAttributedString?{
         Icon.iconfont.attribute(icon: self)
     }
+    public func maskBackground(image:CGImage)->UIImage?{
+        do{
+            let imag = try Icon.iconfont.charMaskImage(background: image, icon: self)
+            return UIImage(cgImage: imag,scale: Icon.iconfont.scale,orientation: .up)
+        }catch{
+            return nil
+        }
+        
+    }
     public static var iconfont:IconFont = try! IconFont()
 }
 
 extension UIImageView{
-    public func loadIcon(icon:Icon,font:IconFont){
+    public func loadIcon(icon:Icon,font:IconFont = IconFont.shared){
         self.image = font.uiIcon(icon: icon)
     }
 }

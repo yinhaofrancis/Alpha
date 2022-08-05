@@ -125,3 +125,25 @@ public struct RenderContext{
     }
 }
 
+
+public protocol RenderContent{
+    func render(renderCtx:RenderContext,rect:CGRect)
+}
+
+public struct RenderGradient:RenderContent{
+    public func render(renderCtx: RenderContext,rect:CGRect) {
+        let point1 = CGPoint(x: rect.minX + self.relatePoint1.x, y: rect.minY + self.relatePoint1.y)
+        let point2 = CGPoint(x: rect.minX + self.relatePoint2.x, y: rect.minY + self.relatePoint2.y)
+        guard let gra = self.gradient else { return }
+        renderCtx.context.drawLinearGradient(gra, start: point1, end: point2, options: [.drawsAfterEndLocation,.drawsBeforeStartLocation])
+    }
+    public var colors:[CGColor]
+    public var location:[CGFloat]
+    
+    public var relatePoint1:CGPoint
+    public var relatePoint2:CGPoint
+    
+    public var gradient:CGGradient?{
+        CGGradient(colorsSpace: CGColorSpaceCreateDeviceRGB(), colors: self.colors as CFArray, locations: self.location)
+    }
+}

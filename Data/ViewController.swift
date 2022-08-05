@@ -21,7 +21,7 @@ class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePic
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.iamgev.image = Icon.make.image
+        self.iamgev.image = Icon.make.maskBackground(image: UIImage(named: "i")!.cgImage!)
         self.text.attributedText = Icon.make.string
         
     }
