@@ -19,10 +19,13 @@ public enum DrawImageMode{
 
 public struct RenderContext{
     public private(set) var context:CGContext
-    public init(size:CGSize,scale:CGFloat){
-        self.context = RenderContext.context(size: size, scale: scale)!
-        self.context.scaleBy(x: scale, y: -scale)
-        self.context.translateBy(x: 0, y: -size.height)
+    public init(size:CGSize,scale:CGFloat,reverse:Bool = false) throws{
+        guard let ctx =  RenderContext.context(size: size, scale: scale)  else { throw NSError(domain: "create ctx error", code: 0) }
+        self.context = ctx
+        if(reverse){
+            self.context.scaleBy(x: scale, y: -scale)
+            self.context.translateBy(x: 0, y: -size.height)
+        }
     }
     public static func context(size:CGSize,scale:CGFloat)->CGContext?{
         let w = Int(size.width * scale)
@@ -145,5 +148,24 @@ public struct RenderGradient:RenderContent{
     
     public var gradient:CGGradient?{
         CGGradient(colorsSpace: CGColorSpaceCreateDeviceRGB(), colors: self.colors as CFArray, locations: self.location)
+    }
+    public init(colors:[CGColor],location:[CGFloat],relatePoint1:CGPoint,relatePoint2:CGPoint){
+        self.colors = colors
+        self.location = location
+        self.relatePoint1 = relatePoint1
+        self.relatePoint2 = relatePoint2
+    }
+}
+
+public struct RenderImage:RenderContent{
+    public func render(renderCtx: RenderContext, rect: CGRect) {
+        renderCtx.drawScaleImage(image: self.image, rect: rect, mode: self.mode)
+    }
+    
+    public var mode:DrawImageMode
+    public var image:CGImage
+    public init(image:CGImage,mode:DrawImageMode){
+        self.image = image
+        self.mode = mode
     }
 }

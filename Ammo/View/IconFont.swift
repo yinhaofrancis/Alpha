@@ -68,11 +68,11 @@ public class IconFont{
         let path = try self.charIconPath(chars: chars, size: size, color: color)
         let rect = path.boundingBoxOfPath
         let ctx = try self.createContext(rect:rect)
-        ctx.translateBy(x:-rect.origin.x, y: -rect.origin.y)
-        ctx.setFillColor(color)
-        ctx.addPath(path)
-        ctx.fillPath()
-        guard let imag = ctx.makeImage() else { throw NSError(domain: "create image error", code: 6)}
+        ctx.context.translateBy(x:-rect.origin.x, y: -rect.origin.y)
+        ctx.context.setFillColor(color)
+        ctx.context.addPath(path)
+        ctx.context.fillPath()
+        guard let imag = ctx.context.makeImage() else { throw NSError(domain: "create image error", code: 6)}
         return imag
     }
     public func charIconPath(chars:[UInt16],size:CGFloat,color:CGColor)throws ->CGPath{
@@ -87,23 +87,22 @@ public class IconFont{
         guard let path = CTFontCreatePathForGlyph(font, g, nil) else { throw NSError(domain: "create path error", code: 0)}
         return path
     }
-    public func charMaskImage(background:CGImage,icon:Icon,clipFillMode:CGPathFillRule = .winding) throws -> CGImage{
+    public func charMaskImage(background:RenderContent,icon:Icon,clipFillMode:CGPathFillRule = .winding) throws -> CGImage{
         let path = try self.iconPath(icon: icon)
         let rect = path.boundingBoxOfPath
         let ctx = try self.createContext(rect:rect)
-        ctx.translateBy(x:-rect.origin.x, y: -rect.origin.y)
-        ctx.addPath(path)
-        ctx.clip(using: clipFillMode)
-        ctx.draw(background, in: rect)
+        ctx.context.translateBy(x:-rect.origin.x, y: -rect.origin.y)
+        ctx.context.addPath(path)
+        ctx.context.clip(using: clipFillMode)
+        background.render(renderCtx: ctx, rect: rect)
         return try createImage(ctx: ctx)
     }
 
-    private func createContext(rect:CGRect) throws->CGContext{
-        guard let ctx = RenderContext.context(size:rect.size, scale: 1) else { throw NSError(domain: "ctx error", code: 5)}
-        return ctx
+    private func createContext(rect:CGRect) throws->RenderContext{
+        return try RenderContext(size: rect.size, scale: scale)
     }
-    private func createImage(ctx:CGContext) throws->CGImage{
-        guard let imag = ctx.makeImage() else { throw NSError(domain: "create image error", code: 6)}
+    private func createImage(ctx:RenderContext) throws->CGImage{
+        guard let imag = ctx.context.makeImage() else { throw NSError(domain: "create image error", code: 6)}
         return imag
     }
 }
@@ -113,7 +112,6 @@ public struct Icon{
     public var text:String
     public var color:UIColor
     public var size:CGFloat
-    
     public init(text:String, color:UIColor,size:CGFloat){
         self.text = text
         self.color = color
@@ -124,15 +122,6 @@ public struct Icon{
     }
     public var string:NSAttributedString?{
         Icon.iconfont.attribute(icon: self)
-    }
-    public func maskBackground(image:CGImage)->UIImage?{
-        do{
-            let imag = try Icon.iconfont.charMaskImage(background: image, icon: self)
-            return UIImage(cgImage: imag,scale: Icon.iconfont.scale,orientation: .up)
-        }catch{
-            return nil
-        }
-        
     }
     public static var iconfont:IconFont = try! IconFont()
 }
