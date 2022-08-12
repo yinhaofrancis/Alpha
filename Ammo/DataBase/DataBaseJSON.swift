@@ -7,6 +7,8 @@
 
 import Foundation
 
+
+
 @dynamicMemberLookup
 public struct JSONModel:ExpressibleByArrayLiteral,
                    ExpressibleByDictionaryLiteral,

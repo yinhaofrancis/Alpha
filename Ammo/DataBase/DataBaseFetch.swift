@@ -18,6 +18,7 @@ public class FetchColume{
 }
 
 @propertyWrapper
+/// 查询列属性包裹器
 public class QueryColume<T:DBType>:FetchColume{
 
     public var wrappedValue:T{
@@ -32,6 +33,12 @@ public class QueryColume<T:DBType>:FetchColume{
         super.init(colume: colume, type: nil)
         self.value = wrappedValue
     }
+    /// Query Colume
+    /// - Parameters:
+    ///   - wrappedValue: wrappedValue
+    ///   - function: SQL 函数
+    ///   - colume: 列名
+    ///   - type: 实体类型  链接查询时必选
     public init(wrappedValue:T,function:String,colume:String,type:DataBaseProtocol.Type? = nil){
         if let t = type{
             let c = "\(function)(\(t.name).\(colume))"
@@ -44,6 +51,11 @@ public class QueryColume<T:DBType>:FetchColume{
         }
         self.align = true;
     }
+    /// Query Colume
+    /// - Parameters:
+    ///   - wrappedValue: wrappedValue
+    ///   - colume: 列名
+    ///   - type: 实体类型  链接查询时必选
     public init(wrappedValue:T,colume:String,type:DataBaseProtocol.Type? = nil){
         if let t = type{
             super.init(colume: t.name + "." + colume, type: type)
@@ -53,6 +65,25 @@ public class QueryColume<T:DBType>:FetchColume{
             self.value = wrappedValue
         }
     }
+    
+    /// JSON Query Colume
+    /// - Parameters:
+    ///   - wrappedValue: wrappedValue
+    ///   - colume: 列名
+    ///   - jsonKeyPath: json key path
+    ///   - type: 实体类型 链接查询时必选
+    ///   json key path
+    ///   json_extract('{"a":2,"c":[4,5,{"f":7}]}', '$') → '{"a":2,"c":[4,5,{"f":7}]}'
+    ///   json_extract('{"a":2,"c":[4,5,{"f":7}]}', '$.c') → '[4,5,{"f":7}]'
+    ///   json_extract('{"a":2,"c":[4,5,{"f":7}]}', '$.c[2]') → '{"f":7}'
+    ///   json_extract('{"a":2,"c":[4,5,{"f":7}]}', '$.c[2].f') → 7
+    ///   json_extract('{"a":2,"c":[4,5],"f":7}','$.c','$.a') → '[[4,5],2]'
+    ///   json_extract('{"a":2,"c":[4,5],"f":7}','$.c[#-1]') → 5
+    ///   json_extract('{"a":2,"c":[4,5,{"f":7}]}', '$.x') → NULL
+    ///   json_extract('{"a":2,"c":[4,5,{"f":7}]}', '$.x', '$.a') → '[null,2]'
+    ///   json_extract('{"a":"xyz"}', '$.a') → 'xyz'
+    ///   json_extract('{"a":null}', '$.a') → NULL
+    ///
     public init(wrappedValue:T,colume:String,jsonKeyPath:String,type:DataBaseProtocol.Type? = nil){
         let c = "json_extract(\((type == nil ? "" : type!.name + ".")  + colume),\(jsonKeyPath))"
         super.init(colume: c, type: type)
@@ -61,7 +92,9 @@ public class QueryColume<T:DBType>:FetchColume{
 }
 
 
+/// 数据查询对象
 open class DataBaseFetchObject{
+    /// 链接类型
     public enum Join{
         case leftJoin
         case crossJoin
@@ -80,6 +113,9 @@ open class DataBaseFetchObject{
             }
         }
     }
+    /// 创建查询
+    /// - Parameter table: 实体类型
+    /// - Returns: 查询对象
     public static func fetch(table:DataBaseProtocol.Type)->Fetch{
         let sample = Self()
         let f = Fetch()
@@ -87,6 +123,7 @@ open class DataBaseFetchObject{
         return f
     }
     
+    /// 查询对象的定义
     public var declare:[String:FetchColume]{
         return Mirror(reflecting: self).children.filter { kv in
             (kv.value as? FetchColume) != nil
@@ -105,29 +142,54 @@ open class DataBaseFetchObject{
         var having:String = ""
         var sort:[String] = []
         var groupby:String = ""
-        public func select<T:DataBaseFetchObject>(sample:T,table:DataBaseProtocol.Type){
+        fileprivate func select<T:DataBaseFetchObject>(sample:T,table:DataBaseProtocol.Type){
             self.sql = "select \(sample.declare.map({$0.value.colume + "\($0.value.align ? " as \($0.key)" : "")"}).joined(separator: ",")) from \(table.name)"
         }
+        /// 链接查询
+        /// - Parameters:
+        ///   - join: 链接模式
+        ///   - table: 链接的实体名
+        ///   - condition: 条件描述
+        /// - Returns: 查询对象
         public func joinQuery(join:Join,table:DataBaseProtocol.Type,condition:QueryCondition? = nil)->Fetch{
             self.join.append(" \(join.code) \(table.name) \(condition == nil ? "" : "ON \(condition!.condition)")")
             return self
         }
+        /// where 条件
+        /// - Parameter condition: 条件描述
+        /// - Returns: 查询对象
         public func whereCondition(condition:QueryCondition)->Fetch{
             self.condition = " where \(condition.condition)"
             return self
         }
+        /// 排序
+        /// - Parameters:
+        ///   - key: 排序Key
+        ///   - desc: 是否倒叙
+        /// - Returns: 查询对象
         public func orderBy(key:QueryCondition.Key,desc:Bool)->Fetch{
             self.sort.append("\(key.key) \(desc ? "DESC" : "ASC")")
             return self
         }
+        /// 分组
+        /// - Parameter key: group by <key>
+        /// - Returns: 查询对象
         public func groupBy(key:QueryCondition.Key...)->Fetch{
             self.groupby = " group by \(key.map({$0.key}).joined(separator: ","))"
             return self
         }
+        /// having
+        /// - Parameter condition: 条件
+        /// - Returns: 查询对象
         public func having(condition:QueryCondition)->Fetch{
             self.having = "HAVING \(condition.condition)"
             return self
         }
+        /// 执行查询
+        /// - Parameters:
+        ///   - db: 数据库对象
+        ///   - param: 参数
+        /// - Returns: 结果
         public func query<T:DataBaseFetchObject>(db:DataBase,param:[String:DBType]? = nil) throws->[T]{
             let sql = self.selectCode
             let rs = try db.prepare(sql: sql)
@@ -165,6 +227,7 @@ open class DataBaseFetchObject{
 }
 
 
+/// 视图协议
 public protocol DataBaseFetchViewProtocol{
     var viewFetch:DataBaseFetchObject.Fetch { get }
     var name:String { get }
@@ -173,6 +236,8 @@ public protocol DataBaseFetchViewProtocol{
 }
 
 extension DataBaseFetchViewProtocol{
+    /// 创建视图
+    /// - Parameter db: 数据库
     public func createView(db:DataBase) throws {
         let sql = "create view if not exists \(self.name) as " + self.viewFetch.selectCode
         let rs = try db.prepare(sql: sql)
@@ -182,6 +247,12 @@ extension DataBaseFetchViewProtocol{
         _ = try rs.step()
         
     }
+    /// 视图查询
+    /// - Parameters:
+    ///   - db: 数据库
+    ///   - condition: 条件
+    ///   - param: 参数
+    /// - Returns: 结果
     public func query(db:DataBase,condition:QueryCondition? = nil ,param:[String:DBType]? = nil) throws ->[Objects]{
         var sql = "select * from \(self.name) "
         if let condition = condition {

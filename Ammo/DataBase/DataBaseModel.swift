@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+/// 原始列类型
 public enum CollumnType{
     case nullCollumn
     case intCollumn
@@ -15,6 +16,7 @@ public enum CollumnType{
     case dataCollumn
 }
 
+/// 列定义类型
 public enum CollumnDecType:String{
     case intDecType = "INTEGER"
     case doubleDecType = "REAL"
@@ -40,6 +42,7 @@ public enum CollumnDecType:String{
         }
     }
 }
+/// 外键Action
 public struct ForeignDeclareAction:Hashable{
     let action:String
     static public var CASCADE:ForeignDeclareAction = ForeignDeclareAction(action: "CASCADE")
@@ -49,6 +52,7 @@ public struct ForeignDeclareAction:Hashable{
     static public var SET_DEFAULT:ForeignDeclareAction = ForeignDeclareAction(action: "SET DEFAULT")
 }
 
+/// 外键定义
 public struct ForeignDeclare{
     public var key:String
     public var refKey:String
@@ -70,6 +74,7 @@ public struct ForeignDeclare{
         self.onUpdate = onUpdate
     }
 }
+/// 列定义
 public class CollumnDeclare{
     public var type:CollumnDecType
     public var nullable:Bool
@@ -111,6 +116,7 @@ public struct TableBuild{
     }
 }
 
+/// 表定义
 public struct TableDeclare{
     public var name:String
     public var version:Int32
@@ -215,6 +221,7 @@ public struct TableDeclare{
     }
 }
 
+/// 表列定义
 public class TableColumn:CollumnDeclare{
     public var origin:DBType
     public init(value:DBType,type:CollumnDecType,nullable:Bool, name:String, primaryKey:Bool,unique:Bool,autoInc:Bool){
@@ -226,6 +233,7 @@ public class TableColumn:CollumnDeclare{
     }
 }
 
+/// 表数据模型
 public struct TableModel{
     public var name:String
     public var declare:[TableColumn]
@@ -399,6 +407,7 @@ public struct TableModel{
     }
 }
 
+/// 查询条件
 public class QueryCondition{
     public var condition:String
     public init(condition:String){

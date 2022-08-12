@@ -116,9 +116,7 @@ public struct DBWorkFlow{
 public class DBContent<T:DataBaseProtocol>{
     
     public var wrappedValue: Array<T>{
-        if(self.origin.count == 0){
-            self.sync()
-        }
+        self.sync()
         return self.origin
     }
     private var origin:Array<T> = []
