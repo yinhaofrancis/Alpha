@@ -21,7 +21,7 @@ class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePic
     override func viewDidLoad() {
         super.viewDidLoad()
         let rg = RenderGradient(colors: [UIColor.red.cgColor,UIColor.blue.cgColor], location: [0,1], relatePoint1: .zero, relatePoint2: CGPoint(x:120, y: 0))
-        let cgimg = try! IconFont.shared.charMaskImage(background: rg, icon: Icon.make, clipFillMode: .evenOdd)
+        let cgimg = try! IconFont.shared.charMaskImage(background: rg, icon: Icon.make)
         self.iamgev.image = UIImage(cgImage: cgimg ,scale: UIScreen.main.scale,orientation: .up)
         self.text.attributedText = Icon.make.string
         
