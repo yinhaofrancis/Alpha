@@ -9,6 +9,10 @@ import Foundation
 import QuartzCore
 import CoreText
 import UIKit
+import UniformTypeIdentifiers
+
+import CoreServices
+
 
 public enum DrawImageMode{
     case fill
@@ -124,7 +128,24 @@ public struct RenderContext{
         return display.applying(transform);
     }
     public var image:CGImage?{
-        return self.context.makeImage()
+        let data:CFMutableData = CFDataCreateMutable(kCFAllocatorDefault, 0)
+        guard let des = self.insertImageDestination(data: data) else { return nil }
+        guard let img = self.context.makeImage() else { return nil }
+        CGImageDestinationAddImage(des,img, [kCGImageDestinationLossyCompressionQuality:0.8] as CFDictionary)
+        CGImageDestinationFinalize(des)
+        guard let source = CGImageSourceCreateWithData(data, nil) else { return nil }
+        let image = CGImageSourceCreateImageAtIndex(source, 0, nil)
+        
+        return image
+    }
+    
+    public func insertImageDestination(data:CFMutableData)->CGImageDestination?{
+        if #available(iOS 14.0, *) {
+            
+            return CGImageDestinationCreateWithData(data, UTType.png.identifier as CFString, 1, nil)
+        } else {
+            return CGImageDestinationCreateWithData(data, kUTTypePNG as CFString, 1, nil)
+        }
     }
 }
 
