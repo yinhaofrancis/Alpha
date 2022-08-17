@@ -19,13 +19,19 @@ public enum DrawImageMode{
 
 public struct RenderContext{
     public private(set) var context:CGContext
+    public let scale:CGFloat
     public init(size:CGSize,scale:CGFloat,reverse:Bool = false) throws{
+        self.scale = scale
         guard let ctx =  RenderContext.context(size: size, scale: scale)  else { throw NSError(domain: "create ctx error", code: 0) }
         self.context = ctx
         if(reverse){
             self.context.scaleBy(x: scale, y: -scale)
             self.context.translateBy(x: 0, y: -size.height)
         }
+    }
+    public init(ctx:CGContext,scale:CGFloat){
+        self.context = ctx
+        self.scale = scale
     }
     public static func context(size:CGSize,scale:CGFloat)->CGContext?{
         let w = Int(size.width * scale)

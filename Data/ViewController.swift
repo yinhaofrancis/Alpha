@@ -18,13 +18,24 @@ class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePic
     @IBOutlet weak var text: UILabel!
     @IBOutlet weak var iamgev: UIImageView!
     let font:IconFont = try! IconFont()
+    let renderctx = try! RenderContext(size: CGSize(width: 320, height: 480), scale: 3,reverse: true)
     override func viewDidLoad() {
         super.viewDidLoad()
-        let rg = RenderGradient(colors: [UIColor.red.cgColor,UIColor.blue.cgColor], location: [0,1], relatePoint1: .zero, relatePoint2: CGPoint(x:120, y: 0))
-        let cgimg = try! IconFont.shared.charMaskImage(background: rg, icon: Icon.make)
-        self.iamgev.image = UIImage(cgImage: cgimg ,scale: UIScreen.main.scale,orientation: .up)
-        self.text.attributedText = Icon.make.string
+//        let rg = RenderGradient(colors: [UIColor.red.cgColor,UIColor.blue.cgColor], location: [0,1], relatePoint1: .zero, relatePoint2: CGPoint(x:120, y: 0))
+//        let cgimg = try! IconFont.shared.charMaskImage(background: rg, icon: Icon.make)
+//        self.iamgev.image = UIImage(cgImage: cgimg ,scale: UIScreen.main.scale,orientation: .up)
+//        self.text.attributedText = Icon.make.string
+        let a = NSAttributedString(string: "adasdada", attributes: [
+            .font:UIFont.systemFont(ofSize: 24),
+            .foregroundColor:UIColor.white
+        ]) as CFAttributedString
         
+        let v = RenderTextView(ctx: self.renderctx, frame: CGRect(x: 20, y: 20, width: 300, height: 50))
+        v.backgroundColor = UIColor.red.cgColor
+        v.attributedString = a
+        guard let l = v.layer else { return }
+        self.renderctx.context.draw(l, in: v.frame)
+        self.iamgev.image = UIImage(cgImage: self.renderctx.image! ,scale: 3,orientation: .up)
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		A922C3EE2876CFC800FB05E7 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = A922C3ED2876CFC800FB05E7 /* Node.swift */; };
+		A946FCA228AD4DD400868E2A /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A946FCA128AD4DD400868E2A /* View.swift */; };
 		A95BCB732824C491000982D0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95BCB722824C491000982D0 /* AppDelegate.swift */; };
 		A95BCB752824C491000982D0 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95BCB742824C491000982D0 /* SceneDelegate.swift */; };
 		A95BCB772824C491000982D0 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95BCB762824C491000982D0 /* ViewController.swift */; };
@@ -22,7 +23,6 @@
 		A95BCB9D28250846000982D0 /* TextDetect.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95BCB9C28250846000982D0 /* TextDetect.swift */; };
 		A95E514C2848BFB100BA7028 /* Download.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95E514B2848BFB100BA7028 /* Download.swift */; };
 		A967E03A28539C22005CF3AC /* Zip.swift in Sources */ = {isa = PBXBuildFile; fileRef = A967E03928539C22005CF3AC /* Zip.swift */; };
-		A976238F2869A5B600BAC1FC /* Pretty.swift in Sources */ = {isa = PBXBuildFile; fileRef = A976238E2869A5B600BAC1FC /* Pretty.swift */; };
 		A97623912869AEC100BAC1FC /* data.json in Resources */ = {isa = PBXBuildFile; fileRef = A97623902869AEC100BAC1FC /* data.json */; };
 		A9A3FBA8283F11BF003582F2 /* DataBaseUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A3FBA7283F11BF003582F2 /* DataBaseUpdate.swift */; };
 		A9CD687E28425CC000ABD882 /* DataBaseConcurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9CD687D28425CC000ABD882 /* DataBaseConcurrency.swift */; };
@@ -88,6 +88,7 @@
 
 /* Begin PBXFileReference section */
 		A922C3ED2876CFC800FB05E7 /* Node.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
+		A946FCA128AD4DD400868E2A /* View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = View.swift; path = ../../../../../View.swift; sourceTree = "<group>"; };
 		A95BCB702824C491000982D0 /* Data.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Data.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A95BCB722824C491000982D0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A95BCB742824C491000982D0 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -101,7 +102,6 @@
 		A95BCB9C28250846000982D0 /* TextDetect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextDetect.swift; sourceTree = "<group>"; };
 		A95E514B2848BFB100BA7028 /* Download.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Download.swift; sourceTree = "<group>"; };
 		A967E03928539C22005CF3AC /* Zip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zip.swift; sourceTree = "<group>"; };
-		A976238E2869A5B600BAC1FC /* Pretty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pretty.swift; sourceTree = "<group>"; };
 		A97623902869AEC100BAC1FC /* data.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = data.json; sourceTree = "<group>"; };
 		A9A3FBA7283F11BF003582F2 /* DataBaseUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBaseUpdate.swift; sourceTree = "<group>"; };
 		A9CD687D28425CC000ABD882 /* DataBaseConcurrency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBaseConcurrency.swift; sourceTree = "<group>"; };
@@ -265,9 +265,9 @@
 			isa = PBXGroup;
 			children = (
 				A9FF619628411027006637DC /* Context.swift */,
-				A976238E2869A5B600BAC1FC /* Pretty.swift */,
 				A922C3ED2876CFC800FB05E7 /* Node.swift */,
 				A9EEA3DE289AADAB00F6F938 /* IconFont.swift */,
+				A946FCA128AD4DD400868E2A /* View.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -481,12 +481,12 @@
 				A9FB798C281A6942008CCF39 /* DataBaseModel.swift in Sources */,
 				A9FB7989281A6942008CCF39 /* DataBaseBackUp.swift in Sources */,
 				A967E03A28539C22005CF3AC /* Zip.swift in Sources */,
-				A976238F2869A5B600BAC1FC /* Pretty.swift in Sources */,
 				A9FB798B281A6942008CCF39 /* DataBaseWorkFlow.swift in Sources */,
 				A9CD687E28425CC000ABD882 /* DataBaseConcurrency.swift in Sources */,
 				A9FF619728411027006637DC /* Context.swift in Sources */,
 				A9FB798E281A6942008CCF39 /* DataBase.swift in Sources */,
 				A9FB798A281A6942008CCF39 /* DataBaseFetch.swift in Sources */,
+				A946FCA228AD4DD400868E2A /* View.swift in Sources */,
 				A95E514C2848BFB100BA7028 /* Download.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -799,7 +799,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				"IPHONEOS_DEPLOYMENT_TARGET[sdk=macosx*]" = 13.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -829,7 +829,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				"IPHONEOS_DEPLOYMENT_TARGET[sdk=macosx*]" = 13.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
