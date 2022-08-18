@@ -21,21 +21,28 @@ class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePic
     let renderctx = try! RenderContext(size: CGSize(width: 320, height: 480), scale: 3,reverse: true)
     override func viewDidLoad() {
         super.viewDidLoad()
-//        let rg = RenderGradient(colors: [UIColor.red.cgColor,UIColor.blue.cgColor], location: [0,1], relatePoint1: .zero, relatePoint2: CGPoint(x:120, y: 0))
-//        let cgimg = try! IconFont.shared.charMaskImage(background: rg, icon: Icon.make)
-//        self.iamgev.image = UIImage(cgImage: cgimg ,scale: UIScreen.main.scale,orientation: .up)
-//        self.text.attributedText = Icon.make.string
-        let a = NSAttributedString(string: "adasdada", attributes: [
-            .font:UIFont.systemFont(ofSize: 24),
+        var j:CGFloat = 0
+        let a = NSAttributedString(string: "ada", attributes: [
+            .font:UIFont.systemFont(ofSize: 12),
             .foregroundColor:UIColor.white
         ]) as CFAttributedString
+        let v = RenderTextView(frame: CGRect(x: 0, y: 0, width: 150, height: 150), context: self.renderctx)
+        let b = RenderImageView(image: UIImage(named: "i")!.cgImage!, position: CGPoint(x: 0, y: 0), context: self.renderctx)
+        v.attributedString = a;
+        v.clip = true
+        v.content = ImageFillContent(image: UIImage(named: "i")?.cgImage)
+        v.shadowColor = UIColor.red.cgColor
+        v.shadowRadius = 6
+        v.radius = 5
+        v.addSubView(view: b)
+        Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { t in
+            j = CGFloat(arc4random() % 30)
+            v.frame = CGRect(x:  j, y: j, width: v.frame.width, height: v.frame.height)
+            v.render(ctx: self.renderctx)
+            self.iamgev.image = UIImage(cgImage: self.renderctx.image! ,scale: self.renderctx.scale,orientation: .up)
+            self.renderctx.clean()
+        }
         
-        let v = RenderTextView(ctx: self.renderctx, frame: CGRect(x: 20, y: 20, width: 300, height: 50))
-        v.backgroundColor = UIColor.red.cgColor
-        v.attributedString = a
-        guard let l = v.layer else { return }
-        self.renderctx.context.draw(l, in: v.frame)
-        self.iamgev.image = UIImage(cgImage: self.renderctx.image! ,scale: 3,orientation: .up)
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {

@@ -14,6 +14,7 @@ import UniformTypeIdentifiers
 import CoreServices
 
 
+/// fill 拉伸填充 fillScale 放大填充 fillScaleClip 放大填充剪切 scale 适应填充
 public enum DrawImageMode{
     case fill
     case fillScale
@@ -154,6 +155,17 @@ public struct RenderContext{
         } else {
             return CGImageDestinationCreateWithData(data, kUTTypePNG as CFString, 1, nil)
         }
+    }
+    public func createLayer(size:CGSize)->CGLayer?{
+        let layer = CGLayer(self.context, size: CGSize(width: size.width * self.scale, height: size.height * self.scale), auxiliaryInfo: nil)
+        layer?.context?.scaleBy(x: self.scale, y: self.scale)
+        return layer
+    }
+    public func imageSize(image:CGImage)->CGSize{
+        return CGSize(width: CGFloat(image.width) / self.scale, height: CGFloat(image.height) / self.scale)
+    }
+    public func clean(){
+        self.context.clear(CGRect(x: 0, y: 0, width: self.context.width, height: self.context.height))
     }
 }
 
