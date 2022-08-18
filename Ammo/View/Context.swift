@@ -113,7 +113,7 @@ public struct RenderContext{
             CTFrameDraw(frame, ctx.context)
         }
     }
-    public func drawString(string:CFAttributedString,constaint:CGRect){
+    public func drawString(string:CFAttributedString,constaint:CGRect,alignX:CGFloat = 0,AlignY:CGFloat = 0){
         var size = constaint.size
         size.width = constaint.size.width < 0 ? CGFloat.infinity : constaint.size.width
         size.height = constaint.size.height < 0 ? CGFloat.infinity : constaint.size.height
@@ -121,7 +121,9 @@ public struct RenderContext{
         let range = CFRange(location: 0, length: CFAttributedStringGetLength(string))
         let display = CTFramesetterSuggestFrameSizeWithConstraints(frameset,range , nil, size, nil)
         let frame = CTFramesetterCreateFrame(frameset, range, CGPath(rect: CGRect(x: 0, y: 0, width: display.width, height: display.height), transform: nil), nil)
-        let drawFrame =  CGRect(x: constaint.minX, y: constaint.minY, width: display.width, height: display.height)
+        let deltaX = constaint.width - display.width;
+        let deltaY = constaint.height - display.height;
+        let drawFrame =  CGRect(x: constaint.minX + deltaX * alignX, y: constaint.minY + deltaY * AlignY, width: display.width, height: display.height)
         self.drawFrame(frame: frame, rect:drawFrame)
     }
     public func drawString(string:CFAttributedString,point:CGPoint){
