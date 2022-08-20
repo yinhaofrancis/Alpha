@@ -79,6 +79,7 @@ public struct GradientFillContent:FillContent{
         context.context.clip()
         let rect = path.boundingBoxOfPath
         context.context.drawLinearGradient(self.gradient,start:CGPoint(x: startPoint.x + rect.origin.x, y: startPoint.y + rect.origin.y) , end: CGPoint(x: endPoint.x + rect.origin.x, y: endPoint.y + rect.origin.y), options: [.drawsAfterEndLocation,.drawsBeforeStartLocation])
+        
     }
     public init(gradient:CGGradient,startPoint:CGPoint,endPoint:CGPoint){
         self.gradient = gradient
