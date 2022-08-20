@@ -70,6 +70,23 @@ public struct ImageFillContent:FillContent{
         }
     }
 }
+public struct GradientFillContent:FillContent{
+    public var gradient:CGGradient
+    public var startPoint:CGPoint
+    public var endPoint:CGPoint
+    public func draw(context: RenderContext, path: CGPath) {
+        context.context.addPath(path)
+        context.context.clip()
+        let rect = path.boundingBoxOfPath
+        context.context.drawLinearGradient(self.gradient,start:CGPoint(x: startPoint.x + rect.origin.x, y: startPoint.y + rect.origin.y) , end: CGPoint(x: endPoint.x + rect.origin.x, y: endPoint.y + rect.origin.y), options: [.drawsAfterEndLocation,.drawsBeforeStartLocation])
+    }
+    public init(gradient:CGGradient,startPoint:CGPoint,endPoint:CGPoint){
+        self.gradient = gradient
+        self.startPoint = startPoint
+        self.endPoint = endPoint
+    }
+}
+
 public class RenderView:View{
     
     public var clip: Bool = true
@@ -186,9 +203,39 @@ public class RenderImageView:RenderView{
         }
         context.drawScaleImage(image: image, rect: self.bound, mode: self.mode)
     }
-    public init(image:CGImage,position:CGPoint, context: RenderContext) {
+    public convenience init(image:CGImage,position:CGPoint, context: RenderContext) {
+        self.init(image: image, frame: CGRect(origin: position, size: context.imageSize(image: image)), context: context)
+    }
+    public init(image:CGImage?,frame:CGRect,context:RenderContext){
         self.image = image
-        super.init(frame: CGRect(origin: position, size: context.imageSize(image: image)), context: context)
+        super.init(frame: frame, context: context)
     }
     
+}
+public class RenderURLImageView:RenderImageView{
+    public var url:URL?
+    public init(url:URL,frame:CGRect,context:RenderContext){
+        self.url = url
+        super.init(image: nil, frame: frame, context: context)
+        StaticImageDownloader.shared.downloadImage(url: url) {[weak self] img in
+            self?.image = img
+            self?.setNeedDisplay()
+        }
+    }
+}
+
+public class RenderPathImageView:RenderView{
+    public var path:CGPath
+    public init(path:CGPath,context:RenderContext){
+        self.path = path
+        super.init(frame: path.boundingBoxOfPath, context: context)
+    }
+    public override func drawLayer(context: RenderContext) {
+        context.context.scaleBy(x: 1, y: -1)
+        context.context.translateBy(x: 0, y: -self.frame.size.height)
+        var tra = CGAffineTransform(translationX: -self.frame.origin.x, y: -self.frame.origin.y)
+        context.context.addPath(self.path.copy(using: &tra)!)
+        context.context.clip()
+        super.drawLayer(context: context)
+    }
 }

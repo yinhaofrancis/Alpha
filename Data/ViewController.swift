@@ -10,7 +10,7 @@ import Ammo
 import TextDetect
 import WebKit
 extension Icon{
-    public static var make = Icon(text: "\u{e687}", color: UIColor.yellow, size: 43)
+    public static var make = Icon(text: "\u{e687}", color: UIColor.yellow, size: 12)
 }
 class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePickerControllerDelegate {
    
@@ -23,25 +23,28 @@ class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePic
         super.viewDidLoad()
         var j:CGFloat = 0
         let a = NSAttributedString(string: "ada", attributes: [
-            .font:UIFont.systemFont(ofSize: 12),
+            .font:UIFont.systemFont(ofSize: 24),
             .foregroundColor:UIColor.white
         ]) as CFAttributedString
         let v = RenderTextView(frame: CGRect(x: 0, y: 0, width: 150, height: 150), context: self.renderctx)
-        let b = RenderImageView(image: UIImage(named: "i")!.cgImage!, position: CGPoint(x: 0, y: 0), context: self.renderctx)
+        let f = RenderPathImageView(path: CGPath(ellipseIn: CGRect(x: 30, y: 30, width: 100, height: 100), transform: nil).copy(dashingWithPhase:5, lengths: [5,20]).copy(strokingWithWidth: 5, lineCap: .round, lineJoin: .round, miterLimit: 0), context: self.renderctx)
+        f.shadowColor = UIColor.black.cgColor
+        f.shadowRadius = 10
+        f.content = UIColor.green.cgColor
+        let b = RenderURLImageView(url: URL(string: "https://news-bos.cdn.bcebos.com/mvideo/log-news.png")!, frame: CGRect(x: 10, y: 10, width: 80, height: 30), context: self.renderctx)
         v.attributedString = a;
         v.clip = true
         v.content = ImageFillContent(image: UIImage(named: "i")?.cgImage)
         v.shadowColor = UIColor.red.cgColor
         v.shadowRadius = 6
-        v.radius = 5
+        v.radius = 20
         v.addSubView(view: b)
-        Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { t in
-            j = CGFloat(arc4random() % 30)
-            v.frame = CGRect(x:  j, y: j, width: v.frame.width, height: v.frame.height)
-            v.render(ctx: self.renderctx)
-            self.iamgev.image = UIImage(cgImage: self.renderctx.image! ,scale: self.renderctx.scale,orientation: .up)
-            self.renderctx.clean()
-        }
+        v.addSubView(view: f)
+        j = CGFloat(arc4random() % 80)
+        v.frame = CGRect(x:  j, y: j, width: v.frame.width, height: v.frame.height)
+        v.render(ctx: self.renderctx)
+        self.iamgev.image = UIImage(cgImage: self.renderctx.image! ,scale: self.renderctx.scale,orientation: .up)
+        self.renderctx.clean()
         
     }
     
