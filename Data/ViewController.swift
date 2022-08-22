@@ -18,20 +18,29 @@ class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePic
     @IBOutlet weak var text: UILabel!
     @IBOutlet weak var iamgev: UIImageView!
     let font:IconFont = try! IconFont()
+    lazy var b = {
+        RenderURLImageView(url: URL(string: "https://news-bos.cdn.bcebos.com/mvideo/log-news.png")!, frame: CGRect(x: 10, y: 10, width: 80, height: 30), context: self.renderctx)
+    }()
     let renderctx = try! RenderContext(size: CGSize(width: 320, height: 480), scale: 3,reverse: true)
+    var float:CGFloat = 0
     override func viewDidLoad() {
         super.viewDidLoad()
+        Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [self] t in
+            run()
+        }
+    }
+    func run(){
         var j:CGFloat = 0
-        let a = NSAttributedString(string: "ada", attributes: [
-            .font:UIFont.systemFont(ofSize: 24),
+        let a = NSAttributedString(string: "Label", attributes: [
+            .font:UIFont.systemFont(ofSize: 17),
             .foregroundColor:UIColor.white
         ]) as CFAttributedString
         let v = RenderTextView(frame: CGRect(x: 0, y: 0, width: 150, height: 150), context: self.renderctx)
-        let f = RenderPathImageView(path: CGPath(ellipseIn: CGRect(x: 30, y: 30, width: 100, height: 100), transform: nil).copy(dashingWithPhase:5, lengths: [5,20]).copy(strokingWithWidth: 5, lineCap: .round, lineJoin: .round, miterLimit: 0), context: self.renderctx)
+        let f = RenderPathImageView(path: CGPath(ellipseIn: CGRect(x: 30, y: 30, width: 100, height: 100), transform: nil).copy(dashingWithPhase:float, lengths: [10,10]).copy(strokingWithWidth: 5, lineCap: .butt, lineJoin: .round, miterLimit: 0), context: self.renderctx)
         f.shadowColor = UIColor.black.cgColor
         f.shadowRadius = 10
         f.content = UIColor.green.cgColor
-        let b = RenderURLImageView(url: URL(string: "https://news-bos.cdn.bcebos.com/mvideo/log-news.png")!, frame: CGRect(x: 10, y: 10, width: 80, height: 30), context: self.renderctx)
+        
         v.attributedString = a;
         v.clip = true
         v.content = ImageFillContent(image: UIImage(named: "i")?.cgImage)
@@ -40,14 +49,12 @@ class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePic
         v.radius = 20
         v.addSubView(view: b)
         v.addSubView(view: f)
-        j = CGFloat(arc4random() % 80)
+        j = 80.0
         v.frame = CGRect(x:  j, y: j, width: v.frame.width, height: v.frame.height)
         v.render(ctx: self.renderctx)
         self.iamgev.image = UIImage(cgImage: self.renderctx.image! ,scale: self.renderctx.scale,orientation: .up)
         self.renderctx.clean()
-        
     }
-    
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
      
     }

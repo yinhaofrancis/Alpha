@@ -12,7 +12,7 @@ public protocol CacheContent{
     func close(name:String)
     func copy(name:String,local:URL)
     func queryAllData(name:String)->Data?
-    func queryMd5(name:String)->String?
+    func querySha256(name:String)->String?
 }
 public class DiskCache{
     public var lock:DispatchSemaphore = DispatchSemaphore(value: 1)
@@ -80,7 +80,7 @@ public class Cache:CacheContent,CustomDebugStringConvertible{
     public var CacheDictionaryName:String = "Cache"
     public static func name(url:String)->String?{
         guard let data = url.data(using: .utf8) else  { return nil }
-        return Md5.update(data: data).hex
+        return Sha256.update(data: data).hex
     }
     public var dictionaryUrl:URL?{
         Cache.cacheDictionary(name: self.CacheDictionaryName,refresh: false)
@@ -137,9 +137,9 @@ public class Cache:CacheContent,CustomDebugStringConvertible{
         }
         return nil
     }
-    public func queryMd5(name:String)->String?{
+    public func querySha256(name:String)->String?{
         guard let data = self.queryAllData(name: name) else { return nil }
-        return Md5.update(data: data).base64EncodedString()
+        return Sha256.update(data: data).base64EncodedString()
     }
     public func writeToFile(name:String)->FileHandle?{
         self.dispatchSem.wait()
@@ -160,7 +160,6 @@ public class Cache:CacheContent,CustomDebugStringConvertible{
             self.map[name] = handle
             return handle
         }catch{
-            print(error)
             return nil
         }
     }
@@ -432,7 +431,6 @@ public class Downloader<T:DataTransformAdaptor,R>:NSObject,URLSessionDataDelegat
         self.lock.wait()
         self.urls.remove(name)
         self.lock.signal()
-//        print("downloaded")
         self.callbackLock.wait()
         let a = self.callbacks.removeValue(forKey: name)
         self.callbackLock.signal()
@@ -461,28 +459,26 @@ public class Downloader<T:DataTransformAdaptor,R>:NSObject,URLSessionDataDelegat
     }
     private func download(request:URLRequest)->String?{
         guard let name = self.buildName(request: request) else { return nil }
-        print(name)
         if self.needDownload(name: name){
             self.session.dataTask(with: request).resume()
             self.urls.insert(name)
-//            print("launch download")
         }
         return name
             
     }
+    public func getImage(url:URL)->T.Result?{
+        guard let name = Cache.name(url: url.absoluteString) else { return nil }
+        return self.createContent(name: name)
+    }
     public func download(request:URLRequest,callback:@escaping (R?)->Void){
         self.lock.wait()
-//        print("try download")
         guard let name = self.download(request: request) else {self.lock.signal();callback(nil);return}
         self.lock.signal()
         if !self.hasDownload(name: name){
             callback(self.createContent(name: name))
-//            print("read cache")
         }else{
-//            print("wait download")
             self.observerDownload(name:name) { [weak self] in
                 callback(self?.createContent(name: name))
-//                print("handle download")
             }
         }
     }
@@ -533,30 +529,30 @@ public class Downloader<T:DataTransformAdaptor,R>:NSObject,URLSessionDataDelegat
     }
 }
 
-public class Md5{
-    var ctx:CC_MD5_CTX
+public class Sha256{
+    var ctx:CC_SHA256_CTX
     public init(){
-        self.ctx = CC_MD5_CTX()
-        CC_MD5_Init(&self.ctx)
+        self.ctx = CC_SHA256_CTX()
+        CC_SHA256_Init(&self.ctx)
     }
     @discardableResult
-    public func update(data:Data)->Md5{
+    public func update(data:Data)->Sha256{
         let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: data.count)
         data.copyBytes(to: buffer, count: data.count)
-        CC_MD5_Update(&self.ctx, buffer, CC_LONG(data.count))
+        CC_SHA256_Update(&self.ctx, buffer, CC_LONG(data.count))
         buffer.deallocate()
         return self
     }
     public func final()->Data{
-        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(CC_MD5_DIGEST_LENGTH))
+        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(CC_SHA256_DIGEST_LENGTH))
         
-        CC_MD5_Final(buffer, &self.ctx)
-        let data = Data(bytes: buffer, count: Int(CC_MD5_DIGEST_LENGTH))
+        CC_SHA256_Final(buffer, &self.ctx)
+        let data = Data(bytes: buffer, count: Int(CC_SHA256_DIGEST_LENGTH))
         buffer.deallocate()
         return data
     }
     public static func update(data:Data)->Data{
-        Md5().update(data: data).final()
+        Sha256().update(data: data).final()
     }
 }
 extension Data{
@@ -592,12 +588,14 @@ public class StaticImageDownloader{
         StaticImageDownloader()
     }()!
     public func downloadImage(url:URL,callback:@escaping (CGImage?)->Void){
-
         imageDownloader.download(url: url) { i in
             DispatchQueue.main.async {
                 callback(i)
             }
         }
+    }
+    public func localImage(url:URL)->CGImage?{
+        return imageDownloader.getImage(url: url)
     }
 }
 public class StaticStringDownloader{
@@ -630,18 +628,3 @@ public class StaticJSONDownloader{
         }
     }
 }
-
-@objc public protocol pub:NSObjectProtocol,JSExport{
-    func go()
-    init(m:String)
-}
-public class mm:NSObject,pub{
-    public func go() {
-        print(go)
-    }
-    public required init(m: String) {
-        print(m)
-    }
-}
-
-

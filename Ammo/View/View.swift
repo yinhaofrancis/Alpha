@@ -218,9 +218,12 @@ public class RenderURLImageView:RenderImageView{
     public init(url:URL,frame:CGRect,context:RenderContext){
         self.url = url
         super.init(image: nil, frame: frame, context: context)
-        StaticImageDownloader.shared.downloadImage(url: url) {[weak self] img in
-            self?.image = img
-            self?.setNeedDisplay()
+        self.image = StaticImageDownloader.shared.localImage(url: url)
+        if(self.image == nil){
+            StaticImageDownloader.shared.downloadImage(url: url) {[weak self] img in
+                self?.image = img
+                self?.setNeedDisplay()
+            }
         }
     }
 }

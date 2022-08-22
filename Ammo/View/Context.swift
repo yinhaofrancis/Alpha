@@ -58,7 +58,6 @@ public struct RenderContext{
         return self.image
     }
     public func drawImage(image:CGImage,rect:CGRect){
-        print(rect)
         self.begin { ctx in
             ctx.context.translateBy(x: rect.origin.x, y: rect.origin.y)
             ctx.context.scaleBy(x: 1, y: -1)
