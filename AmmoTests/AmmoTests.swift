@@ -25,42 +25,39 @@ class AmmoTests: XCTestCase {
         let m = XCTestExpectation(description: "mark")
         let m2 = XCTestExpectation(description: "mark2")
         StaticStringDownloader.shared.downloadImage(url: URL(string: "https://app.5eplay.com/api/csgo/tournament/game_session_info/65456")!) { string in
-            print(string)
             m.fulfill()
-            
         }
         StaticJSONDownloader.shared.downloadImage(url: URL(string: "https://app.5eplay.com/api/csgo/tournament/game_session_info/65456")!) { string in
-            print(string)
             m2.fulfill()
-            
         }
         self.wait(for: [m,m2], timeout: 10)
     }
     
     
     func testExample() throws {
-  
-        let ns:[Node] = (0 ..< 5).map { _ in
-            createNode()
+        let data = DataSortSet<Int>()
+        
+        for i in 0 ..< 10{
+            data.insert(index: (9 - i) * 5, content: (9 - i) * 5)
+            print(data.holes)
         }
-        let a = Node()
-        a.width = Value(constant: 1000, mode: .absoluteValue)
-        a.height = Value(constant: 1000, mode: .absoluteValue)
-        a.children = ns
-        a.layout()
-        print(a)
-    }
-   
-    func createNode()->Node{
-        let ns:[Node] = (0 ..< 5).map { _ in
-            let n = Node()
-            n.width = Value(constant: 10, mode: .absoluteValue)
-            n.height = Value(constant: 10, mode: .absoluteValue)
-            return n
+        for i in 0 ..< 10{
+            data.insert(index: (9 - i) * 5 + 1, content: (9 - i) * 5 + 1)
+            print(data.holes)
         }
-        let a = Node()
-        a.children = ns
-        return a
+        for i in 0 ..< 10{
+            data.insert(index: (9 - i) * 5 + 2, content: (9 - i) * 5 + 2)
+            print(data.holes)
+        }
+        for i in 0 ..< 10{
+            data.insert(index: (9 - i) * 5 + 3, content: (9 - i) * 5 + 3)
+            print(data.holes)
+        }
+        for i in 0 ..< 10{
+            data.insert(index: (9 - i) * 5 + 4, content: (9 - i) * 5 + 4)
+            print(data.holes)
+        }
+        print(data.data)
     }
     func testPerformanceExample() throws {
         // This is an example of a performance test case.

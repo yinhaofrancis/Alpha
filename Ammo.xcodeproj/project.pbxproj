@@ -7,8 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A9205A0A28B469EA001529BA /* DataSortSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9205A0928B469EA001529BA /* DataSortSet.swift */; };
+		A9205A0C28B4D134001529BA /* Websocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9205A0B28B4D134001529BA /* Websocket.swift */; };
 		A922C3EE2876CFC800FB05E7 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = A922C3ED2876CFC800FB05E7 /* Node.swift */; };
 		A93C45DC28ADCE290089A9EA /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A93C45DB28ADCE290089A9EA /* View.swift */; };
+		A943B7EA28B8BB800063FA45 /* CokeConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A943B7E628B8BB7F0063FA45 /* CokeConfig.swift */; };
+		A943B7EB28B8BB800063FA45 /* CokeCompute.swift in Sources */ = {isa = PBXBuildFile; fileRef = A943B7E728B8BB800063FA45 /* CokeCompute.swift */; };
+		A943B7EC28B8BB800063FA45 /* CokeConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A943B7E828B8BB800063FA45 /* CokeConfiguration.swift */; };
 		A95BCB732824C491000982D0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95BCB722824C491000982D0 /* AppDelegate.swift */; };
 		A95BCB752824C491000982D0 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95BCB742824C491000982D0 /* SceneDelegate.swift */; };
 		A95BCB772824C491000982D0 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95BCB762824C491000982D0 /* ViewController.swift */; };
@@ -26,8 +31,11 @@
 		A97623912869AEC100BAC1FC /* data.json in Resources */ = {isa = PBXBuildFile; fileRef = A97623902869AEC100BAC1FC /* data.json */; };
 		A9A3FBA8283F11BF003582F2 /* DataBaseUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A3FBA7283F11BF003582F2 /* DataBaseUpdate.swift */; };
 		A9CD687E28425CC000ABD882 /* DataBaseConcurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9CD687D28425CC000ABD882 /* DataBaseConcurrency.swift */; };
+		A9DC4EE428BC55EF00DACFA9 /* default.metal in Sources */ = {isa = PBXBuildFile; fileRef = A9DC4EE328BC55EF00DACFA9 /* default.metal */; };
+		A9DC4EE628BDEB9F00DACFA9 /* CokeRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9DC4EE528BDEB9F00DACFA9 /* CokeRender.swift */; };
 		A9EE8384289940CB004217A8 /* iconfont.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A9EE8383289940CB004217A8 /* iconfont.ttf */; };
 		A9EEA3DF289AADAB00F6F938 /* IconFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9EEA3DE289AADAB00F6F938 /* IconFont.swift */; };
+		A9F411A428B72123003372B2 /* AMPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9F411A328B72123003372B2 /* AMPageView.swift */; };
 		A9FB7989281A6942008CCF39 /* DataBaseBackUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB7983281A6942008CCF39 /* DataBaseBackUp.swift */; };
 		A9FB798A281A6942008CCF39 /* DataBaseFetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB7984281A6942008CCF39 /* DataBaseFetch.swift */; };
 		A9FB798B281A6942008CCF39 /* DataBaseWorkFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB7985281A6942008CCF39 /* DataBaseWorkFlow.swift */; };
@@ -87,8 +95,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		A9205A0928B469EA001529BA /* DataSortSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSortSet.swift; sourceTree = "<group>"; };
+		A9205A0B28B4D134001529BA /* Websocket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Websocket.swift; sourceTree = "<group>"; };
 		A922C3ED2876CFC800FB05E7 /* Node.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
 		A93C45DB28ADCE290089A9EA /* View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = View.swift; sourceTree = "<group>"; };
+		A943B7E628B8BB7F0063FA45 /* CokeConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CokeConfig.swift; sourceTree = "<group>"; };
+		A943B7E728B8BB800063FA45 /* CokeCompute.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CokeCompute.swift; sourceTree = "<group>"; };
+		A943B7E828B8BB800063FA45 /* CokeConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CokeConfiguration.swift; sourceTree = "<group>"; };
 		A95BCB702824C491000982D0 /* Data.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Data.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A95BCB722824C491000982D0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A95BCB742824C491000982D0 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -105,8 +118,11 @@
 		A97623902869AEC100BAC1FC /* data.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = data.json; sourceTree = "<group>"; };
 		A9A3FBA7283F11BF003582F2 /* DataBaseUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBaseUpdate.swift; sourceTree = "<group>"; };
 		A9CD687D28425CC000ABD882 /* DataBaseConcurrency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBaseConcurrency.swift; sourceTree = "<group>"; };
+		A9DC4EE328BC55EF00DACFA9 /* default.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = default.metal; sourceTree = "<group>"; };
+		A9DC4EE528BDEB9F00DACFA9 /* CokeRender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CokeRender.swift; sourceTree = "<group>"; };
 		A9EE8383289940CB004217A8 /* iconfont.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = iconfont.ttf; sourceTree = "<group>"; };
 		A9EEA3DE289AADAB00F6F938 /* IconFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconFont.swift; sourceTree = "<group>"; };
+		A9F411A328B72123003372B2 /* AMPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AMPageView.swift; sourceTree = "<group>"; };
 		A9FB7976281A68B0008CCF39 /* Ammo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Ammo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9FB7983281A6942008CCF39 /* DataBaseBackUp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataBaseBackUp.swift; sourceTree = "<group>"; };
 		A9FB7984281A6942008CCF39 /* DataBaseFetch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataBaseFetch.swift; sourceTree = "<group>"; };
@@ -155,6 +171,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A943B7E528B8BB740063FA45 /* Render */ = {
+			isa = PBXGroup;
+			children = (
+				A943B7E728B8BB800063FA45 /* CokeCompute.swift */,
+				A943B7E628B8BB7F0063FA45 /* CokeConfig.swift */,
+				A943B7E828B8BB800063FA45 /* CokeConfiguration.swift */,
+				A9DC4EE328BC55EF00DACFA9 /* default.metal */,
+				A9DC4EE528BDEB9F00DACFA9 /* CokeRender.swift */,
+			);
+			path = Render;
+			sourceTree = "<group>";
+		};
 		A95BCB712824C491000982D0 /* Data */ = {
 			isa = PBXGroup;
 			children = (
@@ -168,6 +196,7 @@
 				A9EE8383289940CB004217A8 /* iconfont.ttf */,
 				A95BCB8A2824C4F3000982D0 /* Settings.bundle */,
 				A97623902869AEC100BAC1FC /* data.json */,
+				A9F411A328B72123003372B2 /* AMPageView.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -191,6 +220,7 @@
 			isa = PBXGroup;
 			children = (
 				A95E514B2848BFB100BA7028 /* Download.swift */,
+				A9205A0B28B4D134001529BA /* Websocket.swift */,
 			);
 			path = Web;
 			sourceTree = "<group>";
@@ -199,6 +229,7 @@
 			isa = PBXGroup;
 			children = (
 				A967E03928539C22005CF3AC /* Zip.swift */,
+				A9205A0928B469EA001529BA /* DataSortSet.swift */,
 			);
 			path = Z;
 			sourceTree = "<group>";
@@ -264,6 +295,7 @@
 		A9FF619328410684006637DC /* View */ = {
 			isa = PBXGroup;
 			children = (
+				A943B7E528B8BB740063FA45 /* Render */,
 				A9FF619628411027006637DC /* Context.swift */,
 				A922C3ED2876CFC800FB05E7 /* Node.swift */,
 				A9EEA3DE289AADAB00F6F938 /* IconFont.swift */,
@@ -458,6 +490,7 @@
 			files = (
 				A95BCB772824C491000982D0 /* ViewController.swift in Sources */,
 				A95BCB732824C491000982D0 /* AppDelegate.swift in Sources */,
+				A9F411A428B72123003372B2 /* AMPageView.swift in Sources */,
 				A95BCB752824C491000982D0 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -479,15 +512,22 @@
 				A9A3FBA8283F11BF003582F2 /* DataBaseUpdate.swift in Sources */,
 				A9EEA3DF289AADAB00F6F938 /* IconFont.swift in Sources */,
 				A9FB798C281A6942008CCF39 /* DataBaseModel.swift in Sources */,
+				A9205A0C28B4D134001529BA /* Websocket.swift in Sources */,
 				A9FB7989281A6942008CCF39 /* DataBaseBackUp.swift in Sources */,
+				A943B7EB28B8BB800063FA45 /* CokeCompute.swift in Sources */,
 				A967E03A28539C22005CF3AC /* Zip.swift in Sources */,
 				A9FB798B281A6942008CCF39 /* DataBaseWorkFlow.swift in Sources */,
+				A9DC4EE628BDEB9F00DACFA9 /* CokeRender.swift in Sources */,
 				A9CD687E28425CC000ABD882 /* DataBaseConcurrency.swift in Sources */,
 				A9FF619728411027006637DC /* Context.swift in Sources */,
 				A9FB798E281A6942008CCF39 /* DataBase.swift in Sources */,
 				A9FB798A281A6942008CCF39 /* DataBaseFetch.swift in Sources */,
 				A93C45DC28ADCE290089A9EA /* View.swift in Sources */,
+				A943B7EA28B8BB800063FA45 /* CokeConfig.swift in Sources */,
+				A943B7EC28B8BB800063FA45 /* CokeConfiguration.swift in Sources */,
 				A95E514C2848BFB100BA7028 /* Download.swift in Sources */,
+				A9205A0A28B469EA001529BA /* DataSortSet.swift in Sources */,
+				A9DC4EE428BC55EF00DACFA9 /* default.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

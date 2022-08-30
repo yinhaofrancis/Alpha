@@ -9,6 +9,8 @@ import UIKit
 import Ammo
 import TextDetect
 import WebKit
+import simd
+import MetalKit
 extension Icon{
     public static var make = Icon(text: "\u{e687}", color: UIColor.yellow, size: 12)
 }
@@ -16,47 +18,61 @@ class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePic
    
     
     @IBOutlet weak var text: UILabel!
-    @IBOutlet weak var iamgev: UIImageView!
+    var iamgev: CAMetalLayer!
+    let com = try! CokeComputer()
     let font:IconFont = try! IconFont()
     lazy var b = {
         RenderURLImageView(url: URL(string: "https://news-bos.cdn.bcebos.com/mvideo/log-news.png")!, frame: CGRect(x: 10, y: 10, width: 80, height: 30), context: self.renderctx)
     }()
     let renderctx = try! RenderContext(size: CGSize(width: 320, height: 480), scale: 3,reverse: true)
     var float:CGFloat = 0
+    var step:CGFloat = 1
     override func viewDidLoad() {
-        super.viewDidLoad()
-        Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [self] t in
-            run()
-        }
-    }
-    func run(){
-        var j:CGFloat = 0
-        let a = NSAttributedString(string: "Label", attributes: [
-            .font:UIFont.systemFont(ofSize: 17),
-            .foregroundColor:UIColor.white
-        ]) as CFAttributedString
-        let v = RenderTextView(frame: CGRect(x: 0, y: 0, width: 150, height: 150), context: self.renderctx)
-        let f = RenderPathImageView(path: CGPath(ellipseIn: CGRect(x: 30, y: 30, width: 100, height: 100), transform: nil).copy(dashingWithPhase:float, lengths: [10,10]).copy(strokingWithWidth: 5, lineCap: .butt, lineJoin: .round, miterLimit: 0), context: self.renderctx)
-        f.shadowColor = UIColor.black.cgColor
-        f.shadowRadius = 10
-        f.content = UIColor.green.cgColor
         
-        v.attributedString = a;
-        v.clip = true
-        v.content = ImageFillContent(image: UIImage(named: "i")?.cgImage)
-        v.shadowColor = UIColor.red.cgColor
-        v.shadowRadius = 6
-        v.radius = 20
-        v.addSubView(view: b)
-        v.addSubView(view: f)
-        j = 80.0
-        v.frame = CGRect(x:  j, y: j, width: v.frame.width, height: v.frame.height)
-        v.render(ctx: self.renderctx)
-        self.iamgev.image = UIImage(cgImage: self.renderctx.image! ,scale: self.renderctx.scale,orientation: .up)
-        self.renderctx.clean()
+        super.viewDidLoad()
+       
+        self.iamgev =  CAMetalLayer()
+        self.iamgev.contentsScale = UIScreen.main.scale;
+        self.iamgev.frame = CGRect(x: 0, y: 100, width: 300, height: 300)
+        self.iamgev.framebufferOnly = false
+        self.iamgev.device = com.device
+        self.iamgev.pixelFormat = CokeConfig.metalColorFormat;
+        self.view.layer .addSublayer(self.iamgev)
+        Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true) { [self] t in
+            guard let t = self.iamgev.nextDrawable() else { return }
+            run(drawable: t)
+            
+        }
+        self.iamgev.device = com.device
     }
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-     
+    func run(drawable:CAMetalDrawable){
+        let text = drawable.texture
+
+//        guard let text = com.configuration.createTexture(width: 300, height: 300) else { return }
+//
+//        let buffer = try! com.configuration.begin()
+//        let databuffer = com.configuration.createBuffer(data: [SIMD2<Float>(x: 10, y: 10),SIMD2<Float>(x: 50, y: 80)]);
+//        try! com.compute(name: "linearBezier", buffer: buffer, countOfGrid: 300, buffers: [databuffer!], textures: [text])
+//        com.configuration.commit(buffer: buffer)
+//        let ciimage = com.configuration.createCIImage(texture: text)!
+//
+//        self.iamgev.image = UIImage(ciImage: ciimage,scale: UIScreen.main.scale, orientation: .up)
+        let c = try! CokeRender2d(texture: text)
+        try! c.begin()
+        
+        try! c.drawLine(point1: .zero, point2: CGPoint(x: 200, y: 200))
+        
+        try! c.drawQuadraticBezier(point1: .zero, point2: CGPoint(x: 150, y: float), point3: CGPoint(x: 300, y: 0))
+        
+        
+        try! c.drawCubicBezier(point1: .zero, point2: CGPoint(x: 100, y: float), point3: CGPoint(x: 200, y: -float), point4: CGPoint(x: 300, y: 300))
+        float += step
+        if(float > 100 || float < 0){
+            step = -step;
+        }
+        c.present(drawble: drawable)
+        c.commit()
+        
     }
 }
 
@@ -105,28 +121,72 @@ class collectionViewController:UICollectionViewController{
 }
 
 
-public class PageViewController:UIViewController{
-    public var numberOfPage: Int{
-        return 10
+public class PageViewController:UIViewController,AMPageViewDelegate,UITableViewDelegate,UITableViewDataSource{
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 100
     }
     
-    public func viewAtIndex(index: Int) -> UIView {
-        let l = UILabel()
-        l.textColor = .white
-        l.backgroundColor = UIColor(red: CGFloat(arc4random() % 100) / 99.0 , green: CGFloat(arc4random() % 100) / 99.0 , blue: CGFloat(arc4random() % 100) / 99.0 , alpha: 1)
-        l.textAlignment = .center
-        l.text = "\(index) page"
-        return l
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "aaa", for: indexPath)
+        cell.textLabel?.text = "\(indexPath.row)"
+        return cell
     }
+    
+    var sc:[Int:UIScrollView] = [:]
+    public func currentScrollAtIndex(index: Int) -> UIScrollView {
+        sc[index]!
+    }
+    
+    public func childViewAtIndex(index: Int) -> UIView {
+        let s = UITableView()
+        s.register(UITableViewCell.self, forCellReuseIdentifier: "aaa")
+        s.backgroundColor = UIColor(red: CGFloat(arc4random() % 9) / 10.0, green: 1, blue: 1, alpha: 1)
+        s.delegate = self
+        s.dataSource = self
+        sc[index] = s
+        return s
+    }
+    
+    public func numberOfChild() -> Int {
+        return 10
+    }
+    public func topView() -> UIView {
+        let v = UIView()
+        v.backgroundColor = UIColor.red
+        return v
+    }
+    
+    public func topViewHeight() -> Int {
+        return 128
+    }
+    
+    public func topViewMinHeight() -> Int {
+        return 44
+    }
+    
+    
+    @IBOutlet weak var page: AMPageView!
+   
+    
+   
     public override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
-        for i in 0 ..< 1{
-            guard let vc = self.storyboard?.instantiateViewController(identifier: "ccc") as? UICollectionViewController else { break }
-      
-            self.vcs.append(vc)
+        self.page.reload()
+    }
+}
+class vViewController: UIViewController,UIScrollViewDelegate{
+    @IBOutlet weak var scrollView: UIScrollView!
+    @IBOutlet weak var topConstraint: NSLayoutConstraint!
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.scrollView.contentSize = CGSize(width: self.view.frame.width, height: 3000)
+        self.scrollView.delegate = self
+    }
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if scrollView.contentOffset.y > 0{
+            topConstraint.constant = -scrollView.contentOffset.y
+        }else{
+            topConstraint.constant = 0
         }
     }
-    public var vcs:[UIViewController] = []
-
 }
