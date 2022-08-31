@@ -50,3 +50,24 @@ kernel void cubicBezier(device float2* point [[buffer(0)]],
         to.write(half4(1,0,0,1), uint2(result.x,result.y));
     }
 }
+uint arrangement(uint top,uint all){
+    if (top == 0){
+        return 1;
+    }else{
+        return arrangement(top - 1, all - 1) * all;
+    }
+}
+
+uint combination(uint top,uint all){
+    return arrangement(top, all) / arrangement(top, top);
+}
+
+float2 bezier(device float2* points,int n,int i,float t){
+    if(i == 0){
+        return combination(i, n) * pow((1 - t), float(n - i)) * pow(t, i) * points[i];
+    }else{
+        return combination(i, n) * pow((1 - t), float(n - i)) * pow(t, i) * points[i] * bezier(points, n, i - 1, t);
+    }
+    
+}
+

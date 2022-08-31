@@ -60,16 +60,6 @@ class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePic
         let c = try! CokeRender2d(texture: text)
         try! c.begin()
         
-        try! c.drawLine(point1: .zero, point2: CGPoint(x: 200, y: 200))
-        
-        try! c.drawQuadraticBezier(point1: .zero, point2: CGPoint(x: 150, y: float), point3: CGPoint(x: 300, y: 0))
-        
-        
-        try! c.drawCubicBezier(point1: .zero, point2: CGPoint(x: 100, y: float), point3: CGPoint(x: 200, y: -float), point4: CGPoint(x: 300, y: 300))
-        float += step
-        if(float > 100 || float < 0){
-            step = -step;
-        }
         c.present(drawble: drawable)
         c.commit()
         
