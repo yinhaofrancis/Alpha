@@ -7,8 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A9205A0A28B469EA001529BA /* DataSortSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9205A0928B469EA001529BA /* DataSortSet.swift */; };
-		A9205A0C28B4D134001529BA /* Websocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9205A0B28B4D134001529BA /* Websocket.swift */; };
+		A9205A0C28B4D134001529BA /* JavascriptGlue.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9205A0B28B4D134001529BA /* JavascriptGlue.swift */; };
 		A922C3EE2876CFC800FB05E7 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = A922C3ED2876CFC800FB05E7 /* Node.swift */; };
 		A93C45DC28ADCE290089A9EA /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A93C45DB28ADCE290089A9EA /* View.swift */; };
 		A943B7EA28B8BB800063FA45 /* CokeConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A943B7E628B8BB7F0063FA45 /* CokeConfig.swift */; };
@@ -95,8 +94,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		A9205A0928B469EA001529BA /* DataSortSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSortSet.swift; sourceTree = "<group>"; };
-		A9205A0B28B4D134001529BA /* Websocket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Websocket.swift; sourceTree = "<group>"; };
+		A9205A0B28B4D134001529BA /* JavascriptGlue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JavascriptGlue.swift; sourceTree = "<group>"; };
 		A922C3ED2876CFC800FB05E7 /* Node.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
 		A93C45DB28ADCE290089A9EA /* View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = View.swift; sourceTree = "<group>"; };
 		A943B7E628B8BB7F0063FA45 /* CokeConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CokeConfig.swift; sourceTree = "<group>"; };
@@ -220,7 +218,7 @@
 			isa = PBXGroup;
 			children = (
 				A95E514B2848BFB100BA7028 /* Download.swift */,
-				A9205A0B28B4D134001529BA /* Websocket.swift */,
+				A9205A0B28B4D134001529BA /* JavascriptGlue.swift */,
 			);
 			path = Web;
 			sourceTree = "<group>";
@@ -229,7 +227,6 @@
 			isa = PBXGroup;
 			children = (
 				A967E03928539C22005CF3AC /* Zip.swift */,
-				A9205A0928B469EA001529BA /* DataSortSet.swift */,
 			);
 			path = Z;
 			sourceTree = "<group>";
@@ -512,7 +509,7 @@
 				A9A3FBA8283F11BF003582F2 /* DataBaseUpdate.swift in Sources */,
 				A9EEA3DF289AADAB00F6F938 /* IconFont.swift in Sources */,
 				A9FB798C281A6942008CCF39 /* DataBaseModel.swift in Sources */,
-				A9205A0C28B4D134001529BA /* Websocket.swift in Sources */,
+				A9205A0C28B4D134001529BA /* JavascriptGlue.swift in Sources */,
 				A9FB7989281A6942008CCF39 /* DataBaseBackUp.swift in Sources */,
 				A943B7EB28B8BB800063FA45 /* CokeCompute.swift in Sources */,
 				A967E03A28539C22005CF3AC /* Zip.swift in Sources */,
@@ -526,7 +523,6 @@
 				A943B7EA28B8BB800063FA45 /* CokeConfig.swift in Sources */,
 				A943B7EC28B8BB800063FA45 /* CokeConfiguration.swift in Sources */,
 				A95E514C2848BFB100BA7028 /* Download.swift in Sources */,
-				A9205A0A28B469EA001529BA /* DataSortSet.swift in Sources */,
 				A9DC4EE428BC55EF00DACFA9 /* default.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -59,7 +59,13 @@ class ViewController: UIViewController,UINavigationControllerDelegate,UIImagePic
 //        self.iamgev.image = UIImage(ciImage: ciimage,scale: UIScreen.main.scale, orientation: .up)
         let c = try! CokeRender2d(texture: text)
         try! c.begin()
-        
+        let databuffer = com.configuration.createBuffer(data: [
+            SIMD2<Float>(x: 10, y: 10),
+            SIMD2<Float>(x: 10, y: 200),
+            SIMD2<Float>(x: 290, y: 200),
+            SIMD2<Float>(x: 290, y: 10),
+        ]);
+        try! c.compute(name: "cubicBezier",count: 280, buffers: [databuffer!], textures: [text])
         c.present(drawble: drawable)
         c.commit()
         
