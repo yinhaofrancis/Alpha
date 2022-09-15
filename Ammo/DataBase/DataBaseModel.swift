@@ -436,6 +436,18 @@ public class QueryCondition{
         public init(key:String,table:DataBaseProtocol.Type? = nil){
             self.key = table == nil ? key : (table!.name + ".") + key
         }
+        
+        // json_extract('{"a":2,"c":[4,5,{"f":7}]}', '$') → '{"a":2,"c":[4,5,{"f":7}]}'
+        // json_extract('{"a":2,"c":[4,5,{"f":7}]}', '$.c') → '[4,5,{"f":7}]'
+        // json_extract('{"a":2,"c":[4,5,{"f":7}]}', '$.c[2]') → '{"f":7}'
+        // json_extract('{"a":2,"c":[4,5,{"f":7}]}', '$.c[2].f') → 7
+        // json_extract('{"a":2,"c":[4,5],"f":7}','$.c','$.a') → '[[4,5],2]'
+        // json_extract('{"a":2,"c":[4,5],"f":7}','$.c[#-1]') → 5
+        // json_extract('{"a":2,"c":[4,5,{"f":7}]}', '$.x') → NULL
+        // json_extract('{"a":2,"c":[4,5,{"f":7}]}', '$.x', '$.a') → '[null,2]'
+        // json_extract('{"a":"xyz"}', '$.a') → 'xyz'
+        // json_extract('{"a":null}', '$.a') → NULL
+        
         public init(jsonKey:String,keypath:String,table:DataBaseProtocol.Type? = nil){
             let key = table == nil ? jsonKey : (table!.name + ".") + jsonKey
             self.key = "json_extract(\(key),'\(keypath)')"
