@@ -111,6 +111,9 @@ public struct RenderContext{
             ctx.context.scaleBy(x: 1, y: -1)
             ctx.context.translateBy(x: 0, y: -rect.height)
             CTFrameDraw(frame, ctx.context)
+            let lines = frame.lines
+            let origins = UnsafeMutablePointer<CGPoint>.allocate(capacity:lines.count)
+            CTFrameGetLineOrigins(frame, CFRange(location: 0, length: 0), origins)
         }
     }
     public func drawString(string:CFAttributedString,constaint:CGRect,alignX:CGFloat = 0,AlignY:CGFloat = 0){
@@ -125,9 +128,6 @@ public struct RenderContext{
         let deltaY = constaint.height - display.height;
         let drawFrame =  CGRect(x: constaint.minX + deltaX * alignX, y: constaint.minY + deltaY * AlignY, width: display.width, height: display.height)
         self.drawFrame(frame: frame, rect:drawFrame)
-    }
-    public func drawString(string:CFAttributedString,point:CGPoint){
-        self.drawString(string: string, constaint: CGRect(origin: point, size: CGSize(width: CGFloat.infinity, height: .infinity)))
     }
     public static func size(string:CFAttributedString,transform:CGAffineTransform)->CGSize{
         let frameset = CTFramesetterCreateWithAttributedString(string)
@@ -207,5 +207,11 @@ public struct RenderImage:RenderContent{
     public init(image:CGImage,mode:DrawImageMode){
         self.image = image
         self.mode = mode
+    }
+}
+
+extension CTFrame{
+    public var lines:[CTLine]{
+        CTFrameGetLines(self) as! [CTLine]
     }
 }
