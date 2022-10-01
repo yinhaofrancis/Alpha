@@ -6,13 +6,14 @@
 //
 
 import UIKit
-
+import RatioScreen
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+//        RSScreenConfigration.shared().designSize = CGSize(width: 414, height: 480)
         return true
     }
 
