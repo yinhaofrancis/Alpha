@@ -148,8 +148,8 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
                     view.widthAnchor.constraint(equalTo: self.pageScrollView.frameLayoutGuide.widthAnchor)
                 ])
             }
-            self.syncSubscrollContent(index: self.index)
-            self.syncSubscrollOffset(index: self.index)
+//            self.syncSubscrollContent(index: self.index)
+//            self.syncSubscrollOffset(index: self.index)
         }
         
     }
