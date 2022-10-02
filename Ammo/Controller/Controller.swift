@@ -257,12 +257,12 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
     
     private lazy var headerGuide:UILayoutGuide = {
         let g = UILayoutGuide()
-        self.addLayoutGuide(g)
+        self.mainScrollView.addLayoutGuide(g)
         let top = g.topAnchor.constraint(equalTo: self.mainScrollView.frameLayoutGuide.topAnchor)
         let height = g.heightAnchor.constraint(equalToConstant: 0)
         self.mainTop = top
         self.headerHeight = height
-        self.addConstraints([
+        self.mainScrollView.addConstraints([
             g.leadingAnchor.constraint(equalTo: self.mainScrollView.frameLayoutGuide.leadingAnchor),
             g.trailingAnchor.constraint(equalTo: self.mainScrollView.frameLayoutGuide.trailingAnchor),
             top,
@@ -274,11 +274,11 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
     
     private lazy var indicateGuide:UILayoutGuide = {
         let g = UILayoutGuide()
-        self.addLayoutGuide(g)
+        self.mainScrollView.addLayoutGuide(g)
         let top = g.topAnchor.constraint(equalTo: self.headerGuide.bottomAnchor)
         let height = g.heightAnchor.constraint(equalToConstant: 0)
         self.indicateHeight = height
-        self.addConstraints([
+        self.mainScrollView.addConstraints([
             g.leadingAnchor.constraint(equalTo: self.mainScrollView.frameLayoutGuide.leadingAnchor),
             g.trailingAnchor.constraint(equalTo: self.mainScrollView.frameLayoutGuide.trailingAnchor),
             top,
@@ -293,8 +293,8 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
         }
         self.headerView = header
         header.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(header)
-        self.addConstraints([
+        self.mainScrollView.addSubview(header)
+        self.mainScrollView.addConstraints([
             header.leadingAnchor.constraint(equalTo: self.headerGuide.leadingAnchor),
             header.trailingAnchor.constraint(equalTo: self.headerGuide.trailingAnchor),
             header.topAnchor.constraint(equalTo: self.headerGuide.topAnchor),
@@ -307,10 +307,10 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
         }
         let view = header.view
         view.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(header.view)
+        self.mainScrollView.addSubview(header.view)
         header.pageView = self
         self.indicate = header
-        self.addConstraints([
+        self.mainScrollView.addConstraints([
             view.leadingAnchor.constraint(equalTo: self.indicateGuide.leadingAnchor),
             view.trailingAnchor.constraint(equalTo: self.indicateGuide.trailingAnchor),
             view.topAnchor.constraint(equalTo: self.indicateGuide.topAnchor),
