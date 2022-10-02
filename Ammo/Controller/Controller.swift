@@ -41,43 +41,10 @@ public class YHPageContentView:UIView{
     @objc optional func indicateView()->YHPageViewIndicate
     @objc optional func heightOfHeaderView()->NSInteger
     @objc optional func heightOfIndicateView()->NSInteger
-}
-
-public class testp:NSObject,YHPageViewPage{
-    public var pageView: YHPageView?
-    
-
-    
-    lazy var lsview:UIScrollView  = {
-        let v = UITextView()
-        v.text = "sdlfaskdf asfdhaksdf asdfaskdf asdf jasdf asjd faskdf askd fajskdf hasjkdf askdf asdjkf askdfha sjkdfaskdfh ajksdf jaksdf ajks ajksfjksdf aksdf aksdf alsjdf hajksdf aksdfh jaskdf ksjadfh akjlsdf jkasdhf kjasdf ksadf ajklsdhf jslakdf kjsdhsljkfhaskdfh asjkdf hasjkdf haskjdfhasdfa sjkdfhasdf sadfh askjdf asdfh asdjkfh askdfh asdh akjlsdf jkasdhf kjasdf ksadf ajklsdhf jslakdf kjsdhsljkfhaskdfh asjkdf hasjkdf haskjdfhasdfa sjkdfhasdf sadfh askjdf asdfh asdjkfh askdfh asdh asldf alsfhljksdfh klajsfh aksdfh sadjhf ajks askjldfh akjsdfhasdf sjakdfh asjkdf sajkdfh asjdkfh sjdf ajskdf sjkdh skjad jaksdf jsdkf jskdhf jsakdf ajks jksdf skd jksaf lkasjdhf ksldh sljak lk ajksdhf lkjsadhfl ksadhf ksd jskh sjkadh jks hfskjh ajslkdfh akljsdhf kjsdfajksdf ajksd jlskh fjlsakdfh lsakjdh sakjdf kajsdh lsak akjlsdf jkasdhf kjasdf ksadf ajklsdhf jslakdf kjsdhsljkfhaskdfh asjkdf hasjkdf haskjdfhasdfa sjkdfhasdf sadfh askjdf asdfh asdjkfh askdfh asdh asldf alsfhljksdfh klajsfh aksdfh sadjhf ajks askjldfh akjsdfhasdf sjakdfh asjkdf sajkdfh asjdkfh sjdf ajskdf sjkdh skjad jaksdf jsdkf jskdhf jsakdf ajks jksdf skd jksaf lkasjdhf ksldh sljak lk ajksdhf lkjsadhfl ksadhf ksd jskh sjkadh jks hfskjh ajslkdfh akljsdhf kjsdfajksdf ajksd jlskh fjlsakdfh lsakjdh sakjdf kajsdh lsak akjlsdf jkasdhf kjasdf ksadf ajklsdhf jslakdf kjsdhsljkfhaskdfh asjkdf hasjkdf haskjdfhasdfa sjkdfhasdf sadfh askjdf asdfh asdjkfh askdfh asdh asldf alsfhljksdfh klajsfh aksdfh sadjhf ajks askjldfh akjsdfhasdf sjakdfh asjkdf sajkdfh asjdkfh sjdf ajskdf sjkdh skjad jaksdf jsdkf jskdhf jsakdf ajks jksdf skd jksaf lkasjdhf ksldh sljak lk ajksdhf lkjsadhfl ksadhf ksd jskh sjkadh jks hfskjh ajslkdfh akljsdhf kjsdfajksdf ajksd jlskh fjlsakdfh lsakjdh sakjdf kajsdh lsak akjlsdf jkasdhf kjasdf ksadf ajklsdhf jslakdf kjsdhsljkfhaskdfh asjkdf hasjkdf haskjdfhasdfa sjkdfhasdf sadfh askjdf asdfh asdjkfh askdfh asdh asldf alsfhljksdfh klajsfh aksdfh sadjhf ajks askjldfh akjsdfhasdf sjakdfh asjkdf sajkdfh asjdkfh sjdf ajskdf sjkdh skjad jaksdf jsdkf jskdhf jsakdf ajks jksdf skd jksaf lkasjdhf ksldh sljak lk ajksdhf lkjsadhfl ksadhf ksd jskh sjkadh jks hfskjh ajslkdfh akljsdhf kjsdfajksdf ajksd jlskh fjlsakdfh lsakjdh sakjdf kajsdh lsak akjlsdf jkasdhf kjasdf ksadf ajklsdhf jslakdf kjsdhsljkfhaskdfh asjkdf hasjkdf haskjdfhasdfa sjkdfhasdf sadfh askjdf asdfh asdjkfh askdfh asdh asldf alsfhljksdfh klajsfh aksdfh sadjhf ajks askjldfh akjsdfhasdf sjakdfh asjkdf sajkdfh asjdkfh sjdf ajskdf sjkdh skjad jaksdf jsdkf jskdhf jsakdf ajks jksdf skd jksaf lkasjdhf ksldh sljak lk ajksdhf lkjsadhfl ksadhf ksd jskh sjkadh jks hfskjh ajslkdfh akljsdhf kjsdfajksdf ajksd jlskh fjlsakdfh lsakjdh sakjdf kajsdh lsak akjlsdf jkasdhf kjasdf ksadf ajklsdhf jslakdf kjsdhsljkfhaskdfh asjkdf hasjkdf haskjdfhasdfa sjkdfhasdf sadfh askjdf asdfh asdjkfh askdfh asdh asldf alsfhljksdfh klajsfh aksdfh sadjhf ajks askjldfh akjsdfhasdf sjakdfh asjkdf sajkdfh asjdkfh sjdf ajskdf sjkdh skjad jaksdf jsdkf jskdhf jsakdf ajks jksdf skd jksaf lkasjdhf ksldh sljak lk ajksdhf lkjsadhfl ksadhf ksd jskh sjkadh jks hfskjh ajslkdfh akljsdhf kjsdfajksdf ajksd jlskh fjlsakdfh lsakjdh sakjdf kajsdh lsak asldf alsfhljksdfh klajsfh aksdfh sadjhf ajks askjldfh akjsdfhasdf sjakdfh asjkdf sajkdfh asjdkfh sjdf ajskdf sjkdh skjad jaksdf jsdkf jskdhf jsakdf ajks jksdf skd jksaf lkasjdhf ksldh sljak lk ajksdhf lkjsadhfl ksadhf ksd jskh sjkadh jks hfskjh ajslkdfh akljsdhf kjsdfajksdf ajksd jlskh fjlsakdfh lsakjdh sakjdf kajsdh lsakdfh skdjfh skdf hsjdkf kslajd hjaksdh jksadfhk sladf jksd skd kj"
-        v.font = UIFont .systemFont(ofSize: 40)
-        v.isEditable = false
-        return v
-    }()
-    
-    public var view: UIView{
-        return lsview
-    }
-    
-    public var scrollView: UIScrollView{
-        return lsview
-    }
-    
-    
-}
-
-public class testPd:NSObject,YHPageViewDelegate{
-    public func numberOfPage() -> NSInteger {
-        return 10;
-    }
-    public func pageOfIndex(index: Int) -> YHPageViewPage {
-        testp()
-    }
+    @objc optional func headerScrollOffset()->NSInteger
 }
 
 public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
-    public var headerScrollOffset:Int = 192;
     @objc @IBOutlet public weak var indicate:YHPageViewIndicate?
     @objc @IBOutlet public weak var delegate:YHPageViewDelegate?{
         didSet{
@@ -95,10 +62,37 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
         }
     }
    //主动操作
+    public func reloadHeader(){
+        self.headerView?.removeFromSuperview()
+        self.indicate?.view.removeFromSuperview()
+        self.resize()
+        self.loadHeader()
+        self.loadIndicate()
+    }
+    public func resize(){
+        guard let delegate = delegate else {
+            return
+        }
+        let hh = delegate.heightOfHeaderView?() ?? 0
+        let hi = delegate.heightOfIndicateView?() ?? 0
+        self.headerHeight?.constant = CGFloat(hh)
+        self.indicateHeight?.constant = CGFloat(hi)
+        
+        
+        self.headerScrollOffset = delegate.headerScrollOffset?() ?? 0
+        
+//        self.mainContentHeight?.constant = CGFloat(-self.headerScrollOffset);
+        self.limitOfScroll = hh + hi - self.headerScrollOffset;
+        
+        if Int(self.mainScrollView.contentOffset.y) > self.limitOfScroll{
+            self.mainTop?.constant = -CGFloat(self.limitOfScroll)
+        }
+    }
     public func reload(){
         self.content.forEach { i in
             i.value.view.removeFromSuperview()
         }
+        
         self.content.removeAll()
         guard let delegate = delegate else {
             return
@@ -113,28 +107,37 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
             w
         ])
         self.scrollToIndex(index: self.index, animation: false)
-        let hh = delegate.heightOfHeaderView?() ?? 128
-        let hi = delegate.heightOfIndicateView?() ?? 64
-        self.headerHeight?.constant = CGFloat(hh)
-        self.indicateHeight?.constant = CGFloat(hi)
-        self.mainContentHeight?.constant = CGFloat(-self.headerScrollOffset);
-        self.limitOfScroll = hh + hi - self.headerScrollOffset;
+        self.reloadHeader()
+        
     }
     public func scrollToIndex(index:Int,animation:Bool){
-        self.pageScrollView.scrollRectToVisible(CGRect(x: CGFloat(index) * self.frame.width, y: 0, width: self.frame.width, height: self.frame.height), animated: animation)
+        if(animation){
+            UIView.animate(withDuration: 0.25, delay: 0, options: .curveEaseInOut) {
+                self.scrollToIndex(index: index, animation: false)
+            } completion: { b in
+                
+            }
+        }else{
+            self.pageScrollView.contentOffset = CGPoint(x: CGFloat(index) * self.frame.width, y: 0)
+            self.loadPage(index: index)
+        }
+        
     }
     func loadPage(index:Int){
         guard let delegate = self.delegate else { return }
         
-        if(delegate.numberOfPage() > index){
+        if(delegate.numberOfPage() > index && index >= 0){
             if nil == self.content[index]{
                 let page = delegate.pageOfIndex(index: index)
                 self.content[index] = page
                 let view = page.view
 //                page.scrollView.isScrollEnabled = false
-                page.scrollView.panGestureRecognizer.isEnabled = false;
+                page.scrollView.panGestureRecognizer.isEnabled = false
+                page.scrollView.showsVerticalScrollIndicator = false
+                page.scrollView.showsHorizontalScrollIndicator = false
                 self.pageContentView.addSubview(view)
                 view.translatesAutoresizingMaskIntoConstraints = false
+                page.scrollView.contentOffset =  CGPoint(x: 0, y: 0 - page.scrollView.contentInset.top)
                 self.pageContentView.addConstraints([
                     view.topAnchor.constraint(equalTo: self.pageContentView.topAnchor),
                     view.bottomAnchor.constraint(equalTo: self.pageContentView.bottomAnchor),
@@ -144,9 +147,10 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
                     view.widthAnchor.constraint(equalTo: self.pageScrollView.frameLayoutGuide.widthAnchor)
                 ])
             }
+            self.syncSubscrollContent(index: self.index)
+            self.syncSubscrollOffset(index: self.index)
         }
-        self.syncSubscrollContent(index: self.index)
-        self.syncSubscrollOffset(index: self.index)
+        
     }
 
     
@@ -154,6 +158,11 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if(self.pageScrollView == scrollView){
             self.indicate?.indicateOffset(offset: scrollView.contentOffset.x / self.frame.width)
+            if(scrollView.panGestureRecognizer.velocity(in: self).x > 0){
+                self.loadPage(index: index)
+            }else if (scrollView.panGestureRecognizer.velocity(in: self).x < 0){
+                self.loadPage(index: index + 1)
+            }
         }
         if(self.mainScrollView == scrollView){
             self.syncSubscrollContent(index: self.index)
@@ -202,13 +211,12 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
         self.mainScrollView.addSubview(pageScroll)
         pageScroll.translatesAutoresizingMaskIntoConstraints = false;
         let top = pageScroll.topAnchor.constraint(equalTo: self.indicateGuide.bottomAnchor)
-        let height = pageScroll.heightAnchor.constraint(equalTo: self.mainScrollView.frameLayoutGuide.heightAnchor)
-        self.mainContentHeight = height
+        let bottom = pageScroll.bottomAnchor.constraint(equalTo: self.mainScrollView.frameLayoutGuide.bottomAnchor)
         self.addConstraints([
             pageScroll.leadingAnchor.constraint(equalTo: self.mainScrollView.frameLayoutGuide.leadingAnchor),
             pageScroll.trailingAnchor.constraint(equalTo: self.mainScrollView.frameLayoutGuide.trailingAnchor),
             top,
-            height
+            bottom
         ])
         pageScroll.isPagingEnabled = true
         pageScroll.delegate = self
@@ -277,6 +285,36 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
         
         return g
     }()
+    public func loadHeader(){
+        guard let header = delegate?.headerView?() else {
+            return
+        }
+        self.headerView = header
+        header.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(header)
+        self.addConstraints([
+            header.leadingAnchor.constraint(equalTo: self.headerGuide.leadingAnchor),
+            header.trailingAnchor.constraint(equalTo: self.headerGuide.trailingAnchor),
+            header.topAnchor.constraint(equalTo: self.headerGuide.topAnchor),
+            header.bottomAnchor.constraint(equalTo: self.headerGuide.bottomAnchor),
+        ])
+    }
+    public func loadIndicate(){
+        guard let header = delegate?.indicateView?() else {
+            return
+        }
+        let view = header.view
+        view.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(header.view)
+        header.pageView = self
+        self.indicate = header
+        self.addConstraints([
+            view.leadingAnchor.constraint(equalTo: self.indicateGuide.leadingAnchor),
+            view.trailingAnchor.constraint(equalTo: self.indicateGuide.trailingAnchor),
+            view.topAnchor.constraint(equalTo: self.indicateGuide.topAnchor),
+            view.bottomAnchor.constraint(equalTo: self.indicateGuide.bottomAnchor),
+        ])
+    }
     private func syncSubscrollContent(index:Int){
         guard let scroll = self.scrollView(at: index) else { return }
         let min = CGFloat(self.limitOfScroll) + self.frame.size.height
@@ -287,7 +325,7 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
         self.mainScrollView.delegate = nil
         guard let mt = mainTop else { return }
         if(Int(-mt.constant) == self.limitOfScroll){
-            self.mainScrollView.contentOffset = CGPoint(x: 0, y: Int(scroll.contentOffset.y) + self.limitOfScroll)
+            self.mainScrollView.contentOffset = CGPoint(x: 0, y: Int(scroll.contentOffset.y + scroll.contentInset.top) + self.limitOfScroll)
         }
         self.mainScrollView.delegate = self
     }
@@ -299,15 +337,15 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
         return content[self.index]?.scrollView
     }
     var limitOfScroll:Int = 0
-    var scrollDelta:Int = 0
+    var headerView:UIView?
+
+    var headerScrollOffset:Int = 0;
     //缓存页
     private var content:[Int:YHPageViewPage] = [:]
     // page 宽度
     private var widthConstaint:NSLayoutConstraint?
     // 顶部约束
     private var mainTop:NSLayoutConstraint?
-    // 主体高度
-    private var mainContentHeight:NSLayoutConstraint?
     //header 高度
     private var headerHeight:NSLayoutConstraint?
     //指示器高度

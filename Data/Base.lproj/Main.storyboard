@@ -60,16 +60,17 @@
                             <state key="normal" title="Button"/>
                             <buttonConfiguration key="configuration" style="plain" title="Button"/>
                             <connections>
-                                <segue destination="DnG-fv-shb" kind="show" id="MXz-oL-wfy"/>
+                                <action selector="reload" destination="3B3-3S-Z17" eventType="touchUpInside" id="geP-hi-Dyn"/>
                             </connections>
                         </button>
                     </navigationItem>
                     <connections>
                         <outlet property="de" destination="kTq-qM-IvQ" id="F4W-t3-c1y"/>
+                        <outlet property="pager" destination="0tR-Yk-1YG" id="uJI-bJ-nuD"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="hJ8-PG-Dsg" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-                <customObject id="kTq-qM-IvQ" customClass="testPd" customModule="Ammo"/>
+                <customObject id="kTq-qM-IvQ" customClass="testPd" customModule="Data"/>
             </objects>
             <point key="canvasLocation" x="1050" y="128"/>
         </scene>
@@ -82,10 +83,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JUi-9c-u98" customClass="AMPrimaryView" customModule="Ammo">
-                                <rect key="frame" x="0.0" y="88" width="414" height="774"/>
+                                <rect key="frame" x="0.0" y="44" width="414" height="818"/>
                                 <subviews>
                                     <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aNP-1E-GGy" customClass="AMPrimaryScrollView" customModule="Ammo">
-                                        <rect key="frame" x="0.0" y="0.0" width="414" height="774"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="414" height="818"/>
                                         <subviews>
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="PcF-Kd-NRG">
                                                 <rect key="frame" x="0.0" y="0.0" width="414" height="2048"/>
