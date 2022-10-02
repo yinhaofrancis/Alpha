@@ -235,6 +235,7 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
             view.bottomAnchor.constraint(equalTo: self.bottomAnchor)
         ])
         view.delegate = self
+        view.contentInsetAdjustmentBehavior = .never
         view.page = self
         return view
     }()

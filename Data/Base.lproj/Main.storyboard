@@ -36,7 +36,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0tR-Yk-1YG" customClass="YHPageView" customModule="Ammo">
-                                <rect key="frame" x="0.0" y="88" width="414" height="774"/>
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                                 <color key="backgroundColor" systemColor="systemGreenColor"/>
                                 <connections>
                                     <outlet property="delegate" destination="kTq-qM-IvQ" id="dM3-GW-FCv"/>
@@ -46,10 +46,10 @@
                         <viewLayoutGuide key="safeArea" id="rlX-ap-VDB"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="0tR-Yk-1YG" firstAttribute="top" secondItem="rlX-ap-VDB" secondAttribute="top" id="KDQ-5q-P6Y"/>
+                            <constraint firstItem="0tR-Yk-1YG" firstAttribute="top" secondItem="fBr-wO-Qcr" secondAttribute="top" id="KDQ-5q-P6Y"/>
                             <constraint firstItem="rlX-ap-VDB" firstAttribute="trailing" secondItem="0tR-Yk-1YG" secondAttribute="trailing" id="e4V-To-Zh3"/>
-                            <constraint firstItem="0tR-Yk-1YG" firstAttribute="width" secondItem="fBr-wO-Qcr" secondAttribute="width" id="eML-Mz-TC0"/>
-                            <constraint firstItem="rlX-ap-VDB" firstAttribute="bottom" secondItem="0tR-Yk-1YG" secondAttribute="bottom" id="uTn-Qf-cSk"/>
+                            <constraint firstItem="0tR-Yk-1YG" firstAttribute="leading" secondItem="rlX-ap-VDB" secondAttribute="leading" id="sbX-P5-2ke"/>
+                            <constraint firstAttribute="bottom" secondItem="0tR-Yk-1YG" secondAttribute="bottom" id="uTn-Qf-cSk"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="DRB-Qu-Q8p">

@@ -53,7 +53,7 @@ public class testp:NSObject,YHPageViewPage,UITableViewDataSource{
 
     lazy var table: UITableView = {
         let t = UITableView()
-        t.contentInset = UIEdgeInsets(top: 250, left: 0, bottom: 250, right: 0)
+//        t.contentInset = UIEdgeInsets(top: 250, left: 0, bottom: 250, right: 0)
         t.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         t.dataSource = self
         return t
