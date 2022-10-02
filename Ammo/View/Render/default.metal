@@ -95,12 +95,12 @@ void drawline(texture2d<half, access::write> texture,float2 point0,float2 point1
 //        plot(texture,xpxl1, ypxl1  , rfpart(yend) * xgap);
 //        plot(texture,xpxl1, ypxl1+1,  fpart(yend) * xgap);
     }
-    float intery = yend + gradient;
+//    float intery = yend + gradient;
     xend = round(point1.x);
     yend = point1.y + gradient * (xend - point1.x);
     xgap = fpart(point1.x + 0.5);
-    float xpxl2 = xend; //this will be used in the main loop
-    float ypxl2 = ipart(yend);
+//    float xpxl2 = xend; //this will be used in the main loop
+//    float ypxl2 = ipart(yend);
 }
 
 

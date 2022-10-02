@@ -14,28 +14,36 @@ class ViewController: UIViewController {
     @IBOutlet var de:testPd!
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.de.headerHeight = 128 + 88
+        self.de.headerHeight = 128
         self.de.indicateHeight = 64
-        self.de.offset = 64 + 88
+        self.de.offset = 64
         self.pager.resize()
+        self.pager.mainScrollView.contentInsetAdjustmentBehavior = .always
         self.navigationController?.hidesBarsOnTap = true
+        self.pager.mainScrollView.refreshControl = UIRefreshControl(frame: CGRect(x: 0, y: 0, width: 44, height: 44), primaryAction: UIAction(handler: { [weak self] i in
+            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) {
+                self?.pager.mainScrollView.refreshControl?.endRefreshing()
+            }
+        }))
     }
     @IBOutlet weak var pager: YHPageView!
     @IBAction public func reload(){
-        self.de.indicateHeight = 44
-        self.de.headerHeight = 200 + 88
-        self.de.offset = 88 + 44
-        pager.resize()
+        self.de.indicateHeight = 128
+        self.de.headerHeight = 300
+        self.de.offset = 64
+        
         UIView .animate(withDuration: 0.5) {
-            self.view.layoutIfNeeded()
+            self.pager.resize()
+            self.pager.mainScrollView.layoutIfNeeded()
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) {
-            self.de.headerHeight = 128 + 88
+            self.de.headerHeight = 128
             self.de.indicateHeight = 64
-            self.de.offset = 64 + 88
-            self.pager.resize()
+            self.de.offset = 64
+            
             UIView .animate(withDuration: 0.5) {
-                self.view.layoutIfNeeded()
+                self.pager.resize()
+                self.pager.mainScrollView.layoutIfNeeded()
             }
         }
        
@@ -121,10 +129,10 @@ public class testPd:NSObject,YHPageViewDelegate{
     public var indicateHeight:Int = 64
     public var offset:Int = 64
     public func headerView() -> UIView {
-        let l = UILabel()
-        l.text = "Dasdadadasdas"
-        l.font = UIFont .systemFont(ofSize: 32);
-        l.textColor = UIColor.black;
+        let l = UIView()
+
+        l.backgroundColor = UIColor.purple
+
         return l
     }
     let bt:im = {
