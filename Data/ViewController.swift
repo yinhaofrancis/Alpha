@@ -14,26 +14,31 @@ class ViewController: UIViewController {
     @IBOutlet var de:testPd!
     override func viewDidLoad() {
         super.viewDidLoad()
-    
+        self.de.headerHeight = 128 + 88
+        self.de.indicateHeight = 64
+        self.de.offset = 64 + 88
+        self.pager.resize()
+        self.navigationController?.hidesBarsOnTap = true
     }
     @IBOutlet weak var pager: YHPageView!
     @IBAction public func reload(){
         self.de.indicateHeight = 44
-        self.de.headerHeight = 200
-        self.de.offset = 244
+        self.de.headerHeight = 200 + 88
+        self.de.offset = 88 + 44
         pager.resize()
         UIView .animate(withDuration: 0.5) {
             self.view.layoutIfNeeded()
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) {
-            self.de.headerHeight = 128
+            self.de.headerHeight = 128 + 88
             self.de.indicateHeight = 64
-            self.de.offset = 64
+            self.de.offset = 64 + 88
             self.pager.resize()
             UIView .animate(withDuration: 0.5) {
                 self.view.layoutIfNeeded()
             }
         }
+       
     }
 }
 
@@ -52,7 +57,7 @@ public class testp:NSObject,YHPageViewPage,UITableViewDataSource{
     
 
     lazy var table: UITableView = {
-        let t = UITableView()
+        let t = UITableView(frame: .zero, style: .insetGrouped)
 //        t.contentInset = UIEdgeInsets(top: 250, left: 0, bottom: 250, right: 0)
         t.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         t.dataSource = self

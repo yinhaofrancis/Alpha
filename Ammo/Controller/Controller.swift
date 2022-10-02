@@ -112,10 +112,11 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
     }
     public func scrollToIndex(index:Int,animation:Bool){
         if(animation){
+            self.isPageScrolling = true
             UIView.animate(withDuration: 0.25, delay: 0, options: .curveEaseInOut) {
                 self.scrollToIndex(index: index, animation: false)
             } completion: { b in
-                
+                self.isPageScrolling = false
             }
         }else{
             self.pageScrollView.contentOffset = CGPoint(x: CGFloat(index) * self.frame.width, y: 0)
@@ -316,12 +317,18 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
             view.bottomAnchor.constraint(equalTo: self.indicateGuide.bottomAnchor),
         ])
     }
-    private func syncSubscrollContent(index:Int){
+    fileprivate func syncSubscrollContent(index:Int){
+        if isPageScrolling {
+            return
+        }
         guard let scroll = self.scrollView(at: index) else { return }
         let min = CGFloat(self.limitOfScroll) + self.frame.size.height
         self.mainScrollView.contentSize = CGSize(width: self.frame.width, height: max(scroll.contentSize.height, min))
     }
-    private func syncSubscrollOffset(index:Int){
+    fileprivate func syncSubscrollOffset(index:Int){
+        if isPageScrolling {
+            return
+        }
         guard let scroll = self.scrollView(at: index) else { return }
         self.mainScrollView.delegate = nil
         guard let mt = mainTop else { return }
@@ -340,6 +347,7 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
     var limitOfScroll:Int = 0
     var headerView:UIView?
 
+    var isPageScrolling = false;
     var headerScrollOffset:Int = 0;
     //缓存页
     private var content:[Int:YHPageViewPage] = [:]
@@ -358,9 +366,16 @@ public class YHPagerScrollView:UIScrollView,UIGestureRecognizerDelegate{
             self.panGestureRecognizer.delegate = self
         }
     }
+    
+    var exceptViews:[UIView] = []
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         guard let p = self.page else { return false }
         if(otherGestureRecognizer.view == p.currentScroll && otherGestureRecognizer .isKind(of: UIPanGestureRecognizer.self)){
+            guard let page = page else {
+                return false
+            }
+            page.syncSubscrollOffset(index:page.index)
+            page.syncSubscrollContent(index:page.index)
             return true
         }
         return false
