@@ -1,5 +1,5 @@
 //
-//  Controller.swift
+//  YHPageView.swift
 //  Ammo
 //
 //  Created by wenyang on 2022/9/22.
@@ -33,6 +33,7 @@ public class YHPageContentView:UIView{
     weak var pageView:YHPageView? { get set }
     var view:UIView { get }
     var scrollView:UIScrollView { get }
+    func viewPageDidLoad()
 }
 @objc public protocol YHPageViewDelegate:NSObjectProtocol{
     @objc func numberOfPage()->NSInteger
@@ -105,17 +106,11 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
         
     }
     public func scrollToIndex(index:Int,animation:Bool){
-        if(animation){
-            UIView.animate(withDuration: 0.25, delay: 0, options: .curveEaseInOut) {
-                self.scrollToIndex(index: index, animation: false)
-            } completion: { b in
-                
-            }
-        }else{
-            self.pageScrollView.contentOffset = CGPoint(x: CGFloat(index) * self.frame.width, y: 0)
+        RunLoop.main.perform(inModes: [.common]) {
+            self.pageScrollView.setContentOffset(CGPoint(x: CGFloat(index) * self.frame.width, y: 0), animated: animation)
             self.loadPage(index: index)
         }
-        
+        RunLoop.main.run(mode: .tracking, before: Date(timeIntervalSinceNow: 0.5))
     }
     func loadPage(index:Int){
         guard let delegate = self.delegate else { return }
@@ -140,6 +135,9 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
                 self.pageScrollView.addConstraints([
                     view.widthAnchor.constraint(equalTo: self.pageScrollView.frameLayoutGuide.widthAnchor)
                 ])
+                RunLoop.main.perform(inModes: [.default]) {
+                    page.viewPageDidLoad()
+                }
             }
         }
         
@@ -149,11 +147,14 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
     //uiscroll view delegate
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if(self.pageScrollView == scrollView){
-            self.indicate?.indicateOffset(offset: scrollView.contentOffset.x / self.frame.width)
-            if(scrollView.panGestureRecognizer.velocity(in: self).x > 0){
-                self.loadPage(index: index)
-            }else if (scrollView.panGestureRecognizer.velocity(in: self).x < 0){
-                self.loadPage(index: index + 1)
+            let findex = scrollView.contentOffset.x / self.frame.width
+            self.indicate?.indicateOffset(offset: findex)
+            if(abs(findex - CGFloat(index)) > 0.2){
+                if(scrollView.panGestureRecognizer.velocity(in: self).x > 0){
+                    self.loadPage(index: index)
+                }else if (scrollView.panGestureRecognizer.velocity(in: self).x < 0){
+                    self.loadPage(index: index + 1)
+                }
             }
         }
         if(self.mainScrollView == scrollView){
@@ -370,9 +371,6 @@ public class YHPagerScrollView:UIScrollView,UIGestureRecognizerDelegate{
             self.panGestureRecognizer.delegate = self
         }
     }
-    
-    
-    
 
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         guard let p = self.page else { return false }

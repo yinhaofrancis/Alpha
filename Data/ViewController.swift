@@ -19,18 +19,13 @@ class ViewController: UIViewController {
         self.de.offset = 64
         self.pager.resize()
         self.pager.mainScrollView.contentInsetAdjustmentBehavior = .always
-        self.navigationController?.hidesBarsOnTap = true
-        self.pager.mainScrollView.refreshControl = UIRefreshControl(frame: CGRect(x: 0, y: 0, width: 44, height: 44), primaryAction: UIAction(handler: { [weak self] i in
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) {
-                self?.pager.mainScrollView.refreshControl?.endRefreshing()
-            }
-        }))
+        self.navigationController?.hidesBarsOnSwipe = true
     }
     @IBOutlet weak var pager: YHPageView!
     @IBAction public func reload(){
         self.de.indicateHeight = 128
         self.de.headerHeight = 300
-        self.de.offset = 64
+        self.de.offset = 428
         
         UIView .animate(withDuration: 0.5) {
             self.pager.resize()
@@ -51,6 +46,13 @@ class ViewController: UIViewController {
 }
 
 public class testp:NSObject,YHPageViewPage,UITableViewDataSource{
+    public func viewPageDidLoad() {
+        var s:String = ""
+        for i in 0 ..< 30000{
+            s = s.appending("\(i)")
+        }
+    }
+    
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 100
     }
@@ -143,4 +145,24 @@ public class testPd:NSObject,YHPageViewDelegate{
     public func indicateView() -> YHPageViewIndicate {
         return bt
     }
+}
+public class testam:NSObject,AMPageViewDelegate{
+    public func numberOfView() -> Int {
+        return 10
+    }
+    
+    public func viewAtIndex(index: Int) -> UIView {
+        let p = UITextView()
+        p.text = "\(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index)  \(index) \(index) \(index)\(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index)  \(index) \(index) \(index)\(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index)  \(index) \(index) \(index)\(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index)  \(index) \(index) \(index)\(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index)  \(index) \(index) \(index)\(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index)  \(index) \(index) \(index)\(index) \(index)"
+        p.font = UIFont.systemFont(ofSize: 128)
+        p.textColor = UIColor.black
+        p.textAlignment = .center
+        return p
+    }
+    
+    public func contentOffsetAt(location: CGPoint) {
+        print(location)
+    }
+    
+    
 }

@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A90D56C028DF220300FEFF80 /* Controller.swift in Sources */ = {isa = PBXBuildFile; fileRef = A931745D28DC1FA900C7FCF7 /* Controller.swift */; };
+		A90D56C028DF220300FEFF80 /* YHPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A931745D28DC1FA900C7FCF7 /* YHPageView.swift */; };
 		A90D56CA28DF5D2300FEFF80 /* RatioScreen.docc in Sources */ = {isa = PBXBuildFile; fileRef = A90D56C928DF5D2300FEFF80 /* RatioScreen.docc */; };
 		A90D56CB28DF5D2300FEFF80 /* RatioScreen.h in Headers */ = {isa = PBXBuildFile; fileRef = A90D56C828DF5D2300FEFF80 /* RatioScreen.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A90D56CE28DF5D2300FEFF80 /* RatioScreen.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A90D56C628DF5D2300FEFF80 /* RatioScreen.framework */; };
@@ -39,6 +39,7 @@
 		A9A3FBA8283F11BF003582F2 /* DataBaseUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A3FBA7283F11BF003582F2 /* DataBaseUpdate.swift */; };
 		A9B5DEB628D8D714008E5C15 /* Kate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9B5DEB528D8D714008E5C15 /* Kate.swift */; };
 		A9CD687E28425CC000ABD882 /* DataBaseConcurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9CD687D28425CC000ABD882 /* DataBaseConcurrency.swift */; };
+		A9CED30F28EBEA7F00BA9070 /* AMPager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9CED30E28EBEA7F00BA9070 /* AMPager.swift */; };
 		A9DC4EE428BC55EF00DACFA9 /* default.metal in Sources */ = {isa = PBXBuildFile; fileRef = A9DC4EE328BC55EF00DACFA9 /* default.metal */; };
 		A9DC4EE628BDEB9F00DACFA9 /* CokeRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9DC4EE528BDEB9F00DACFA9 /* CokeRender.swift */; };
 		A9DD1BA228E0003700E016D5 /* AMScoreBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9DD1BA128E0003600E016D5 /* AMScoreBoard.swift */; };
@@ -122,7 +123,7 @@
 		A90D56D728DFF27700FEFF80 /* View.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = View.xib; path = ../../../../View.xib; sourceTree = "<group>"; };
 		A9205A0B28B4D134001529BA /* JavascriptGlue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JavascriptGlue.swift; sourceTree = "<group>"; };
 		A922C3ED2876CFC800FB05E7 /* Node.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
-		A931745D28DC1FA900C7FCF7 /* Controller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Controller.swift; sourceTree = "<group>"; };
+		A931745D28DC1FA900C7FCF7 /* YHPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YHPageView.swift; sourceTree = "<group>"; };
 		A931745E28DC1FBE00C7FCF7 /* Request.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Request.swift; path = ../../../../../Request.swift; sourceTree = "<group>"; };
 		A93C45DB28ADCE290089A9EA /* View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = View.swift; sourceTree = "<group>"; };
 		A943B7E628B8BB7F0063FA45 /* CokeConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CokeConfig.swift; sourceTree = "<group>"; };
@@ -145,6 +146,7 @@
 		A9A3FBA7283F11BF003582F2 /* DataBaseUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBaseUpdate.swift; sourceTree = "<group>"; };
 		A9B5DEB528D8D714008E5C15 /* Kate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Kate.swift; path = ../../../../../Kate.swift; sourceTree = "<group>"; };
 		A9CD687D28425CC000ABD882 /* DataBaseConcurrency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBaseConcurrency.swift; sourceTree = "<group>"; };
+		A9CED30E28EBEA7F00BA9070 /* AMPager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AMPager.swift; path = ../../../../../AMPager.swift; sourceTree = "<group>"; };
 		A9DC4EE328BC55EF00DACFA9 /* default.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = default.metal; sourceTree = "<group>"; };
 		A9DC4EE528BDEB9F00DACFA9 /* CokeRender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CokeRender.swift; sourceTree = "<group>"; };
 		A9DD1BA128E0003600E016D5 /* AMScoreBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AMScoreBoard.swift; path = ../../../../AMScoreBoard.swift; sourceTree = "<group>"; };
@@ -222,7 +224,8 @@
 		A931745A28DC1F7C00C7FCF7 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
-				A931745D28DC1FA900C7FCF7 /* Controller.swift */,
+				A931745D28DC1FA900C7FCF7 /* YHPageView.swift */,
+				A9CED30E28EBEA7F00BA9070 /* AMPager.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -633,7 +636,8 @@
 				A922C3EE2876CFC800FB05E7 /* Node.swift in Sources */,
 				A9FB798D281A6942008CCF39 /* DataBaseJSON.swift in Sources */,
 				A9F0429728D39BA2007DAB58 /* ContentView.swift in Sources */,
-				A90D56C028DF220300FEFF80 /* Controller.swift in Sources */,
+				A9CED30F28EBEA7F00BA9070 /* AMPager.swift in Sources */,
+				A90D56C028DF220300FEFF80 /* YHPageView.swift in Sources */,
 				A9A3FBA8283F11BF003582F2 /* DataBaseUpdate.swift in Sources */,
 				A9EEA3DF289AADAB00F6F938 /* IconFont.swift in Sources */,
 				A9FB798C281A6942008CCF39 /* DataBaseModel.swift in Sources */,
