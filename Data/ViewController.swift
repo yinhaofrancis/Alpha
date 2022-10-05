@@ -51,6 +51,7 @@ public class testp:NSObject,YHPageViewPage,UITableViewDataSource{
         for i in 0 ..< 30000{
             s = s.appending("\(i)")
         }
+        print(s)
     }
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -110,6 +111,22 @@ public class im:UIButton,YHPageViewIndicate{
     }
     
 }
+public class aim:UIButton,AMPageViewIndicate{
+    public func indicateOffset(offset: CGFloat) {
+        self .setTitle("\(offset)", for: .normal)
+        self.addTarget(self, action: #selector(handleTouch), for: .touchUpInside)
+    }
+    
+    public var pageView: AMPageView?
+    
+    public var view: UIView{
+        return self
+    }
+    @objc func handleTouch(){
+        self.pageView?.scrollToIndex(index: Int(arc4random()) % 10 , animation: true)
+    }
+    
+}
 
 public class testPd:NSObject,YHPageViewDelegate{
     public func numberOfPage() -> NSInteger {
@@ -146,18 +163,48 @@ public class testPd:NSObject,YHPageViewDelegate{
         return bt
     }
 }
+
+public class page:AMPageViewPage{
+    public var view: UIView{
+        self.scrollView
+    }
+    
+    
+    public var scrollView: UIScrollView = {
+        let p = UITextView()
+        p.text = "asdadadasda'dadas'dasdasdasdas'dasdasdadasdadasdasdasdadsasdasdasdasd"
+        p.font = UIFont.systemFont(ofSize: 128)
+        p.textColor = UIColor.lightText
+        p.textAlignment = .center
+        return p
+    }()
+    
+    
+}
+
 public class testam:NSObject,AMPageViewDelegate{
+    public func indicateView() -> AMPageViewIndicate {
+        aim()
+    }
+    
+    public func headerView() -> UIView {
+        UIView()
+    }
+    
+    public func heightOfHeaderView() -> Int {
+        128
+    }
+    
+    public func heightOfIndicateView() -> Int {
+        44
+    }
+    
     public func numberOfView() -> Int {
         return 10
     }
     
-    public func viewAtIndex(index: Int) -> UIView {
-        let p = UITextView()
-        p.text = "\(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index)  \(index) \(index) \(index)\(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index)  \(index) \(index) \(index)\(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index)  \(index) \(index) \(index)\(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index)  \(index) \(index) \(index)\(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index)  \(index) \(index) \(index)\(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index) \(index)  \(index) \(index) \(index)\(index) \(index)"
-        p.font = UIFont.systemFont(ofSize: 128)
-        p.textColor = UIColor.black
-        p.textAlignment = .center
-        return p
+    public func viewAt(index: Int) -> AMPageViewPage {
+        page()
     }
     
     public func contentOffsetAt(location: CGPoint) {

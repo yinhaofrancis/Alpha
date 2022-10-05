@@ -107,8 +107,17 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
     }
     public func scrollToIndex(index:Int,animation:Bool){
         RunLoop.main.perform(inModes: [.common]) {
-            self.pageScrollView.setContentOffset(CGPoint(x: CGFloat(index) * self.frame.width, y: 0), animated: animation)
+            if(animation){
+                UIView .animate(withDuration: 0.25, delay: 0, options: .curveEaseInOut) {
+                    self.pageScrollView.contentOffset = CGPoint(x:CGFloat(index) * self.frame.width, y: 0)
+                } completion: { b in
+                    RunLoop.main.run(mode: .default, before: Date(timeIntervalSinceNow: 0.5))
+                }
+            }else{
+                self.pageScrollView.contentOffset = CGPoint(x:CGFloat(index) * self.frame.width, y: 0)
+            }
             self.loadPage(index: index)
+            RunLoop.main.run(mode: .tracking, before: Date(timeIntervalSinceNow: 0.5))
         }
         RunLoop.main.run(mode: .tracking, before: Date(timeIntervalSinceNow: 0.5))
     }
@@ -149,7 +158,7 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
         if(self.pageScrollView == scrollView){
             let findex = scrollView.contentOffset.x / self.frame.width
             self.indicate?.indicateOffset(offset: findex)
-            if(abs(findex - CGFloat(index)) > 0.2){
+            if(abs(findex - CGFloat(index)) > 0.01){
                 if(scrollView.panGestureRecognizer.velocity(in: self).x > 0){
                     self.loadPage(index: index)
                 }else if (scrollView.panGestureRecognizer.velocity(in: self).x < 0){
