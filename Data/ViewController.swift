@@ -11,38 +11,28 @@ class ViewController: UIViewController {
    
     let ctx = try! RenderContext(size: CGSize(width: 100, height: 100), scale: 3,reverse: true);
    
-    @IBOutlet var de:testPd!
+    @IBOutlet var de:testam!
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.de.headerHeight = 128
-        self.de.indicateHeight = 64
-        self.de.offset = 64
-        self.pager.resize()
-        self.pager.mainScrollView.contentInsetAdjustmentBehavior = .always
-        self.navigationController?.hidesBarsOnSwipe = true
+//        self.pager.mainScrollView.contentInsetAdjustmentBehavior = .always
+//        self.navigationController?.hidesBarsOnSwipe = true
     }
-    @IBOutlet weak var pager: YHPageView!
+    @IBOutlet weak var pager: AMPageView!
     @IBAction public func reload(){
-        self.de.indicateHeight = 128
-        self.de.headerHeight = 300
-        self.de.offset = 428
-        
-        UIView .animate(withDuration: 0.5) {
-            self.pager.resize()
-            self.pager.mainScrollView.layoutIfNeeded()
+        self.de.height = 250
+        self.pager.resize()
+        UIView .animate(withDuration: 0.3) {
+            self.pager.layoutIfNeeded()
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) {
-            self.de.headerHeight = 128
-            self.de.indicateHeight = 64
-            self.de.offset = 64
-            
-            UIView .animate(withDuration: 0.5) {
-                self.pager.resize()
-                self.pager.mainScrollView.layoutIfNeeded()
+            self.de.height = 128
+            self.pager.resize()
+            UIView .animate(withDuration: 0.3) {
+                self.pager.layoutIfNeeded()
             }
         }
-       
     }
+
 }
 
 public class testp:NSObject,YHPageViewPage,UITableViewDataSource{
@@ -164,49 +154,75 @@ public class testPd:NSObject,YHPageViewDelegate{
     }
 }
 
-public class page:AMPageViewPage{
-    public var view: UIView{
-        self.scrollView
+public class page:NSObject,AMPageViewPage,UITableViewDataSource{
+    public var pageView: AMPageView?
+    
+    public func viewPageDidLoad() {
+        var s:String = ""
+        for i in 0 ..< 30000{
+            s = s.appending("\(i)")
+        }
+        print(s)
     }
     
+    public var view: UIView{
+        self.table
+    }
+    @objc public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 100
+    }
     
-    public var scrollView: UIScrollView = {
-        let p = UITextView()
-        p.text = "asdadadasda'dadas'dasdasdasdas'dasdasdadasdadasdasdasdadsasdasdasdasd"
-        p.font = UIFont.systemFont(ofSize: 128)
-        p.textColor = UIColor.lightText
-        p.textAlignment = .center
-        return p
+    @objc(tableView:cellForRowAtIndexPath:) public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        cell.textLabel?.text = "\(indexPath.row)"
+        return cell
+    }
+    
+    public var scrollView: UIScrollView {
+        self.table
+    }
+    lazy var table: UITableView = {
+        let t = UITableView(frame: .zero, style: .insetGrouped)
+//        t.contentInset = UIEdgeInsets(top: 250, left: 0, bottom: 250, right: 0)
+        t.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        t.dataSource = self
+        return t
     }()
-    
     
 }
 
 public class testam:NSObject,AMPageViewDelegate{
+    public func numberOfPage() -> NSInteger {
+        return 10
+    }
+    
+    public func pageOfIndex(index: Int) -> AMPageViewPage {
+        page()
+    }
+    public var height:Int = 128
     public func indicateView() -> AMPageViewIndicate {
-        aim()
+        let a = aim()
+        a.backgroundColor = UIColor.systemPink
+        return a
     }
     
     public func headerView() -> UIView {
-        UIView()
+        let v = UIView()
+        v.backgroundColor = UIColor.red
+        return v
     }
     
     public func heightOfHeaderView() -> Int {
-        128
+        self.height
     }
     
     public func heightOfIndicateView() -> Int {
         44
     }
-    
-    public func numberOfView() -> Int {
-        return 10
+    public func headerScrollOffset() -> NSInteger {
+        44 + 88
     }
-    
-    public func viewAt(index: Int) -> AMPageViewPage {
-        page()
-    }
-    
+
     public func contentOffsetAt(location: CGPoint) {
         print(location)
     }

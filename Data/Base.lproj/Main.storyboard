@@ -30,7 +30,7 @@
         <!--View Controller-->
         <scene sceneID="LMb-ye-tR8">
             <objects>
-                <viewController id="3B3-3S-Z17" customClass="ViewController" customModule="Data" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="3B3-3S-Z17" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="fBr-wO-Qcr">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -64,10 +64,6 @@
                             </connections>
                         </button>
                     </navigationItem>
-                    <connections>
-                        <outlet property="de" destination="kTq-qM-IvQ" id="F4W-t3-c1y"/>
-                        <outlet property="pager" destination="0tR-Yk-1YG" id="uJI-bJ-nuD"/>
-                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="hJ8-PG-Dsg" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
                 <customObject id="kTq-qM-IvQ" customClass="testPd" customModule="Data"/>
@@ -77,29 +73,39 @@
         <!--View Controller-->
         <scene sceneID="Cob-nK-S87">
             <objects>
-                <viewController id="DnG-fv-shb" sceneMemberID="viewController">
+                <viewController id="DnG-fv-shb" customClass="ViewController" customModule="Data" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="gyI-Os-wQu">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3EJ-uB-HYy" customClass="AMPageView" customModule="Ammo">
-                                <rect key="frame" x="20" y="108" width="374" height="734"/>
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <connections>
-                                    <outlet property="delegate" destination="KTy-4c-vI9" id="BlH-9N-nGQ"/>
+                                    <outlet property="delegate" destination="KTy-4c-vI9" id="7lp-wb-Goa"/>
                                 </connections>
                             </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="dCX-Kj-Jek"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="dCX-Kj-Jek" firstAttribute="trailing" secondItem="3EJ-uB-HYy" secondAttribute="trailing" constant="20" id="9on-0I-BxG"/>
-                            <constraint firstItem="dCX-Kj-Jek" firstAttribute="bottom" secondItem="3EJ-uB-HYy" secondAttribute="bottom" constant="20" id="DsU-gG-BNe"/>
-                            <constraint firstItem="3EJ-uB-HYy" firstAttribute="leading" secondItem="dCX-Kj-Jek" secondAttribute="leading" constant="20" id="pFy-4x-0eZ"/>
-                            <constraint firstItem="3EJ-uB-HYy" firstAttribute="top" secondItem="dCX-Kj-Jek" secondAttribute="top" constant="20" id="y4Y-JM-xUm"/>
+                            <constraint firstAttribute="bottom" secondItem="3EJ-uB-HYy" secondAttribute="bottom" id="2O3-x5-2ET"/>
+                            <constraint firstItem="3EJ-uB-HYy" firstAttribute="leading" secondItem="gyI-Os-wQu" secondAttribute="leading" id="2qH-lD-DsC"/>
+                            <constraint firstItem="3EJ-uB-HYy" firstAttribute="top" secondItem="gyI-Os-wQu" secondAttribute="top" id="Sxc-Uw-sLv"/>
+                            <constraint firstAttribute="trailing" secondItem="3EJ-uB-HYy" secondAttribute="trailing" id="urn-y5-x9l"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="iSy-GA-weI"/>
+                    <navigationItem key="navigationItem" id="iSy-GA-weI">
+                        <barButtonItem key="rightBarButtonItem" title="Item" id="9gI-MC-9hg">
+                            <connections>
+                                <action selector="reload" destination="DnG-fv-shb" id="ODQ-GK-rK3"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="de" destination="KTy-4c-vI9" id="hl3-M3-XCb"/>
+                        <outlet property="pager" destination="3EJ-uB-HYy" id="Yvl-Vo-jIb"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="2Q7-vV-waP" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
                 <customObject id="KTy-4c-vI9" customClass="testam" customModule="Data" customModuleProvider="target"/>

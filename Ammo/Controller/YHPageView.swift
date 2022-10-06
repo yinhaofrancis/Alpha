@@ -106,8 +106,16 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
         
     }
     public func scrollToIndex(index:Int,animation:Bool){
+        if(index == self.index){
+            return
+        }
         RunLoop.main.perform(inModes: [.common]) {
             if(animation){
+                if(self.index - index > 1){
+                    self.pageScrollView.contentOffset = CGPoint(x:CGFloat(index + 1) * self.frame.width, y: 0)
+                }else if(self.index - index < -1){
+                    self.pageScrollView.contentOffset = CGPoint(x:CGFloat(index - 1) * self.frame.width, y: 0)
+                }
                 UIView .animate(withDuration: 0.25, delay: 0, options: .curveEaseInOut) {
                     self.pageScrollView.contentOffset = CGPoint(x:CGFloat(index) * self.frame.width, y: 0)
                 } completion: { b in
