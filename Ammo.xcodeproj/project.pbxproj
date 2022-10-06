@@ -146,7 +146,7 @@
 		A9A3FBA7283F11BF003582F2 /* DataBaseUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBaseUpdate.swift; sourceTree = "<group>"; };
 		A9B5DEB528D8D714008E5C15 /* Kate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Kate.swift; path = ../../../../../Kate.swift; sourceTree = "<group>"; };
 		A9CD687D28425CC000ABD882 /* DataBaseConcurrency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBaseConcurrency.swift; sourceTree = "<group>"; };
-		A9CED30E28EBEA7F00BA9070 /* AMPager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AMPager.swift; path = ../../../../../AMPager.swift; sourceTree = "<group>"; };
+		A9CED30E28EBEA7F00BA9070 /* AMPager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AMPager.swift; sourceTree = "<group>"; };
 		A9DC4EE328BC55EF00DACFA9 /* default.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = default.metal; sourceTree = "<group>"; };
 		A9DC4EE528BDEB9F00DACFA9 /* CokeRender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CokeRender.swift; sourceTree = "<group>"; };
 		A9DD1BA128E0003600E016D5 /* AMScoreBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AMScoreBoard.swift; path = ../../../../AMScoreBoard.swift; sourceTree = "<group>"; };
@@ -224,8 +224,8 @@
 		A931745A28DC1F7C00C7FCF7 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
-				A931745D28DC1FA900C7FCF7 /* YHPageView.swift */,
 				A9CED30E28EBEA7F00BA9070 /* AMPager.swift */,
+				A931745D28DC1FA900C7FCF7 /* YHPageView.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";

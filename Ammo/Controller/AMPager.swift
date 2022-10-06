@@ -1,5 +1,6 @@
+
 //
-//  YHPageView.swift
+//  AMPageView.swift
 //  Ammo
 //
 //  Created by wenyang on 2022/9/22.
@@ -9,7 +10,7 @@ import Foundation
 import UIKit
 import ObjectiveC
 
-public class YHPageContentView:UIView{
+public class AMPageContentView:UIView{
 
     public weak var scrollView:UIScrollView?
     public override func layoutSubviews() {
@@ -24,30 +25,61 @@ public class YHPageContentView:UIView{
         self.contentOffset = offset
     }
 }
-@objc public protocol YHPageViewIndicate:NSObjectProtocol{
+@objc public protocol AMPageViewIndicate:NSObjectProtocol{
     func indicateOffset(offset:CGFloat)
-    weak var pageView:YHPageView? { get set }
+    weak var pageView:AMPageView? { get set }
     var view:UIView { get }
 }
-@objc public protocol YHPageViewPage:NSObjectProtocol{
-    weak var pageView:YHPageView? { get set }
+@objc public protocol AMPageViewPage:NSObjectProtocol{
+    weak var pageView:AMPageView? { get set }
     var view:UIView { get }
     var scrollView:UIScrollView { get }
     func viewPageDidLoad()
 }
-@objc public protocol YHPageViewDelegate:NSObjectProtocol{
+@objc public protocol AMPageViewDelegate:NSObjectProtocol{
     @objc func numberOfPage()->NSInteger
-    @objc func pageOfIndex(index:Int)->YHPageViewPage
+    @objc func pageOfIndex(index:Int)->AMPageViewPage
     @objc optional func headerView()->UIView
-    @objc optional func indicateView()->YHPageViewIndicate
+    @objc optional func indicateView()->AMPageViewIndicate
     @objc optional func heightOfHeaderView()->NSInteger
     @objc optional func heightOfIndicateView()->NSInteger
     @objc optional func headerScrollOffset()->NSInteger
 }
+@objc public class AMPageViewCell:UICollectionViewCell{
+    public var view:UIView?{
+        didSet{
+            oldValue?.removeFromSuperview()
+            guard let view = view else {
+                return
+            }
+            self.contentView.addSubview(view)
+            view.translatesAutoresizingMaskIntoConstraints = false;
+            self.contentView .addConstraints([
+                view.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor),
+                view.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor),
+                view.topAnchor.constraint(equalTo: self.contentView.topAnchor),
+                view.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor)
+            ])
+        }
+    }
+}
 
-public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
-    @objc @IBOutlet public weak var indicate:YHPageViewIndicate?
-    @objc @IBOutlet public weak var delegate:YHPageViewDelegate?{
+public class AMPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout{
+    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return self.delegate?.numberOfPage() ?? 0
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "\(AMPageViewCell.self)", for: indexPath) as! AMPageViewCell
+        cell.view = self.loadPage(index: indexPath.item)?.view
+        return cell
+    }
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return collectionView.frame.size
+    }
+    
+    @objc @IBOutlet public weak var indicate:AMPageViewIndicate?
+    @objc @IBOutlet public weak var delegate:AMPageViewDelegate?{
         didSet{
             if(oldValue == nil){
                 self.reload()
@@ -66,7 +98,6 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
     public func reloadHeader(){
         self.headerView?.removeFromSuperview()
         self.indicate?.view.removeFromSuperview()
-        self.resize()
         self.loadHeader()
         self.loadIndicate()
     }
@@ -74,14 +105,15 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
         guard let delegate = delegate else {
             return
         }
+        guard let mt = self.mainTop else { return }
         let hh = delegate.heightOfHeaderView?() ?? 0
         let hi = delegate.heightOfIndicateView?() ?? 0
         self.headerHeight?.constant = CGFloat(hh)
         self.indicateHeight?.constant = CGFloat(hi)
         self.headerScrollOffset = delegate.headerScrollOffset?() ?? 0
         self.limitOfScroll = hh + hi - self.headerScrollOffset
+        self.pageHeight?.constant = CGFloat(-self.headerScrollOffset)
         guard let sc = self.currentScroll else { return }
-        guard let mt = self.mainTop else { return }
         if(sc.contentOffset.y + sc.contentInset.top > 0.1){
             mt.constant = -CGFloat(limitWithAdjust)
         }else{
@@ -90,40 +122,20 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
         
     }
     public func reload(){
-        self.content.forEach { i in
-            i.value.view.removeFromSuperview()
-        }
         
         self.content.removeAll()
-        guard let delegate = delegate else {
-            return
-        }
-        self.loadPage(index: self.index)
-        if let widthConstaint = widthConstaint {
-            self.pageScrollView.removeConstraint(widthConstaint)
-        }
-        let w = self.pageContentView.widthAnchor.constraint(equalTo: self.pageScrollView.frameLayoutGuide.widthAnchor, multiplier: CGFloat(delegate.numberOfPage()), constant: 0)
-        self.widthConstaint = w;
-        self.pageScrollView.addConstraints([
-            w
-        ])
-        self.scrollToIndex(index: self.index, animation: false)
+        
         self.reloadHeader()
+        self.resize()
+        self.pageScrollView.reloadData()
+        self.scrollToIndex(index: self.index, animation: false)
         self.mainScrollView.showsVerticalScrollIndicator = false
         self.mainScrollView.showsHorizontalScrollIndicator = false
         
     }
     public func scrollToIndex(index:Int,animation:Bool){
-        if(index == self.index){
-            return
-        }
         RunLoop.main.perform(inModes: [.common]) {
             if(animation){
-                if(self.index - index > 1){
-                    self.pageScrollView.contentOffset = CGPoint(x:CGFloat(index + 1) * self.frame.width, y: 0)
-                }else if(self.index - index < -1){
-                    self.pageScrollView.contentOffset = CGPoint(x:CGFloat(index - 1) * self.frame.width, y: 0)
-                }
                 UIView .animate(withDuration: 0.25, delay: 0, options: .curveEaseInOut) {
                     self.pageScrollView.contentOffset = CGPoint(x:CGFloat(index) * self.frame.width, y: 0)
                 } completion: { b in
@@ -132,40 +144,30 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
             }else{
                 self.pageScrollView.contentOffset = CGPoint(x:CGFloat(index) * self.frame.width, y: 0)
             }
-            self.loadPage(index: index)
+//            self.loadPage(index: index)
             RunLoop.main.run(mode: .tracking, before: Date(timeIntervalSinceNow: 0.5))
         }
         RunLoop.main.run(mode: .tracking, before: Date(timeIntervalSinceNow: 0.5))
     }
-    func loadPage(index:Int){
-        guard let delegate = self.delegate else { return }
+    func loadPage(index:Int)->AMPageViewPage?{
+        guard let delegate = self.delegate else { return nil }
         
         if(delegate.numberOfPage() > index && index >= 0){
             if nil == self.content[index]{
                 let page = delegate.pageOfIndex(index: index)
                 self.content[index] = page
-                let view = page.view
-//                page.scrollView.isScrollEnabled = false
                 page.scrollView.panGestureRecognizer.isEnabled = false
                 page.scrollView.showsVerticalScrollIndicator = false
                 page.scrollView.showsHorizontalScrollIndicator = false
-                self.pageContentView.addSubview(view)
-                view.translatesAutoresizingMaskIntoConstraints = false
-                page.scrollView.contentOffset =  CGPoint(x: 0, y: 0 - page.scrollView.contentInset.top)
-                self.pageContentView.addConstraints([
-                    view.topAnchor.constraint(equalTo: self.pageContentView.topAnchor),
-                    view.bottomAnchor.constraint(equalTo: self.pageContentView.bottomAnchor),
-                    NSLayoutConstraint(item: view, attribute: .trailing, relatedBy: .equal, toItem: self.pageContentView, attribute: .trailing, multiplier: CGFloat(index + 1) / CGFloat(delegate.numberOfPage()), constant: 0)
-                ])
-                self.pageScrollView.addConstraints([
-                    view.widthAnchor.constraint(equalTo: self.pageScrollView.frameLayoutGuide.widthAnchor)
-                ])
                 RunLoop.main.perform(inModes: [.default]) {
                     page.viewPageDidLoad()
                 }
+                return page
+            }else{
+                return self.content[index]
             }
         }
-        
+        return nil
     }
 
     
@@ -174,13 +176,6 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
         if(self.pageScrollView == scrollView){
             let findex = scrollView.contentOffset.x / self.frame.width
             self.indicate?.indicateOffset(offset: findex)
-            if(abs(findex - CGFloat(index)) > 0.01){
-                if(scrollView.panGestureRecognizer.velocity(in: self).x > 0){
-                    self.loadPage(index: index)
-                }else if (scrollView.panGestureRecognizer.velocity(in: self).x < 0){
-                    self.loadPage(index: index + 1)
-                }
-            }
         }
         if(self.mainScrollView == scrollView){
             self.syncSubscrollContent(index: self.index)
@@ -201,34 +196,20 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
         }
         
     }
-    
-    public func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
-        if(scrollView == self.pageScrollView){
-            self.loadPage(index: self.index)
-        }
+    public lazy var pageScrollView:UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.minimumLineSpacing = 0
+        layout.minimumInteritemSpacing = 0
         
-    }
-    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        if(scrollView == self.pageScrollView){
-            self.loadPage(index: self.index)
-
-        }
-    }
-    public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        if(decelerate == false){
-            if(scrollView == self.pageScrollView){
-                self.loadPage(index: self.index)
-            }
-        }
-    }
-    
-    
-    public lazy var pageScrollView:UIScrollView = {
-        let pageScroll = UIScrollView()
+        layout.scrollDirection = .horizontal
+        let pageScroll = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        pageScroll.register(AMPageViewCell.self, forCellWithReuseIdentifier: "\(AMPageViewCell.self)")
         self.mainScrollView.addSubview(pageScroll)
+        pageScroll.contentInsetAdjustmentBehavior = .never
         pageScroll.translatesAutoresizingMaskIntoConstraints = false;
         let top = pageScroll.topAnchor.constraint(equalTo: self.indicateGuide.bottomAnchor)
-        let bottom = pageScroll.bottomAnchor.constraint(equalTo: self.mainScrollView.frameLayoutGuide.bottomAnchor)
+        let bottom = pageScroll.heightAnchor.constraint(equalTo: self.mainScrollView.frameLayoutGuide.heightAnchor,constant: -CGFloat(self.headerScrollOffset))
+        self.pageHeight = bottom
         self.addConstraints([
             pageScroll.leadingAnchor.constraint(equalTo: self.mainScrollView.frameLayoutGuide.leadingAnchor),
             pageScroll.trailingAnchor.constraint(equalTo: self.mainScrollView.frameLayoutGuide.trailingAnchor),
@@ -237,12 +218,13 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
         ])
         pageScroll.isPagingEnabled = true
         pageScroll.delegate = self
+        pageScroll.dataSource = self
         pageScroll.showsVerticalScrollIndicator = false;
         pageScroll.showsHorizontalScrollIndicator = false;
         return pageScroll
     }()
-    public lazy var mainScrollView:YHPagerScrollView = {
-        let view = YHPagerScrollView()
+    public lazy var mainScrollView:AMPagerScrollView = {
+        let view = AMPagerScrollView()
         self.addSubview(view)
         view.translatesAutoresizingMaskIntoConstraints = false
         self.addConstraints([
@@ -257,20 +239,6 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
         view.page = self
         return view
     }()
-    // 页容器
-    private lazy var pageContentView:UIView = {
-        let view = UIView()
-        self.pageScrollView.addSubview(view)
-        view.translatesAutoresizingMaskIntoConstraints = false
-        self.pageScrollView .addConstraints([
-            view.topAnchor.constraint(equalTo: self.pageScrollView.frameLayoutGuide.topAnchor),
-            view.bottomAnchor.constraint(equalTo: self.pageScrollView.frameLayoutGuide.bottomAnchor),
-            view.leadingAnchor.constraint(equalTo: self.pageScrollView.contentLayoutGuide.leadingAnchor),
-            view.trailingAnchor.constraint(equalTo: self.pageScrollView.contentLayoutGuide.trailingAnchor)
-        ])
-        return view
-    } ()
-    
     
     private lazy var headerGuide:UILayoutGuide = {
         let g = UILayoutGuide()
@@ -354,6 +322,7 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
             self.mainScrollView.contentOffset = self.mainShouldContentOffset
         }
         self.mainScrollView.delegate = self
+        self.mainScrollView.contentInsetAdjustmentBehavior = .never
     }
     //当前页的scrollView
     fileprivate var currentScroll:UIScrollView?{
@@ -379,19 +348,18 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
         return CGPoint(x: 0, y: Int(currentScroll.contentOffset.y + currentScroll.contentInset.top) + self.limitWithAdjust)
     }
     //缓存页
-    private var content:[Int:YHPageViewPage] = [:]
-    // page 宽度
-    private var widthConstaint:NSLayoutConstraint?
+    private var content:[Int:AMPageViewPage] = [:]
     // 顶部约束
     private var mainTop:NSLayoutConstraint?
     //header 高度
     private var headerHeight:NSLayoutConstraint?
-    
+    //pageHeight 高度
+    private var pageHeight:NSLayoutConstraint?
     //指示器高度
     private var indicateHeight:NSLayoutConstraint?
 }
-public class YHPagerScrollView:UIScrollView,UIGestureRecognizerDelegate{
-    weak var page:YHPageView?{
+public class AMPagerScrollView:UIScrollView,UIGestureRecognizerDelegate{
+    weak var page:AMPageView?{
         didSet{
             self.panGestureRecognizer.delegate = self
         }

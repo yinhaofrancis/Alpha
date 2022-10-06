@@ -134,9 +134,9 @@ public class testPd:NSObject,YHPageViewDelegate{
     public func headerScrollOffset() -> NSInteger {
         return offset
     }
-    public var headerHeight:Int  = 128
+    public var headerHeight:Int  = 128 + 88
     public var indicateHeight:Int = 64
-    public var offset:Int = 64
+    public var offset:Int = 64 + 88
     public func headerView() -> UIView {
         let l = UIView()
 
@@ -202,13 +202,13 @@ public class testam:NSObject,AMPageViewDelegate{
     public var height:Int = 128
     public func indicateView() -> AMPageViewIndicate {
         let a = aim()
-        a.backgroundColor = UIColor.systemPink
+        a.backgroundColor = UIColor.systemOrange
         return a
     }
     
     public func headerView() -> UIView {
         let v = UIView()
-        v.backgroundColor = UIColor.red
+        v.backgroundColor = UIColor.yellow
         return v
     }
     
