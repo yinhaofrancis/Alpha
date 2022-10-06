@@ -20,12 +20,14 @@ class ViewController: UIViewController {
     @IBOutlet weak var pager: AMPageView!
     @IBAction public func reload(){
         self.de.height = 250
+        self.de.indicate = 64
         self.pager.resize()
         UIView .animate(withDuration: 0.3) {
             self.pager.layoutIfNeeded()
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) {
             self.de.height = 128
+            self.de.indicate = 44
             self.pager.resize()
             UIView .animate(withDuration: 0.3) {
                 self.pager.layoutIfNeeded()
@@ -200,6 +202,7 @@ public class testam:NSObject,AMPageViewDelegate{
         page()
     }
     public var height:Int = 128
+    public var indicate:Int = 44
     public func indicateView() -> AMPageViewIndicate {
         let a = aim()
         a.backgroundColor = UIColor.systemOrange
@@ -217,10 +220,10 @@ public class testam:NSObject,AMPageViewDelegate{
     }
     
     public func heightOfIndicateView() -> Int {
-        44
+        return indicate
     }
     public func headerScrollOffset() -> NSInteger {
-        44 + 88
+        return indicate + 88
     }
 
     public func contentOffsetAt(location: CGPoint) {
