@@ -36,14 +36,27 @@ class ViewController: UIViewController {
     }
 
 }
-
+class ViewController2: UIViewController {
+   
+    @IBOutlet var render: CoreImageView!
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        let g = GaussGradientMaskBlendFilter()
+        g.gaussRadius = 20
+        g.maskColor = UIColor.red.withAlphaComponent(0.1)
+        g.start = CGPoint(x: 0, y: 0);
+        g.end = CGPoint(x: 0, y: 1)
+        g.startColor = UIColor.clear.cgColor
+        g.endColor = UIColor.black.cgColor
+        let img = g.filter(img: CIImage(image: UIImage(named: "o")!), bound: self.render.nativeBound)
+        Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self]i in
+            self?.render.image = img
+        }
+    }
+}
 public class testp:NSObject,YHPageViewPage,UITableViewDataSource{
     public func viewPageDidLoad() {
-        var s:String = ""
-        for i in 0 ..< 30000{
-            s = s.appending("\(i)")
-        }
-        print(s)
+
     }
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -160,11 +173,7 @@ public class page:NSObject,AMPageViewPage,UITableViewDataSource{
     public var pageView: AMPageView?
     
     public func viewPageDidLoad() {
-        var s:String = ""
-        for i in 0 ..< 30000{
-            s = s.appending("\(i)")
-        }
-        print(s)
+
     }
     
     public var view: UIView{

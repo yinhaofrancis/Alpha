@@ -114,7 +114,7 @@ public class AMPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate,
         self.limitOfScroll = hh + hi - self.headerScrollOffset
         self.pageHeight?.constant = CGFloat(-self.headerScrollOffset)
         guard let sc = self.currentScroll else { return }
-        if(sc.contentOffset.y + sc.contentInset.top > 0.1){
+        if(sc.contentOffset.y + sc.contentInset.top > 0.01){
             mt.constant = -CGFloat(limitWithAdjust)
         }else{
             mt.constant = -CGFloat(mainScrollView.contentInset.top)

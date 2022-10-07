@@ -82,7 +82,7 @@ public class YHPageView:UIView,UIScrollViewDelegate,UIGestureRecognizerDelegate{
         self.limitOfScroll = hh + hi - self.headerScrollOffset
         guard let sc = self.currentScroll else { return }
         guard let mt = self.mainTop else { return }
-        if(sc.contentOffset.y + sc.contentInset.top > 0.1){
+        if(sc.contentOffset.y + sc.contentInset.top > 0.01){
             mt.constant = -CGFloat(limitWithAdjust)
         }else{
             mt.constant = -CGFloat(mainScrollView.contentInset.top)

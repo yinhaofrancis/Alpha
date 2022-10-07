@@ -38,6 +38,7 @@
 		A97623912869AEC100BAC1FC /* data.json in Resources */ = {isa = PBXBuildFile; fileRef = A97623902869AEC100BAC1FC /* data.json */; };
 		A9A3FBA8283F11BF003582F2 /* DataBaseUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A3FBA7283F11BF003582F2 /* DataBaseUpdate.swift */; };
 		A9B5DEB628D8D714008E5C15 /* Kate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9B5DEB528D8D714008E5C15 /* Kate.swift */; };
+		A9C0811528F01DAD00CCEBC3 /* ImageDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9C0811428F01DAD00CCEBC3 /* ImageDisplay.swift */; };
 		A9CD687E28425CC000ABD882 /* DataBaseConcurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9CD687D28425CC000ABD882 /* DataBaseConcurrency.swift */; };
 		A9CED30F28EBEA7F00BA9070 /* AMPager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9CED30E28EBEA7F00BA9070 /* AMPager.swift */; };
 		A9DC4EE428BC55EF00DACFA9 /* default.metal in Sources */ = {isa = PBXBuildFile; fileRef = A9DC4EE328BC55EF00DACFA9 /* default.metal */; };
@@ -145,6 +146,7 @@
 		A97623902869AEC100BAC1FC /* data.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = data.json; sourceTree = "<group>"; };
 		A9A3FBA7283F11BF003582F2 /* DataBaseUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBaseUpdate.swift; sourceTree = "<group>"; };
 		A9B5DEB528D8D714008E5C15 /* Kate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Kate.swift; path = ../../../../../Kate.swift; sourceTree = "<group>"; };
+		A9C0811428F01DAD00CCEBC3 /* ImageDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageDisplay.swift; sourceTree = "<group>"; };
 		A9CD687D28425CC000ABD882 /* DataBaseConcurrency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBaseConcurrency.swift; sourceTree = "<group>"; };
 		A9CED30E28EBEA7F00BA9070 /* AMPager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AMPager.swift; sourceTree = "<group>"; };
 		A9DC4EE328BC55EF00DACFA9 /* default.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = default.metal; sourceTree = "<group>"; };
@@ -226,6 +228,7 @@
 			children = (
 				A9CED30E28EBEA7F00BA9070 /* AMPager.swift */,
 				A931745D28DC1FA900C7FCF7 /* YHPageView.swift */,
+				A9C0811428F01DAD00CCEBC3 /* ImageDisplay.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -639,6 +642,7 @@
 				A9CED30F28EBEA7F00BA9070 /* AMPager.swift in Sources */,
 				A90D56C028DF220300FEFF80 /* YHPageView.swift in Sources */,
 				A9A3FBA8283F11BF003582F2 /* DataBaseUpdate.swift in Sources */,
+				A9C0811528F01DAD00CCEBC3 /* ImageDisplay.swift in Sources */,
 				A9EEA3DF289AADAB00F6F938 /* IconFont.swift in Sources */,
 				A9FB798C281A6942008CCF39 /* DataBaseModel.swift in Sources */,
 				A9205A0C28B4D134001529BA /* JavascriptGlue.swift in Sources */,
