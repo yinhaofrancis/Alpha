@@ -39,19 +39,21 @@ class ViewController: UIViewController {
 class ViewController2: UIViewController {
    
     @IBOutlet var render: CoreImageView!
+    private var radius:CGFloat = 1
+    private var alpha:CGFloat = 1
+    let g = curry(GradientGaussMask().filter(point0:point1:color:alpha:radius:image:))(CGPoint(x: 0, y: 0))(CGPoint(x: 0, y: 1))(CIColor(color: UIColor.cyan))
     override func viewDidLoad() {
         super.viewDidLoad()
-        let g = GaussGradientMaskBlendFilter()
-        g.gaussRadius = 20
-        g.maskColor = UIColor.red.withAlphaComponent(0.1)
-        g.start = CGPoint(x: 0, y: 0);
-        g.end = CGPoint(x: 0, y: 1)
-        g.startColor = UIColor.clear.cgColor
-        g.endColor = UIColor.black.cgColor
-        let img = g.filter(img: CIImage(image: UIImage(named: "o")!), bound: self.render.nativeBound)
-        Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self]i in
-            self?.render.image = img
-        }
+        
+        self.render.image = g(self.alpha)(self.radius)(CIImage(image: UIImage(named: "o")!));
+    }
+    @IBAction func changeRadius(_ sender: UISlider) {
+        self.radius = CGFloat(sender.value)
+        self.render.image = g(self.alpha)(self.radius)(CIImage(image: UIImage(named: "o")!));
+    }
+    @IBAction func changeGradient(_ sender: UISlider) {
+        self.alpha = CGFloat(sender.value)
+        self.render.image = g(self.alpha)(self.radius)(CIImage(image: UIImage(named: "o")!));
     }
 }
 public class testp:NSObject,YHPageViewPage,UITableViewDataSource{
