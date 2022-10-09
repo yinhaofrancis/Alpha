@@ -74,6 +74,38 @@
             </objects>
             <point key="canvasLocation" x="1041" y="-495"/>
         </scene>
+        <!--View Controller3-->
+        <scene sceneID="iEm-Vm-DZx">
+            <objects>
+                <viewController id="4Om-Oe-Pwj" customClass="ViewController3" customModule="Data" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Pdu-nA-Mud" customClass="VideoHasBackgroundView" customModule="Ammo">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="50" translatesAutoresizingMaskIntoConstraints="NO" id="gqA-r9-hwA">
+                                <rect key="frame" x="18" y="812" width="378" height="31"/>
+                                <connections>
+                                    <action selector="changeRadius:" destination="4Om-Oe-Pwj" eventType="valueChanged" id="rCQ-IG-c38"/>
+                                </connections>
+                            </slider>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="DG9-Is-SfK"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="DG9-Is-SfK" firstAttribute="trailing" secondItem="gqA-r9-hwA" secondAttribute="trailing" constant="20" id="3Im-pl-HuO"/>
+                            <constraint firstItem="DG9-Is-SfK" firstAttribute="bottom" secondItem="gqA-r9-hwA" secondAttribute="bottom" constant="20" id="TIY-1W-45C"/>
+                            <constraint firstItem="gqA-r9-hwA" firstAttribute="leading" secondItem="DG9-Is-SfK" secondAttribute="leading" constant="20" id="fbe-J0-iuW"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="d95-Ki-eCW"/>
+                    <connections>
+                        <outlet property="videoView" destination="Pdu-nA-Mud" id="efq-f3-CHa"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="1BM-LY-SN0" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1892" y="-278"/>
+        </scene>
         <!--View Controller-->
         <scene sceneID="LMb-ye-tR8">
             <objects>
@@ -115,6 +147,11 @@
                                 <segue destination="DnG-fv-shb" kind="show" id="4i4-Mo-kJV"/>
                             </connections>
                         </button>
+                        <barButtonItem key="rightBarButtonItem" title="Item" id="8uY-aF-sr5">
+                            <connections>
+                                <segue destination="4Om-Oe-Pwj" kind="show" id="rPB-Dx-SLy"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="hJ8-PG-Dsg" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -162,7 +199,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="2Q7-vV-waP" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
                 <customObject id="KTy-4c-vI9" customClass="testam" customModule="Data" customModuleProvider="target"/>
             </objects>
-            <point key="canvasLocation" x="1801" y="120"/>
+            <point key="canvasLocation" x="2348" y="349"/>
         </scene>
         <!--View Controller-->
         <scene sceneID="ChP-8S-VdJ">

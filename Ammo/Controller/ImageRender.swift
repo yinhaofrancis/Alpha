@@ -14,7 +14,12 @@ public class CoreImageView:UIView{
         didSet{
             self.invalidateIntrinsicContentSize()
             self.superview?.layoutIfNeeded()
-            self.render()
+            let bound = self.nativeBound
+            let layer = self.mtlayer
+            DispatchQueue.global().async {
+                self.render(renderImage: self.image, bound: bound, layer: layer)
+            }
+            
         }
     }
     public var uiImage:UIImage?{
@@ -31,15 +36,15 @@ public class CoreImageView:UIView{
         return self.layer as! CAMetalLayer
     }
 
-    public func render(){
-        guard let img = self.image else { return }
-        MetalRender.shared.render(img: img, bound: self.nativeBound, filter: self.displayfilter, target: self.mtlayer)
+    public func render(renderImage:CIImage?,bound: CGRect,layer:CAMetalLayer){
+        guard let img = renderImage else { return }
+        MetalRender.shared.render(img: img, bound: bound, filter: self.displayfilter, target: layer)
     }
     public var nativeBound:CGRect{
         let bound = self.bounds;
         return CGRect(x: 0, y: 0, width: bound.width * UIScreen.main.scale, height: bound.height * UIScreen.main.scale)
     }
-    private var displayfilter:ImageRenderModel = DisplayModeFilter()
+    private var displayfilter:ImageRenderModel = ImageDisplayMode()
     
     
     public override var intrinsicContentSize: CGSize{
@@ -53,24 +58,25 @@ public class MetalRender{
     public var callbuffer:[()->Void] = []
     public func render(img:CIImage,bound:CGRect,filter:ImageRenderModel,target:CAMetalLayer){
         target.device = self.device
-        target.pixelFormat = .bgra8Unorm_srgb
+        target.pixelFormat = .bgra8Unorm
         target.framebufferOnly = false
         target.colorspace = CGColorSpaceCreateDeviceRGB()
         target.contentsScale = UIScreen.main.scale
         target.drawableSize = bound.size
-        self.dispatchQueue.async {
-            guard let buffer = self.buffer else { return }
+        guard let buffer = self.buffer else { return }
 
-            guard let result = filter.filter(img: img, bound: bound) else { return }
-            guard let ctx = self.ctx else { return }
-            guard let drawable = target.nextDrawable() else { return }
-            ctx.render(result, to: drawable.texture, commandBuffer: buffer, bounds: bound, colorSpace: CGColorSpaceCreateDeviceRGB())
-            buffer.present(drawable)
-            buffer.commit()
-            buffer.waitUntilCompleted()
-        }
+        guard let result = filter.filter(img: img, bound: bound) else { return }
+        guard let ctx = self.ctx else { return }
+        guard let drawable = target.nextDrawable() else { return }
+        ctx.render(result, to: drawable.texture, commandBuffer: buffer, bounds: bound, colorSpace: CGColorSpaceCreateDeviceRGB())
+        buffer.present(drawable)
+        buffer.commit()
+        buffer.waitUntilCompleted()
     }
- 
+    public func renderOffscreen(img:CIImage)->CGImage?{
+        guard let ctx = self.ctx else { return nil }
+        return ctx.createCGImage(img, from: img.extent)
+    }
     private var buffer:MTLCommandBuffer?{
         self.queue?.makeCommandBuffer()
     }
@@ -84,31 +90,44 @@ public class MetalRender{
         return CIContext(mtlCommandQueue: queue)
     }()
     private var device:MTLDevice? = MTLCreateSystemDefaultDevice()
-    private var dispatchQueue:DispatchQueue = { DispatchQueue(label: "CoreImageView")}()
     
     public static let shared:MetalRender = MetalRender()
-    private var runloop:RunLoop?
-    private lazy var thread:Thread = {
-        Thread {[weak self] in
+}
+
+public class RenderLoop:NSObject{
+    public lazy var thread:Thread = {
+        return Thread {[weak self] in
             self?.runloop = RunLoop.current
-            RunLoop.current.run()
+            _ = self?.link
+            self?.runloop?.run()
         }
     }()
-    @objc func run(){
-        
-    }
-    public lazy var link:CADisplayLink? =  {
-        let link = CADisplayLink(target: self, selector: #selector(run))
-        if #available(iOS 15.0, *) {
-            link.preferredFrameRateRange = CAFrameRateRange(minimum: 10, maximum: 60)
-        } else {
-            // Fallback on earlier versions
-            link.preferredFramesPerSecond = 10
+    public lazy var link:CADisplayLink = {
+        let link = CADisplayLink(target: self, selector: #selector(callbackFunc))
+        if let runloop = self.runloop{
+            link.add(to: runloop, forMode: .default)
         }
-        guard let runloop = runloop else {
-            return nil
-        }
-        link.add(to: runloop, forMode: .default)
         return link
     }()
+    public func start(){
+        self.thread.start()
+    }
+    public var callback:()->Void
+    public init(callback:@escaping ()->Void){
+        self.callback = callback
+    }
+    @objc public func callbackFunc(){
+        self.callback()
+    }
+    deinit {
+        self.stop()
+    }
+    public func stop(){
+        self.link.invalidate()
+        if let rl = self.runloop?.getCFRunLoop(){
+            CFRunLoopStop(rl)
+        }
+        self.thread.cancel()
+    }
+    public var runloop:RunLoop?
 }

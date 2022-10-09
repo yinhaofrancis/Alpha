@@ -7,6 +7,7 @@
 
 import UIKit
 import Ammo
+import AVFoundation
 class ViewController: UIViewController {
    
     let ctx = try! RenderContext(size: CGSize(width: 100, height: 100), scale: 3,reverse: true);
@@ -42,7 +43,7 @@ class ViewController2: UIViewController {
     let g = curry(GradientGaussMask().filter(linear:point0:point1:color:alpha:radius:image:))(false)(CGPoint(x: 0, y: 0))(CGPoint(x: 0, y: 1))(CIColor(color: UIColor.cyan))
     let tras = ImageDissolveTransition()
     let exo = ImageExposureAdjust()
-    let blur = ImageCropGaussImage()
+    let blur = ImageCropGaussianImage()
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -58,6 +59,37 @@ class ViewController2: UIViewController {
     @IBAction func changeGradient(_ sender: UISlider) {
         self.alpha = CGFloat(sender.value)
         self.render.image = g(self.alpha)(self.radius)(CIImage(image: UIImage(named: "o")!))
+    }
+}
+
+
+class ViewController3: UIViewController,VideoViewDelegate {
+    func videoPixelCallBack(source: CIImage,bound:CGRect) -> CIImage? {
+        self.gauss.filter(bound: bound, image: source, radius: self.radius)
+    }
+    func imagePixelCallBack(source: CIImage,bound:CGRect) -> CIImage?{
+        source
+    }
+//
+//
+    let gauss = ImageGaussianBackground()
+    let u2 = "https://www.heishenhua.com/video/b1/gamesci_2022PV03.mp4"
+    let player = AVPlayer(url: URL(string: "https://www.heishenhua.com/video/b1/gamesci_2021PV02.mp4")!)
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.videoView.delegate = self
+        self.videoView.image = CIImage(image: UIImage(named: "i")!)
+    }
+    @IBOutlet var videoView: VideoHasBackgroundView!
+    
+    public var radius:CGFloat = 10
+    @IBAction func changeRadius(_ sender: UISlider) {
+        self.radius = CGFloat(sender.value)
+    }
+    override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+        super.motionEnded(motion, with: event)
+        player.play()
+        self.videoView.player = player
     }
 }
 public class testp:NSObject,YHPageViewPage,UITableViewDataSource{

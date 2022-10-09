@@ -7,7 +7,7 @@
 
 import CoreImage
 
-public struct ImageGaussBlur{
+public struct ImageGaussianBlur{
     public init() {}
     public var gauss:CIFilter? = CIFilter(name: "CIGaussianBlur")
     public func filter(radius:CGFloat?,image:CIImage?)->CIImage?{
@@ -147,8 +147,8 @@ public struct ImageColorMask{
     }
 }
 
-public struct ImageCropGaussImage{
-    public let gauss:ImageGaussBlur = ImageGaussBlur()
+public struct ImageCropGaussianImage{
+    public let gauss:ImageGaussianBlur = ImageGaussianBlur()
     public let crop:ImageCrop = ImageCrop()
     public init() {}
     public func filter(radius:CGFloat,crop:Bool,image:CIImage?)->CIImage?{
@@ -166,7 +166,7 @@ public struct GradientGaussMask{
     public var colorMask:ImageColorMask = ImageColorMask()
     public var gradient:ImageLinearGradient = ImageLinearGradient()
     public var smgradient:ImageSmoothLinearGradient = ImageSmoothLinearGradient()
-    public var gaussImage:ImageCropGaussImage = ImageCropGaussImage()
+    public var gaussImage:ImageCropGaussianImage = ImageCropGaussianImage()
     public var blend:ImageBlendWithAlphaMask = ImageBlendWithAlphaMask()
     public init() {}
     public func filter(linear:Bool?,
@@ -247,7 +247,77 @@ public struct ImageSourceAtop{
         return self.blend?.outputImage
     }
 }
+public struct ImageFillMode{
+    
+    public enum DisplayMode:Int{
+        case scaleToFill = 0
+        case scaleAspectFit = 1
+        case scaleAspectFill = 2
+    }
+    
+    public init() {}
+    public var transform = ImageAffineTransform()
+    
+    public func filter(img:CIImage?,mode:DisplayMode?,bound:CGRect?)->CIImage?{
+        guard let img = img else {
+            return img
+        }
+        guard let mode = mode else {
+            return img
+        }
+        guard let bound = bound else {
+            return img
+        }
+        var result:CIImage?
+        var scale:CGFloat = 1;
+        if mode == .scaleAspectFill{
+            scale = max(bound.width / img.extent.width, bound.height / img.extent.height)
+            let scaleTransFor = CGAffineTransform(scaleX: scale, y: scale)
+            
+            let endFrame = img.extent.applying(scaleTransFor)
+            let deltax = (bound.width - endFrame.width) / 2 - endFrame.minX
+            let deltay = (bound.height - endFrame.height) / 2 - endFrame.minY
+            result = self.transform.filter(transform: CGAffineTransform(translationX: deltax, y: deltay).scaledBy(x: scale, y: scale), image: img)
+        }else if mode == .scaleAspectFit{
+            scale = min(bound.width / img.extent.width, bound.height / img.extent.height)
+            let scaleTransFor = CGAffineTransform(scaleX: scale, y: scale)
+            
+            let endFrame = img.extent.applying(scaleTransFor)
+            let deltax = (bound.width - endFrame.width) / 2 - endFrame.minX
+            let deltay = (bound.height - endFrame.height) / 2 - endFrame.minY
+            result = self.transform.filter(transform: CGAffineTransform(translationX: deltax, y: deltay).scaledBy(x: scale, y: scale), image: img)
+        }else{
+            let x = bound.width / img.extent.width
+            let y = bound.height / img.extent.height
+            result = self.transform.filter(transform: CGAffineTransform(scaleX: x, y: y), image: img)
+        }
+        return result
+    }
+}
 
+public class ImageGaussianBackground{
+    public init() {}
+    public var gauss = ImageCropGaussianImage()
+    public var displayModel = ImageFillMode()
+    public var blend = ImageSourceOver()
+    public var crop = ImageCrop()
+    public func filter(bound:CGRect,
+                       image:CIImage?,
+                       radius:CGFloat?,
+                       backgroundColor:CIColor? = nil)->CIImage?{
+        let nb = self.displayModel.filter(img: image, mode: .scaleAspectFill, bound: bound)
+        let cb = self.crop.filter(rectangle: CIVector(cgRect: bound), image: nb)
+        let bg = self.gauss.filter(radius: radius ?? 10, crop: true, image: cb);
+        let fo = self.displayModel.filter(img: image, mode: .scaleAspectFit, bound: bound)
+        let outFace = self.blend.filter(image: fo, imageBackground: bg)
+        if let bgc = backgroundColor{
+            let bgb = self.crop.filter(rectangle: CIVector(cgRect: bound), image: CIImage(color: bgc))
+            return self.blend.filter(image: outFace, imageBackground: bgb)
+        }else{
+            return outFace
+        }
+    }
+}
 
 @dynamicCallable
 public struct ImageFilter{
