@@ -17,6 +17,9 @@ public func +<C,B>(l:@escaping ()->B,r:@escaping (B)->C)->()->C{
         r(l())
     }
 }
+public func curry <A,B,C,D,E,F,G,H,I>(_ l:@escaping(A,B,C,D,E,F,G,H)->I)->(A)->(B)->(C)->(D)->(E)->(F)->(G)->(H)->I{
+    return { a in{ b in{ c in{ d in{ e in{ f in { g in {h in return l(a,b,c,d,e,f,g,h)}}}}}}}}
+}
 public func curry <A,B,C,D,E,F,G,H>(_ l:@escaping(A,B,C,D,E,F,G)->H)->(A)->(B)->(C)->(D)->(E)->(F)->(G)->H{
     return { a in{ b in{ c in{ d in{ e in{ f in { g in return l(a,b,c,d,e,f,g)}}}}}}}
 }

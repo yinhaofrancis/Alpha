@@ -13,6 +13,7 @@ public class CoreImageView:UIView{
     public var image:CIImage?{
         didSet{
             self.invalidateIntrinsicContentSize()
+            self.superview?.layoutIfNeeded()
             self.render()
         }
     }
@@ -39,6 +40,11 @@ public class CoreImageView:UIView{
         return CGRect(x: 0, y: 0, width: bound.width * UIScreen.main.scale, height: bound.height * UIScreen.main.scale)
     }
     private var displayfilter:ImageRenderModel = DisplayModeFilter()
+    
+    
+    public override var intrinsicContentSize: CGSize{
+        return self.image?.extent.size.applying(CGAffineTransform(scaleX: 1 / UIScreen.main.scale, y:  1 / UIScreen.main.scale)) ?? .zero
+    }
 }
 
 
@@ -51,8 +57,10 @@ public class MetalRender{
         target.framebufferOnly = false
         target.colorspace = CGColorSpaceCreateDeviceRGB()
         target.contentsScale = UIScreen.main.scale
+        target.drawableSize = bound.size
         self.dispatchQueue.async {
             guard let buffer = self.buffer else { return }
+
             guard let result = filter.filter(img: img, bound: bound) else { return }
             guard let ctx = self.ctx else { return }
             guard let drawable = target.nextDrawable() else { return }
