@@ -150,22 +150,15 @@ public struct ImageColorMask{
 public struct ImageCropGaussImage{
     public let gauss:ImageGaussBlur = ImageGaussBlur()
     public let crop:ImageCrop = ImageCrop()
-    public let transform = ImageAffineTransform()
     public init() {}
-    public func filter(radius:CGFloat,crop:Bool,translate:Bool,image:CIImage?)->CIImage?{
+    public func filter(radius:CGFloat,crop:Bool,image:CIImage?)->CIImage?{
         guard let source = image else { return image }
         
         guard let img = self.gauss.filter(radius: radius, image: image) else { return image }
         if(crop){
             return self.crop.filter(rectangle: CIVector(cgRect: source.extent), image: img)
-        }else{
-            if(translate){
-                return transform.filter(transform: CGAffineTransform(translationX: -img.extent.minX, y: -img.extent.minY), image: img)
-            }else{
-                return img
-            }
-            
         }
+        return img
         
     }
 }
@@ -176,8 +169,7 @@ public struct GradientGaussMask{
     public var gaussImage:ImageCropGaussImage = ImageCropGaussImage()
     public var blend:ImageBlendWithAlphaMask = ImageBlendWithAlphaMask()
     public init() {}
-    public func filter(translate:Bool?,
-                       linear:Bool?,
+    public func filter(linear:Bool?,
                        point0:CGPoint?,
                        point1:CGPoint?,
                        color:CIColor?,
@@ -191,7 +183,7 @@ public struct GradientGaussMask{
             result = self.colorMask.filter(color: color, alpha: alpha, image: result)
         }
         if let radius = radius {
-            result = self.gaussImage.filter(radius: radius, crop: false, translate: translate ?? false , image: result)
+            result = self.gaussImage.filter(radius: radius, crop: false, image: result)
         }
         if let po = point0, let p1 = point1,let result = result{
             let cv1 = CIVector(x: po.x * result.extent.width, y: po.y * result.extent.height)

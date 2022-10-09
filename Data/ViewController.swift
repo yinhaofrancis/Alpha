@@ -14,8 +14,6 @@ class ViewController: UIViewController {
     @IBOutlet var de:testam!
     override func viewDidLoad() {
         super.viewDidLoad()
-//        self.pager.mainScrollView.contentInsetAdjustmentBehavior = .always
-//        self.navigationController?.hidesBarsOnSwipe = true
     }
     @IBOutlet weak var pager: AMPageView!
     @IBAction public func reload(){
@@ -41,7 +39,7 @@ class ViewController2: UIViewController {
     @IBOutlet var render: CoreImageView!
     private var radius:CGFloat = 1
     private var alpha:CGFloat = 1
-    let g = curry(GradientGaussMask().filter(translate:linear:point0:point1:color:alpha:radius:image:))(false)(false)(CGPoint(x: 0, y: 0))(CGPoint(x: 0, y: 1))(CIColor(color: UIColor.cyan))
+    let g = curry(GradientGaussMask().filter(linear:point0:point1:color:alpha:radius:image:))(false)(CGPoint(x: 0, y: 0))(CGPoint(x: 0, y: 1))(CIColor(color: UIColor.cyan))
     let tras = ImageDissolveTransition()
     let exo = ImageExposureAdjust()
     let blur = ImageCropGaussImage()
@@ -51,11 +49,11 @@ class ViewController2: UIViewController {
     }
     @IBAction func changeRadius(_ sender: UISlider) {
         self.radius = CGFloat(sender.value)
-        self.image()
+        self.render.image = g(self.alpha)(self.radius)(CIImage(image: UIImage(named: "o")!))
     }
     func image(){
 //        (radius: self.radius, image: )
-        self.render.image = self.blur.filter(radius: self.radius, crop: false, translate: false, image: CIImage(image: UIImage(named: "o")!))
+        self.render.image = self.blur.filter(radius: self.radius, crop: false, image: CIImage(image: UIImage(named: "o")!))
     }
     @IBAction func changeGradient(_ sender: UISlider) {
         self.alpha = CGFloat(sender.value)
