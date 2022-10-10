@@ -7,63 +7,204 @@
 
 import CoreImage
 
-
-public protocol ImageBlur{
-    func filter(radius:CGFloat?,image:CIImage?)->CIImage?
-    init()
+public enum BlurType:String{
+    case Gaussian = "CIGaussianBlur"
+    case Box = "CIBoxBlur"
+    case Disc = "CIDiscBlur"
 }
 
-public struct ImageGaussianBlur:ImageBlur{
-    public init() {}
-    public var gauss:CIFilter? = CIFilter(name: "CIGaussianBlur")
+public enum AffineType:String{
+    case Transform = "CIAffineTransform"
+    case Clamp = "CIAffineClamp"
+    case Tile = "CIAffineTile"
+}
+
+public enum ConvolutionType:String{
+    case Convolution3x3 = "CIConvolution3x3"
+    case Convolution5x5 = "CIConvolution5x5"
+    case Convolution7x7 = "CIConvolution7x7"
+    case Convolution9Horizontal = "CIConvolution9Horizontal"
+    case Convolution9Vertical = "CIConvolution9Vertical"
+}
+
+public enum ImageBlendType:String{
+    case Addition = "CIAdditionCompositing"
+    case Color = "CIColorBlendMode"
+    case ColorBurn = "CIColorBurnBlendMode"
+    case ColorDodge = "CIColorDodgeBlendMode"
+    case Darken = "CIDarkenBlendMode"
+    case Difference = "CIDifferenceBlendMode"
+    case Divide = "CIDivideBlendMode"
+    case Exclusion = "CIExclusionBlendMode"
+    case HardLight = "CIHardLightBlendMode"
+    case Hue = "CIHueBlendMode"
+    case Lighten = "CILightenBlendMode"
+    case LinearBurn = "CILinearBurnBlendMode"
+    case LinearDodge = "CILinearDodgeBlendMode"
+    case Luminosity = "CILuminosityBlendMode"
+    case Maximum = "CIMaximumCompositing"
+    case Minimum = "CIMinimumCompositing"
+    case MultiplyBlend = "CIMultiplyBlendMode"
+    case MultiplyCompositing = "CIMultiplyCompositing"
+    case Overlay = "CIOverlayBlendMode"
+    case PinLight = "CIPinLightBlendMode"
+    case Saturation = "CISaturationBlendMode"
+    case Screen = "CIScreenBlendMode"
+    case SoftLight = "CISoftLightBlendMode"
+    case SourceAtop = "CISourceAtopCompositing"
+    case SourceIn = "CISourceInCompositing"
+    case SourceOut = "CISourceOutCompositing"
+    case SourceOver = "CISourceOverCompositing"
+    case Subtract = "CISubtractBlendMode"
+}
+
+public enum LinearGradientType:String{
+    case Linear = "CILinearGradient"
+    case SmoothLinear = "CISmoothLinearGradient"
+}
+
+public enum BlendMaskType:String{
+    case BlendMask = "CIBlendWithMask"
+    case BlendAlphaMask = "CIBlendWithAlphaMask"
+}
+
+//blur
+public struct ImageBlur{
     public func filter(radius:CGFloat?,image:CIImage?)->CIImage?{
-        gauss?.setDefaults()
-        gauss?.setValue(image, forKey: kCIInputImageKey)
-        gauss?.setValue(radius, forKey: kCIInputRadiusKey)
-        return gauss?.outputImage
+        blur?.setDefaults()
+        blur?.setValue(image, forKey: kCIInputImageKey)
+        blur?.setValue(radius, forKey: kCIInputRadiusKey)
+        return blur?.outputImage
+    }
+    public init(type:BlurType){
+        self.blur = CIFilter(name: type.rawValue)
+    }
+    public var blur:CIFilter?
+}
+// affine
+
+
+
+public struct ImageAffine{
+    public func filter(transform:CGAffineTransform?,image:CIImage?)->CIImage?{
+        self.transform?.setDefaults()
+        self.transform?.setValue(image, forKey: kCIInputImageKey)
+        self.transform?.setValue(transform, forKey: "inputTransform")
+        return self.transform?.outputImage
+    }
+    public init(type:AffineType){
+        self.transform = CIFilter(name: type.rawValue)
+    }
+    public var transform:CIFilter?
+}
+
+// linear gradient
+
+public struct ImageLinearGradient{
+    public init(type:LinearGradientType){
+        self.gradient = CIFilter(name: type.rawValue)
+    }
+    public var gradient:CIFilter?
+    public func filter(point0:CIVector,point1:CIVector,color0:CIColor,color1:CIColor)->CIImage?{
+        self.gradient?.setDefaults()
+        self.gradient?.setValue(point0, forKey: "inputPoint0")
+        self.gradient?.setValue(point1, forKey: "inputPoint1")
+        self.gradient?.setValue(color0, forKey: "inputColor0")
+        self.gradient?.setValue(color1, forKey: "inputColor1")
+        return self.gradient?.outputImage
     }
 }
 
-public struct ImageBoxBlur:ImageBlur{
-    public init() {}
-    public var gauss:CIFilter? = CIFilter(name: "CIBoxBlur")
-    public func filter(radius:CGFloat?,image:CIImage?)->CIImage?{
-        gauss?.setDefaults()
-        gauss?.setValue(image, forKey: kCIInputImageKey)
-        gauss?.setValue(radius, forKey: kCIInputRadiusKey)
-        return gauss?.outputImage
+
+//blend mask
+public struct ImageBlendMask{
+    public init(type:BlendMaskType){
+        self.blend = CIFilter(name: type.rawValue)
+    }
+    public var blend:CIFilter?
+    public func filter(image:CIImage?,mask:CIImage?,background:CIImage?)->CIImage?{
+        self.blend?.setDefaults()
+        self.blend?.setValue(image, forKey: kCIInputImageKey)
+        self.blend?.setValue(mask, forKey: kCIInputMaskImageKey)
+        self.blend?.setValue(background, forKey: kCIInputBackgroundImageKey)
+        return self.blend?.outputImage
+    }
+}
+// blend
+public struct ImageBlend{
+    public var filter:CIFilter?
+    public init(blendType:ImageBlendType){
+        self.filter = CIFilter(name: blendType.rawValue)
+    }
+    public func filter(image:CIImage?,imageBackground:CIImage?)->CIImage?{
+        self.filter?.setDefaults()
+        self.filter?.setValue(image, forKey: kCIInputImageKey)
+        self.filter?.setValue(imageBackground, forKey: kCIInputBackgroundImageKey)
+        return self.filter?.outputImage
     }
 }
 
-public struct ImageDiscBlur:ImageBlur{
-    public init() {}
-    public var gauss:CIFilter? = CIFilter(name: "CIDiscBlur")
-    public func filter(radius:CGFloat?,image:CIImage?)->CIImage?{
-        gauss?.setDefaults()
-        gauss?.setValue(image, forKey: kCIInputImageKey)
-        gauss?.setValue(radius, forKey: kCIInputRadiusKey)
-        return gauss?.outputImage
+// convolution
+
+public struct ImageConvolution{
+    public init(type:ConvolutionType){
+        self.convolution = CIFilter(name: type.rawValue)
+    }
+    public var convolution:CIFilter?
+    public func filter(image:CIImage?,weight:CIVector?,bias:CGFloat?)->CIImage?{
+        self.convolution?.setDefaults()
+        self.convolution?.setValue(image, forKey: kCIInputImageKey)
+        self.convolution?.setValue(weight, forKey: kCIInputWeightsKey)
+        self.convolution?.setValue(bias, forKey: kCIInputBiasKey)
+        return self.convolution?.outputImage
     }
 }
 
-public struct ImageCropBlurImage<Blur:ImageBlur>{
-    public let gauss:Blur = Blur()
-    public let crop:ImageCrop = ImageCrop()
-    public init() {}
-    public func filter(radius:CGFloat,crop:Bool,image:CIImage?)->CIImage?{
-        guard let source = image else { return image }
-        
-        guard let img = self.gauss.filter(radius: radius, image: image) else { return image }
-        if(crop){
-            return self.crop.filter(rectangle: CIVector(cgRect: source.extent), image: img)
+public enum ColoredSquaresType:String{
+    case HexagonalPixellate = "CIHexagonalPixellate"
+    case Pixellate = "CIPixellate"
+    case Crystallize = "CICICrystallize"
+    case Pointillize = "CIPointillize"
+}
+
+public struct ImageColoredSquares{
+    public init(type:ColoredSquaresType){
+        self.pixellate = CIFilter(name: type.rawValue)
+        switch(type){
+            
+        case .HexagonalPixellate:
+            self.radius = false
+            break
+        case .Pixellate:
+            self.radius = false
+            break
+        case .Crystallize:
+            self.radius = true
+            break
+        case .Pointillize:
+            self.radius = true
+            break
         }
-        return img
-        
     }
+    public func filter(image:CIImage?,center:CIVector?,scale:CGFloat)->CIImage?{
+        self.pixellate?.setDefaults()
+        if(self.radius){
+            self.pixellate?.setValue(image, forKey: kCIInputImageKey)
+            self.pixellate?.setValue(center, forKey: kCIInputCenterKey)
+            self.pixellate?.setValue(scale, forKey: kCIInputRadiusKey)
+        }else{
+            self.pixellate?.setValue(image, forKey: kCIInputImageKey)
+            self.pixellate?.setValue(center ?? CIVector(x:0,y:0), forKey: kCIInputCenterKey)
+            self.pixellate?.setValue(scale, forKey: kCIInputScaleKey)
+        }
+        
+        return self.pixellate?.outputImage
+    }
+    public var pixellate:CIFilter?
+    public var radius:Bool
 }
 
-
-
+// other
 public struct ImageExposureAdjust{
     public init() {}
     public var gauss:CIFilter? = CIFilter(name: "CIExposureAdjust")
@@ -98,97 +239,62 @@ public struct ImageCrop{
         return self.crop?.outputImage
     }
 }
-
-public protocol ImageAffine{
-    func filter(transform:CGAffineTransform?,image:CIImage?)->CIImage?
-    init()
-}
-
-public struct ImageAffineTransform:ImageAffine{
+public struct ImageDissolveTransition{
     public init() {}
-    public var transform = CIFilter(name: "CIAffineTransform")
-    
-    public func filter(transform:CGAffineTransform?,image:CIImage?)->CIImage?{
-        self.transform?.setDefaults()
-        self.transform?.setValue(image, forKey: kCIInputImageKey)
-        self.transform?.setValue(transform, forKey: "inputTransform")
-        return self.transform?.outputImage
+    public var transition = CIFilter(name:"CIDissolveTransition")
+    public func filter(image:CIImage?,target:CIImage?,time:CGFloat)->CIImage?{
+        self.transition?.setDefaults()
+        self.transition?.setValue(image, forKey: kCIInputImageKey)
+        self.transition?.setValue(target, forKey: kCIInputTargetImageKey)
+        self.transition?.setValue(time, forKey: kCIInputTimeKey)
+        return self.transition?.outputImage
+    }
+}
+public struct ImageHeightFieldFromMask{
+    public var transition = CIFilter(name:"CIHeightFieldFromMask")
+    public func filter(image:CIImage?,radius:CGFloat?)->CIImage?{
+        self.transition?.setDefaults()
+        self.transition?.setValue(image, forKey: kCIInputImageKey)
+        self.transition?.setValue(radius, forKey: kCIInputRadiusKey)
+        return self.transition?.outputImage
+    }
+}
+public struct ImageShadedMaterial{
+    public var transition = CIFilter(name:"CIShadedMaterial")
+    public func filter(image:CIImage?,shadingImage:CIImage?,scale:CGFloat?)->CIImage?{
+        self.transition?.setDefaults()
+        self.transition?.setValue(image, forKey: kCIInputImageKey)
+        self.transition?.setValue(scale, forKey: kCIInputScaleKey)
+        self.transition?.setValue(shadingImage, forKey: kCIInputShadingImageKey)
+        return self.transition?.outputImage
     }
 }
 
-public struct ImageAffineClamp:ImageAffine{
-    public init() {}
-    public var transform = CIFilter(name: "CIAffineClamp")
-    
-    public func filter(transform:CGAffineTransform?,image:CIImage?)->CIImage?{
-        self.transform?.setDefaults()
-        self.transform?.setValue(image, forKey: kCIInputImageKey)
-        self.transform?.setValue(transform, forKey: "inputTransform")
-        return self.transform?.outputImage
+//custom
+
+public struct ImageCropBlurImage{
+    public let gauss:ImageBlur
+    public let crop:ImageCrop = ImageCrop()
+    public init(type:BlurType) {
+        self.gauss = ImageBlur(type: type)
     }
-}
-public struct ImageAffineTile:ImageAffine{
-    public init() {}
-    public var transform = CIFilter(name: "CIAffineClamp")
-    
-    public func filter(transform:CGAffineTransform?,image:CIImage?)->CIImage?{
-        self.transform?.setDefaults()
-        self.transform?.setValue(image, forKey: kCIInputImageKey)
-        self.transform?.setValue(transform, forKey: "inputTransform")
-        return self.transform?.outputImage
-    }
-}
-public struct ImageLinearGradient{
-    public init() {}
-    public var gradient = CIFilter(name: "CILinearGradient")
-    public func filter(point0:CIVector,point1:CIVector,color0:CIColor,color1:CIColor)->CIImage?{
-        self.gradient?.setDefaults()
-        self.gradient?.setValue(point0, forKey: "inputPoint0")
-        self.gradient?.setValue(point1, forKey: "inputPoint1")
-        self.gradient?.setValue(color0, forKey: "inputColor0")
-        self.gradient?.setValue(color1, forKey: "inputColor1")
-        return self.gradient?.outputImage
-    }
-}
-public struct ImageSmoothLinearGradient{
-    public init() {}
-    public var gradient = CIFilter(name: "CISmoothLinearGradient")
-    public func filter(point0:CIVector,point1:CIVector,color0:CIColor,color1:CIColor)->CIImage?{
-        self.gradient?.setDefaults()
-        self.gradient?.setValue(point0, forKey: "inputPoint0")
-        self.gradient?.setValue(point1, forKey: "inputPoint1")
-        self.gradient?.setValue(color0, forKey: "inputColor0")
-        self.gradient?.setValue(color1, forKey: "inputColor1")
-        return self.gradient?.outputImage
+    public func filter(radius:CGFloat,crop:Bool,image:CIImage?)->CIImage?{
+        guard let source = image else { return image }
+        
+        guard let img = self.gauss.filter(radius: radius, image: image) else { return image }
+        if(crop){
+            return self.crop.filter(rectangle: CIVector(cgRect: source.extent), image: img)
+        }
+        return img
+        
     }
 }
 
-public struct ImageBlendWithAlphaMask{
-    public init() {}
-    public var blend = CIFilter(name: "CIBlendWithAlphaMask")
-    public func filter(image:CIImage?,mask:CIImage?,background:CIImage?)->CIImage?{
-        self.blend?.setDefaults()
-        self.blend?.setValue(image, forKey: kCIInputImageKey)
-        self.blend?.setValue(mask, forKey: kCIInputMaskImageKey)
-        self.blend?.setValue(background, forKey: kCIInputBackgroundImageKey)
-        return self.blend?.outputImage
-    }
-}
 
-public struct ImageBlendWithMask{
-    public init() {}
-    public var blend = CIFilter(name: "CIBlendWithMask")
-    public func filter(image:CIImage?,mask:CIImage?,background:CIImage?)->CIImage?{
-        self.blend?.setDefaults()
-        self.blend?.setValue(image, forKey: kCIInputImageKey)
-        self.blend?.setValue(mask, forKey: kCIInputMaskImageKey)
-        self.blend?.setValue(background, forKey: kCIInputBackgroundImageKey)
-        return self.blend?.outputImage
-    }
-}
+
 
 public struct ImageColorMask{
-    public var blend = ImageBlendWithAlphaMask()
+    public var blend = ImageBlendMask(type: .BlendAlphaMask)
     public var crop = ImageCrop()
     public init() {}
     public func filter(color:CIColor,alpha:CGFloat,image:CIImage?)->CIImage?{
@@ -198,10 +304,10 @@ public struct ImageColorMask{
 }
 public struct GradientGaussMask{
     public var colorMask:ImageColorMask = ImageColorMask()
-    public var gradient:ImageLinearGradient = ImageLinearGradient()
-    public var smgradient:ImageSmoothLinearGradient = ImageSmoothLinearGradient()
-    public var gaussImage:ImageCropBlurImage = ImageCropBlurImage<ImageGaussianBlur>()
-    public var blend:ImageBlendWithAlphaMask = ImageBlendWithAlphaMask()
+    public var gradient = ImageLinearGradient(type: .Linear)
+    public var smgradient = ImageLinearGradient(type: .SmoothLinear)
+    public var gaussImage:ImageCropBlurImage = ImageCropBlurImage(type: .Gaussian)
+    public var blend:ImageBlendMask = ImageBlendMask(type: .BlendAlphaMask)
     public init() {}
     public func filter(linear:Bool?,
                        point0:CGPoint?,
@@ -230,57 +336,6 @@ public struct GradientGaussMask{
     }
 }
 
-public struct ImageDissolveTransition{
-    public init() {}
-    public var transition = CIFilter(name:"CIDissolveTransition")
-    public func filter(image:CIImage?,target:CIImage?,time:CGFloat)->CIImage?{
-        self.transition?.setDefaults()
-        self.transition?.setValue(image, forKey: kCIInputImageKey)
-        self.transition?.setValue(target, forKey: kCIInputTargetImageKey)
-        self.transition?.setValue(time, forKey: kCIInputTimeKey)
-        return self.transition?.outputImage
-    }
-}
-public struct ImageSourceIn{
-    public init() {}
-    public var blend = CIFilter(name:"CISourceInCompositing")
-    public func filter(image:CIImage?,imageBackground:CIImage?)->CIImage?{
-        self.blend?.setDefaults()
-        self.blend?.setValue(image, forKey: kCIInputImageKey)
-        self.blend?.setValue(imageBackground, forKey: kCIInputBackgroundImageKey)
-        return self.blend?.outputImage
-    }
-}
-public struct ImageSourceOut{
-    public init() {}
-    public var blend = CIFilter(name:"CISourceOutCompositing")
-    public func filter(image:CIImage?,imageBackground:CIImage?)->CIImage?{
-        self.blend?.setDefaults()
-        self.blend?.setValue(image, forKey: kCIInputImageKey)
-        self.blend?.setValue(imageBackground, forKey: kCIInputBackgroundImageKey)
-        return self.blend?.outputImage
-    }
-}
-public struct ImageSourceOver{
-    public init() {}
-    public var blend = CIFilter(name:"CISourceOverCompositing")
-    public func filter(image:CIImage?,imageBackground:CIImage?)->CIImage?{
-        self.blend?.setDefaults()
-        self.blend?.setValue(image, forKey: kCIInputImageKey)
-        self.blend?.setValue(imageBackground, forKey: kCIInputBackgroundImageKey)
-        return self.blend?.outputImage
-    }
-}
-public struct ImageSourceAtop{
-    public init() {}
-    public var blend = CIFilter(name:"CISourceAtopCompositing")
-    public func filter(image:CIImage?,imageBackground:CIImage?)->CIImage?{
-        self.blend?.setDefaults()
-        self.blend?.setValue(image, forKey: kCIInputImageKey)
-        self.blend?.setValue(imageBackground, forKey: kCIInputBackgroundImageKey)
-        return self.blend?.outputImage
-    }
-}
 public struct ImageFillMode{
     
     public enum DisplayMode:Int{
@@ -290,7 +345,7 @@ public struct ImageFillMode{
     }
     
     public init() {}
-    public var transform = ImageAffineTransform()
+    public var transform = ImageAffine(type: .Transform)
     
     public func filter(img:CIImage?,mode:DisplayMode?,bound:CGRect?)->CIImage?{
         guard let img = img else {
@@ -331,9 +386,9 @@ public struct ImageFillMode{
 
 public class ImageGaussianBackground{
     public init() {}
-    public var gauss = ImageCropBlurImage<ImageGaussianBlur>()
+    public var gauss = ImageCropBlurImage(type: .Gaussian)
     public var displayModel = ImageFillMode()
-    public var blend = ImageSourceOver()
+    public var blend = ImageBlend(blendType:.SourceOver)
     public var crop = ImageCrop()
     public func filter(bound:CGRect,
                        image:CIImage?,

@@ -45,9 +45,16 @@ public class CoreImageView:UIView{
         let bound = self.bounds;
         return CGRect(x: 0, y: 0, width: bound.width * UIScreen.main.scale, height: bound.height * UIScreen.main.scale)
     }
-    private var displayfilter:ImageRenderModel = ImageDisplayMode()
+    private var displayfilter:ImageDisplayMode = ImageDisplayMode()
     
-    
+    public var displayMode:ImageFillMode.DisplayMode{
+        get {
+            return self.displayfilter.displayMode
+        }
+        set{
+            self.displayfilter.displayMode = newValue
+        }
+    }
     public override var intrinsicContentSize: CGSize{
         return self.image?.extent.size.applying(CGAffineTransform(scaleX: 1 / UIScreen.main.scale, y:  1 / UIScreen.main.scale)) ?? .zero
     }

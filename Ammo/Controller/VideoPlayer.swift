@@ -91,9 +91,11 @@ public class VideoView:CoreImageView{
     
     private weak var currentItem:AVPlayerItem?
     
+    
+    private var displayBound:CGRect = .zero
+    
     private func createLink(){
-        let displayBound:CGRect = self.nativeBound
-        let displayer:CAMetalLayer = self.mtlayer
+        let displayer = self.mtlayer
         self.link = RenderLoop {[weak self] in
             guard let ws = self else { return }
             if(ws.currentItem == nil && ws.player?.currentItem != nil){
@@ -108,9 +110,9 @@ public class VideoView:CoreImageView{
                 guard let pixel = ws.output.copyPixelBuffer(forItemTime: time, itemTimeForDisplay: nil) else { return }
                 let img = CIImage(cvPixelBuffer: pixel)
                 let endImg = autoreleasepool {
-                    ws.delegate?.videoPixelCallBack(source: img, bound: displayBound) ?? img
+                    ws.delegate?.videoPixelCallBack(source: img, bound: ws.displayBound) ?? img
                 }
-                ws.render(renderImage: endImg, bound: displayBound, layer: displayer)
+                ws.render(renderImage: endImg, bound: ws.displayBound, layer: displayer)
             }
         }
         self.link?.start()
@@ -126,7 +128,10 @@ public class VideoView:CoreImageView{
         ])
         super.init(frame: .zero)
     }
-    
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        self.displayBound = self.nativeBound;
+    }
     required init?(coder: NSCoder) {
         self.output = AVPlayerItemVideoOutput(outputSettings: [
             kCVPixelBufferPixelFormatTypeKey as String:kCVPixelFormatType_32BGRA

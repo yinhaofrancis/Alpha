@@ -43,7 +43,7 @@ class ViewController2: UIViewController {
     let g = curry(GradientGaussMask().filter(linear:point0:point1:color:alpha:radius:image:))(false)(CGPoint(x: 0, y: 0))(CGPoint(x: 0, y: 1))(CIColor(color: UIColor.cyan))
     let tras = ImageDissolveTransition()
     let exo = ImageExposureAdjust()
-    let blur = ImageDiscBlur()
+    let blur = ImageBlur(type: .Gaussian)
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -67,19 +67,28 @@ class ViewController2: UIViewController {
 class ViewController3: UIViewController,VideoViewDelegate {
     func videoPixelCallBack(source: CIImage,bound:CGRect) -> CIImage? {
         self.gauss.filter(bound: bound, image: source, radius: self.radius)
+//        let r = self.radius
+//        return self.pointil.filter(image: source, weight: CIVector(values: [r,2 * r,r,
+//                                                                            2 * r,4 * r,2 * r,
+//                                                                            r,2 * r,r], count: 9), bias: 0)
+//        self.pointil.filter(image: source, center: nil, scale: self.radius)
+        
     }
     func imagePixelCallBack(source: CIImage,bound:CGRect) -> CIImage?{
         source
     }
 //
 //
+    let pointil:ImageColoredSquares = ImageColoredSquares(type: .HexagonalPixellate)
     let gauss = ImageGaussianBackground()
     let u2 = "https://www.heishenhua.com/video/b1/gamesci_2022PV03.mp4"
     let player = AVPlayer(url: URL(string: "https://www.heishenhua.com/video/b1/gamesci_2021PV02.mp4")!)
     override func viewDidLoad() {
         super.viewDidLoad()
+//        self.videoView.video.displayMode = .scaleAspectFill
         self.videoView.delegate = self
-        self.videoView.image = CIImage(image: UIImage(named: "i")!)
+        player.play()
+        self.videoView.player = player
     }
     @IBOutlet var videoView: VideoHasBackgroundView!
     
@@ -89,8 +98,7 @@ class ViewController3: UIViewController,VideoViewDelegate {
     }
     override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
         super.motionEnded(motion, with: event)
-        player.play()
-        self.videoView.player = player
+        
     }
 }
 public class testp:NSObject,YHPageViewPage,UITableViewDataSource{
