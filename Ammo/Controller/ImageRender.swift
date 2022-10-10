@@ -10,13 +10,14 @@ import MetalKit
 
 public class CoreImageView:UIView{
 
+    private static var dispatchQueue:DispatchQueue = DispatchQueue(label: "CoreImageView")
     public var image:CIImage?{
         didSet{
             self.invalidateIntrinsicContentSize()
             self.superview?.layoutIfNeeded()
             let bound = self.nativeBound
             let layer = self.mtlayer
-            DispatchQueue.global().async {
+            CoreImageView.dispatchQueue.async {
                 self.render(renderImage: self.image, bound: bound, layer: layer)
             }
             

@@ -43,18 +43,19 @@ class ViewController2: UIViewController {
     let g = curry(GradientGaussMask().filter(linear:point0:point1:color:alpha:radius:image:))(false)(CGPoint(x: 0, y: 0))(CGPoint(x: 0, y: 1))(CIColor(color: UIColor.cyan))
     let tras = ImageDissolveTransition()
     let exo = ImageExposureAdjust()
-    let blur = ImageCropGaussianImage()
+    let blur = ImageDiscBlur()
     override func viewDidLoad() {
         super.viewDidLoad()
         
     }
     @IBAction func changeRadius(_ sender: UISlider) {
         self.radius = CGFloat(sender.value)
-        self.render.image = g(self.alpha)(self.radius)(CIImage(image: UIImage(named: "o")!))
+//        self.render.image = g(self.alpha)(self.radius)(CIImage(image: UIImage(named: "o")!))
+        self.image()
     }
     func image(){
 //        (radius: self.radius, image: )
-        self.render.image = self.blur.filter(radius: self.radius, crop: false, image: CIImage(image: UIImage(named: "o")!))
+        self.render.image = self.blur.filter(radius: self.radius, image: CIImage(image: UIImage(named: "o")!))
     }
     @IBAction func changeGradient(_ sender: UISlider) {
         self.alpha = CGFloat(sender.value)

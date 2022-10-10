@@ -7,7 +7,13 @@
 
 import CoreImage
 
-public struct ImageGaussianBlur{
+
+public protocol ImageBlur{
+    func filter(radius:CGFloat?,image:CIImage?)->CIImage?
+    init()
+}
+
+public struct ImageGaussianBlur:ImageBlur{
     public init() {}
     public var gauss:CIFilter? = CIFilter(name: "CIGaussianBlur")
     public func filter(radius:CGFloat?,image:CIImage?)->CIImage?{
@@ -15,6 +21,44 @@ public struct ImageGaussianBlur{
         gauss?.setValue(image, forKey: kCIInputImageKey)
         gauss?.setValue(radius, forKey: kCIInputRadiusKey)
         return gauss?.outputImage
+    }
+}
+
+public struct ImageBoxBlur:ImageBlur{
+    public init() {}
+    public var gauss:CIFilter? = CIFilter(name: "CIBoxBlur")
+    public func filter(radius:CGFloat?,image:CIImage?)->CIImage?{
+        gauss?.setDefaults()
+        gauss?.setValue(image, forKey: kCIInputImageKey)
+        gauss?.setValue(radius, forKey: kCIInputRadiusKey)
+        return gauss?.outputImage
+    }
+}
+
+public struct ImageDiscBlur:ImageBlur{
+    public init() {}
+    public var gauss:CIFilter? = CIFilter(name: "CIDiscBlur")
+    public func filter(radius:CGFloat?,image:CIImage?)->CIImage?{
+        gauss?.setDefaults()
+        gauss?.setValue(image, forKey: kCIInputImageKey)
+        gauss?.setValue(radius, forKey: kCIInputRadiusKey)
+        return gauss?.outputImage
+    }
+}
+
+public struct ImageCropBlurImage<Blur:ImageBlur>{
+    public let gauss:Blur = Blur()
+    public let crop:ImageCrop = ImageCrop()
+    public init() {}
+    public func filter(radius:CGFloat,crop:Bool,image:CIImage?)->CIImage?{
+        guard let source = image else { return image }
+        
+        guard let img = self.gauss.filter(radius: radius, image: image) else { return image }
+        if(crop){
+            return self.crop.filter(rectangle: CIVector(cgRect: source.extent), image: img)
+        }
+        return img
+        
     }
 }
 
@@ -146,27 +190,11 @@ public struct ImageColorMask{
         return self.blend.filter(image: img, mask: image, background: nil)
     }
 }
-
-public struct ImageCropGaussianImage{
-    public let gauss:ImageGaussianBlur = ImageGaussianBlur()
-    public let crop:ImageCrop = ImageCrop()
-    public init() {}
-    public func filter(radius:CGFloat,crop:Bool,image:CIImage?)->CIImage?{
-        guard let source = image else { return image }
-        
-        guard let img = self.gauss.filter(radius: radius, image: image) else { return image }
-        if(crop){
-            return self.crop.filter(rectangle: CIVector(cgRect: source.extent), image: img)
-        }
-        return img
-        
-    }
-}
 public struct GradientGaussMask{
     public var colorMask:ImageColorMask = ImageColorMask()
     public var gradient:ImageLinearGradient = ImageLinearGradient()
     public var smgradient:ImageSmoothLinearGradient = ImageSmoothLinearGradient()
-    public var gaussImage:ImageCropGaussianImage = ImageCropGaussianImage()
+    public var gaussImage:ImageCropBlurImage = ImageCropBlurImage<ImageGaussianBlur>()
     public var blend:ImageBlendWithAlphaMask = ImageBlendWithAlphaMask()
     public init() {}
     public func filter(linear:Bool?,
@@ -297,7 +325,7 @@ public struct ImageFillMode{
 
 public class ImageGaussianBackground{
     public init() {}
-    public var gauss = ImageCropGaussianImage()
+    public var gauss = ImageCropBlurImage<ImageGaussianBlur>()
     public var displayModel = ImageFillMode()
     public var blend = ImageSourceOver()
     public var crop = ImageCrop()
