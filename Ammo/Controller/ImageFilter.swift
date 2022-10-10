@@ -98,7 +98,13 @@ public struct ImageCrop{
         return self.crop?.outputImage
     }
 }
-public struct ImageAffineTransform{
+
+public protocol ImageAffine{
+    func filter(transform:CGAffineTransform?,image:CIImage?)->CIImage?
+    init()
+}
+
+public struct ImageAffineTransform:ImageAffine{
     public init() {}
     public var transform = CIFilter(name: "CIAffineTransform")
     
@@ -110,7 +116,7 @@ public struct ImageAffineTransform{
     }
 }
 
-public struct ImageAffineClamp{
+public struct ImageAffineClamp:ImageAffine{
     public init() {}
     public var transform = CIFilter(name: "CIAffineClamp")
     
@@ -121,7 +127,7 @@ public struct ImageAffineClamp{
         return self.transform?.outputImage
     }
 }
-public struct ImageAffineTile{
+public struct ImageAffineTile:ImageAffine{
     public init() {}
     public var transform = CIFilter(name: "CIAffineClamp")
     
