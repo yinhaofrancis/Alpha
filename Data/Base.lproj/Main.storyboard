@@ -35,7 +35,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MSh-3W-Oeh" customClass="CoreImageView" customModule="Ammo">
+                            <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MSh-3W-Oeh" customClass="CoreImageView" customModule="RenderImage">
                                 <rect key="frame" x="132" y="348" width="150" height="200"/>
                                 <color key="backgroundColor" systemColor="systemPinkColor"/>
                             </view>
@@ -78,7 +78,7 @@
         <scene sceneID="iEm-Vm-DZx">
             <objects>
                 <viewController id="4Om-Oe-Pwj" customClass="ViewController3" customModule="Data" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="Pdu-nA-Mud" customClass="VideoHasBackgroundView" customModule="Ammo">
+                    <view key="view" contentMode="scaleToFill" id="Pdu-nA-Mud" customClass="VideoHasBackgroundView" customModule="RenderImage">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>

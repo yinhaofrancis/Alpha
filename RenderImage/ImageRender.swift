@@ -95,7 +95,14 @@ public class MetalRender{
         guard let queue = queue else {
             return nil
         }
-        return CIContext(mtlCommandQueue: queue)
+        guard let device = device else{
+            return nil
+        }
+        if #available(iOS 13.0, *) {
+            return CIContext(mtlCommandQueue: queue)
+        } else {
+            return CIContext(mtlDevice: device)
+        }
     }()
     private var device:MTLDevice? = MTLCreateSystemDefaultDevice()
     

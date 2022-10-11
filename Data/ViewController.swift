@@ -8,6 +8,7 @@
 import UIKit
 import Ammo
 import AVFoundation
+import RenderImage
 class ViewController: UIViewController {
    
     let ctx = try! RenderContext(size: CGSize(width: 100, height: 100), scale: 3,reverse: true);
