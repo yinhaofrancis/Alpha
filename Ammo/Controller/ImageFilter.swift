@@ -425,14 +425,13 @@ public class ImageGaussianBackground{
     public var displayModel = ImageFillMode()
     public var blend = ImageBlend(blendType:.SourceOver)
     public var crop = ImageCrop()
-    public var background = ImagePhoto(type: .Mono)
     public func filter(bound:CGRect,
                        image:CIImage?,
                        radius:CGFloat?,
                        backgroundColor:CIColor? = nil)->CIImage?{
         let nb = self.displayModel.filter(img: image, mode: .scaleAspectFill, bound: bound)
         let cb = self.crop.filter(rectangle: CIVector(cgRect: bound), image: nb)
-        let bg = self.background.filter(image: self.gauss.filter(radius: radius ?? 10, crop: true, image: cb));
+        let bg = self.gauss.filter(radius: radius ?? 10, crop: true, image: cb);
         let fo = self.displayModel.filter(img: image, mode: .scaleAspectFit, bound: bound)
         let outFace = self.blend.filter(image: fo, imageBackground: bg)
         if let bgc = backgroundColor{
@@ -441,6 +440,21 @@ public class ImageGaussianBackground{
         }else{
             return outFace
         }
+    }
+}
+
+public struct imageShadow{
+    public init () {}
+    public let colorMask = ImageBlend(blendType: .SourceIn)
+    public let affine = ImageAffine(type: .Transform)
+    public let blur = ImageBlur(type: .Box)
+    public let over = ImageBlend(blendType: .SourceOver)
+    public func filter(image:CIImage?,color:CIColor?,offset:CGSize,radius:CGFloat)->CIImage?{
+        guard let color = color else { return image }
+        var result = self.colorMask.filter(image: CIImage(color: color), imageBackground: image)
+        result = affine.filter(transform: CGAffineTransform(translationX: offset.width, y: -offset.height), image: result)
+        result = blur.filter(radius: radius , image: result)
+        return over.filter(image: image, imageBackground: result)
     }
 }
 
