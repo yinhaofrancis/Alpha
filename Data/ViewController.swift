@@ -66,7 +66,8 @@ class ViewController2: UIViewController {
 
 class ViewController3: UIViewController,VideoViewDelegate {
     func videoPixelCallBack(source: CIImage,bound:CGRect) -> CIImage? {
-        self.gauss.filter(bound: bound, image: source, radius: self.radius)
+        let img = self.gauss.filter(bound: bound, image: source, radius: self.radius)
+        return img
 //        let r = self.radius
 //        return self.pointil.filter(image: source, weight: CIVector(values: [r,2 * r,r,
 //                                                                            2 * r,4 * r,2 * r,
@@ -79,6 +80,7 @@ class ViewController3: UIViewController,VideoViewDelegate {
     }
 //
 //
+    let crome = ImageColorMonochrome()
     let pointil:ImageColoredSquares = ImageColoredSquares(type: .HexagonalPixellate)
     let gauss = ImageGaussianBackground()
     let u2 = "https://www.heishenhua.com/video/b1/gamesci_2022PV03.mp4"

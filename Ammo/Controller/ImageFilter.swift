@@ -68,6 +68,30 @@ public enum BlendMaskType:String{
     case BlendAlphaMask = "CIBlendWithAlphaMask"
 }
 
+public enum PhotoEffectType:String{
+    case Chrome     = "CIPhotoEffectChrome"
+    case Fade       = "CIPhotoEffectFade"
+    case Instant    = "CIPhotoEffectInstant"
+    case Mono       = "CIPhotoEffectMono"
+    case Noir       = "CIPhotoEffectNoir"
+    case Proc       = "CIPhotoEffectProcess"
+    case Tonal      = "CIPhotoEffectTonal"
+    case Transfer   = "CIPhotoEffectTransfer"
+}
+public struct ImagePhoto{
+    public init(type:PhotoEffectType){
+        self.photo = CIFilter(name: type.rawValue)
+    }
+    public func filter(image:CIImage?)->CIImage?{
+        self.photo?.setDefaults()
+        self.photo?.setValue(image, forKey: kCIInputImageKey)
+        return self.photo?.outputImage
+    }
+    
+    public var photo:CIFilter?
+}
+
+
 //blur
 public struct ImageBlur{
     public func filter(radius:CGFloat?,image:CIImage?)->CIImage?{
@@ -212,6 +236,17 @@ public struct ImageExposureAdjust{
         gauss?.setDefaults()
         gauss?.setValue(image, forKey: kCIInputImageKey)
         gauss?.setValue(ev, forKey: kCIInputEVKey)
+        return gauss?.outputImage
+    }
+}
+public struct ImageColorMonochrome{
+    public init() {}
+    public var gauss:CIFilter? = CIFilter(name: "CIColorMonochrome")
+    public func filter(image:CIImage?,color:CIColor,intensity:CGFloat)->CIImage?{
+        gauss?.setDefaults()
+        gauss?.setValue(image, forKey: kCIInputImageKey)
+        gauss?.setValue(intensity, forKey: kCIInputIntensityKey)
+        gauss?.setValue(color, forKey: kCIInputColorKey)
         return gauss?.outputImage
     }
 }
@@ -390,13 +425,14 @@ public class ImageGaussianBackground{
     public var displayModel = ImageFillMode()
     public var blend = ImageBlend(blendType:.SourceOver)
     public var crop = ImageCrop()
+    public var background = ImagePhoto(type: .Mono)
     public func filter(bound:CGRect,
                        image:CIImage?,
                        radius:CGFloat?,
                        backgroundColor:CIColor? = nil)->CIImage?{
         let nb = self.displayModel.filter(img: image, mode: .scaleAspectFill, bound: bound)
         let cb = self.crop.filter(rectangle: CIVector(cgRect: bound), image: nb)
-        let bg = self.gauss.filter(radius: radius ?? 10, crop: true, image: cb);
+        let bg = self.background.filter(image: self.gauss.filter(radius: radius ?? 10, crop: true, image: cb));
         let fo = self.displayModel.filter(img: image, mode: .scaleAspectFit, bound: bound)
         let outFace = self.blend.filter(image: fo, imageBackground: bg)
         if let bgc = backgroundColor{
