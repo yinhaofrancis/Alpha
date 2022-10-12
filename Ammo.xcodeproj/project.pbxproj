@@ -43,6 +43,7 @@
 		A992EFA828F53C9E002AA4AC /* Curry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A985434928F129FD0041D401 /* Curry.swift */; };
 		A992EFA928F53C9E002AA4AC /* ImageFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A985434B28F138F30041D401 /* ImageFilter.swift */; };
 		A992EFAA28F53C9E002AA4AC /* ImageRenderModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9C0811628F1121900CCEBC3 /* ImageRenderModel.swift */; };
+		A992EFAC28F58DCD002AA4AC /* RenderImage.ci.metal in Sources */ = {isa = PBXBuildFile; fileRef = A992EFAB28F58DCD002AA4AC /* RenderImage.ci.metal */; };
 		A9A3FBA8283F11BF003582F2 /* DataBaseUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A3FBA7283F11BF003582F2 /* DataBaseUpdate.swift */; };
 		A9B5DEB628D8D714008E5C15 /* Kate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9B5DEB528D8D714008E5C15 /* Kate.swift */; };
 		A9CD687E28425CC000ABD882 /* DataBaseConcurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9CD687D28425CC000ABD882 /* DataBaseConcurrency.swift */; };
@@ -162,6 +163,7 @@
 		A985434928F129FD0041D401 /* Curry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Curry.swift; sourceTree = "<group>"; };
 		A985434B28F138F30041D401 /* ImageFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFilter.swift; sourceTree = "<group>"; };
 		A992EF9B28F53C86002AA4AC /* RenderImage.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RenderImage.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A992EFAB28F58DCD002AA4AC /* RenderImage.ci.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; name = RenderImage.ci.metal; path = ../../../../RenderImage.ci.metal; sourceTree = "<group>"; };
 		A9A3FBA7283F11BF003582F2 /* DataBaseUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBaseUpdate.swift; sourceTree = "<group>"; };
 		A9B5DEB528D8D714008E5C15 /* Kate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Kate.swift; path = ../../../../../Kate.swift; sourceTree = "<group>"; };
 		A9C0811428F01DAD00CCEBC3 /* ImageRender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageRender.swift; sourceTree = "<group>"; };
@@ -332,6 +334,7 @@
 				A985434928F129FD0041D401 /* Curry.swift */,
 				A97FF76328F301F300D55D9B /* VideoPlayer.swift */,
 				A985434B28F138F30041D401 /* ImageFilter.swift */,
+				A992EFAB28F58DCD002AA4AC /* RenderImage.ci.metal */,
 			);
 			path = RenderImage;
 			sourceTree = "<group>";
@@ -711,6 +714,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A992EFAC28F58DCD002AA4AC /* RenderImage.ci.metal in Sources */,
 				A992EFA728F53C9E002AA4AC /* VideoPlayer.swift in Sources */,
 				A992EFAA28F53C9E002AA4AC /* ImageRenderModel.swift in Sources */,
 				A992EFA928F53C9E002AA4AC /* ImageFilter.swift in Sources */,
@@ -1012,6 +1016,8 @@
 					"@loader_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				MTLLINKER_FLAGS = "-cikernel";
+				MTL_COMPILER_FLAGS = "-fcikernel";
 				PRODUCT_BUNDLE_IDENTIFIER = com.yinhao.RenderImage;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -1041,6 +1047,8 @@
 					"@loader_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				MTLLINKER_FLAGS = "-cikernel";
+				MTL_COMPILER_FLAGS = "-fcikernel";
 				PRODUCT_BUNDLE_IDENTIFIER = com.yinhao.RenderImage;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;

@@ -65,7 +65,7 @@ public class MetalRender{
 
     public var callbuffer:[()->Void] = []
     public func render(img:CIImage,bound:CGRect,filter:ImageRenderModel,target:CAMetalLayer){
-        target.device = self.device
+        target.device = MetalRender.device
         target.pixelFormat = .bgra8Unorm
         target.framebufferOnly = false
         target.colorspace = CGColorSpaceCreateDeviceRGB()
@@ -76,7 +76,7 @@ public class MetalRender{
         guard let result = filter.filter(img: img, bound: bound) else { return }
         guard let ctx = self.ctx else { return }
         guard let drawable = target.nextDrawable() else { return }
-        ctx.render(result, to: drawable.texture, commandBuffer: buffer, bounds: bound, colorSpace: CGColorSpaceCreateDeviceRGB())
+        ctx.render(result, to: drawable.texture, commandBuffer: buffer, bounds:result.extent, colorSpace: CGColorSpaceCreateDeviceRGB())
         buffer.present(drawable)
         buffer.commit()
         buffer.waitUntilCompleted()
@@ -86,16 +86,16 @@ public class MetalRender{
         return ctx.createCGImage(img, from: img.extent)
     }
     private var buffer:MTLCommandBuffer?{
-        self.queue?.makeCommandBuffer()
+        MetalRender.queue?.makeCommandBuffer()
     }
-    private lazy var queue:MTLCommandQueue? = {
+    private static var queue:MTLCommandQueue? = {
         device?.makeCommandQueue()
     }()
     private lazy var ctx:CIContext? = {
-        guard let queue = queue else {
+        guard let queue = MetalRender.queue else {
             return nil
         }
-        guard let device = device else{
+        guard let device = MetalRender.device else{
             return nil
         }
         if #available(iOS 13.0, *) {
@@ -104,7 +104,7 @@ public class MetalRender{
             return CIContext(mtlDevice: device)
         }
     }()
-    private var device:MTLDevice? = MTLCreateSystemDefaultDevice()
+    private static var device:MTLDevice? = MTLCreateSystemDefaultDevice()
     
     public static let shared:MetalRender = MetalRender()
 }

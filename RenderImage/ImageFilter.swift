@@ -413,7 +413,8 @@ public struct ImageFillMode{
         }else{
             let x = bound.width / img.extent.width
             let y = bound.height / img.extent.height
-            result = self.transform.filter(transform: CGAffineTransform(scaleX: x, y: y), image: img)
+            let endFrame = img.extent.applying(CGAffineTransform(scaleX: x, y: y));
+            result = self.transform.filter(transform: CGAffineTransform(scaleX: x, y: y).translatedBy(x: -endFrame.width, y: -endFrame.height),image: img)
         }
         return result
     }
@@ -425,21 +426,16 @@ public class ImageGaussianBackground{
     public var displayModel = ImageFillMode()
     public var blend = ImageBlend(blendType:.SourceOver)
     public var crop = ImageCrop()
+    public var remove = RemoveAlpha()
     public func filter(bound:CGRect,
                        image:CIImage?,
-                       radius:CGFloat?,
-                       backgroundColor:CIColor? = nil)->CIImage?{
+                       radius:CGFloat?)->CIImage?{
         let nb = self.displayModel.filter(img: image, mode: .scaleAspectFill, bound: bound)
         let cb = self.crop.filter(rectangle: CIVector(cgRect: bound), image: nb)
         let bg = self.gauss.filter(radius: radius ?? 10, crop: true, image: cb);
         let fo = self.displayModel.filter(img: image, mode: .scaleAspectFit, bound: bound)
         let outFace = self.blend.filter(image: fo, imageBackground: bg)
-        if let bgc = backgroundColor{
-            let bgb = self.crop.filter(rectangle: CIVector(cgRect: bound), image: CIImage(color: bgc))
-            return self.blend.filter(image: outFace, imageBackground: bgb)
-        }else{
-            return outFace
-        }
+        return self.remove.filter(image: outFace)
     }
 }
 
@@ -470,5 +466,42 @@ public struct ImageFilter{
     public init?(name:String){
         guard let f = CIFilter(name: name) else { return nil }
         self.filter = f
+    }
+}
+
+
+public class KernelLibray{
+    private convenience init() throws{
+        try self.init(name: "default")
+    }
+    public let data:Data
+    public init(name:String,bundle:Bundle = Bundle(for: KernelLibray.self)) throws{
+        guard let url = bundle.url(forResource: name, withExtension: "metallib") else {throw NSError(domain: "don't find metallib", code: 0)}
+        data = try Data(contentsOf: url)
+    }
+    public func colorKernel(function:String)throws ->CIColorKernel{
+        try CIColorKernel(functionName: function, fromMetalLibraryData: data)
+    }
+    
+    public func wrapKernel(function:String)throws ->CIWarpKernel?{
+        try CIWarpKernel(functionName: function, fromMetalLibraryData: data)
+    }
+    public func blendKernel(function:String)throws ->CIBlendKernel?{
+        try CIBlendKernel(functionName: function, fromMetalLibraryData: data)
+    }
+    public func kernel(function:String) throws ->CIKernel{
+        try CIKernel(functionName: function, fromMetalLibraryData: data)
+    }
+    public static let shared:KernelLibray = try! KernelLibray()
+}
+
+public struct RemoveAlpha{
+    public init() {
+        self.zip = try? KernelLibray.shared.colorKernel(function: "ZipAlpha")
+    }
+    let zip:CIColorKernel?
+    public func filter(image:CIImage?)->CIImage?{
+        guard let img = image else { return nil }
+        return zip?.apply(extent: img.extent, arguments: [img])
     }
 }

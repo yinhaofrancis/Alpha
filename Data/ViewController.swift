@@ -36,6 +36,7 @@ class ViewController: UIViewController {
     }
 
 }
+let a = try! KernelLibray.shared.kernel(function: "testSampler")
 class ViewController2: UIViewController {
    
     @IBOutlet var render: CoreImageView!
@@ -45,6 +46,8 @@ class ViewController2: UIViewController {
     let tras = ImageDissolveTransition()
     let exo = ImageExposureAdjust()
     let blur = imageShadow()
+    let k =  RemoveAlpha()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -60,14 +63,27 @@ class ViewController2: UIViewController {
     }
     @IBAction func changeGradient(_ sender: UISlider) {
         self.alpha = CGFloat(sender.value)
-        self.render.image = g(self.alpha)(self.radius)(CIImage(image: UIImage(named: "o")!))
+        let v = CIImage(image: UIImage(named: "o")!)
+//        let data = Data(bytes: [SIMD2<Float>.init(x: 1, y: 0),SIMD2<Float>.init(x: 1, y: 1)], count: MemoryLayout<SIMD2<Float>>.stride * 2)
+////        self.render.image = self.a.apply(extent: CGRect(x: 0, y: 0, width: 200, height: 200),roiCallback: { i, rect in
+////            print(rect)
+////            return rect
+////        }, arguments: [v])
+//        self.render.image = a!.apply(extent: v!.extent, roiCallback: { i, rect in
+//            print(i,rect)
+//            return rect
+//        }, image: v!, arguments: [])
     }
 }
 
 
 class ViewController3: UIViewController,VideoViewDelegate {
     func videoPixelCallBack(source: CIImage,bound:CGRect) -> CIImage? {
-        let img = self.gauss.filter(bound: bound, image: source, radius: self.radius)
+        let o = self.gauss.filter(bound: bound, image: source, radius: self.radius)
+        let img = a.apply(extent: o!.extent, roiCallback: { i, r in
+            var re = r.insetBy(dx: -50, dy: -50)
+            return re
+        }, arguments: [o!])
         return img
 //        let r = self.radius
 //        return self.pointil.filter(image: source, weight: CIVector(values: [r,2 * r,r,

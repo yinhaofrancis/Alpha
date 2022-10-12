@@ -90,7 +90,7 @@
                             </slider>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="DG9-Is-SfK"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="DG9-Is-SfK" firstAttribute="trailing" secondItem="gqA-r9-hwA" secondAttribute="trailing" constant="20" id="3Im-pl-HuO"/>
                             <constraint firstItem="DG9-Is-SfK" firstAttribute="bottom" secondItem="gqA-r9-hwA" secondAttribute="bottom" constant="20" id="TIY-1W-45C"/>
