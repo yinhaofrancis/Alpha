@@ -9,6 +9,30 @@ import UIKit
 import Ammo
 import AVFoundation
 import RenderImage
+
+class tableViewController:UITableViewController{
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.tableView.delegate = self
+        self.tableView.dataSource = self
+        self.tableView .reloadData()
+    }
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let tableCell = tableView.dequeueReusableCell(withIdentifier: "mm", for: indexPath) as! tableCell
+        tableCell.ciimage.image = g(CGFloat(indexPath.row % 255) / 255.0)(CGFloat(indexPath.row % 100))(CIImage(image: UIImage(named: "i")!))
+        return tableCell
+    }
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 10000
+    }
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 300;
+    }
+}
+class tableCell: UITableViewCell {
+    @IBOutlet weak var ciimage:CoreImageView!
+}
+
 class ViewController: UIViewController {
    
     let ctx = try! RenderContext(size: CGSize(width: 100, height: 100), scale: 3,reverse: true);
@@ -36,13 +60,16 @@ class ViewController: UIViewController {
     }
 
 }
+
+let g = curry(GradientGaussMask().filter(linear:point0:point1:color:alpha:radius:image:))(false)(CGPoint(x: 0, y: 0))(CGPoint(x: 0, y: 1))(CIColor(color: UIColor.cyan))
+
 let a = try! KernelLibray.shared.kernel(function: "testSampler")
 class ViewController2: UIViewController {
    
     @IBOutlet var render: CoreImageView!
     private var radius:CGFloat = 1
     private var alpha:CGFloat = 1
-    let g = curry(GradientGaussMask().filter(linear:point0:point1:color:alpha:radius:image:))(false)(CGPoint(x: 0, y: 0))(CGPoint(x: 0, y: 1))(CIColor(color: UIColor.cyan))
+    
     let tras = ImageDissolveTransition()
     let exo = ImageExposureAdjust()
     let blur = ImageBlur(type: .Gaussian)
@@ -63,7 +90,7 @@ class ViewController2: UIViewController {
     }
     func image(){
 //        (radius: self.radius, image: )
-        self.render.image = self.blur.filter(radius: self.radius, image: CIImage(cgImage: UIImage(named: "o")!.cgImage!))
+        self.render.image = g(self.alpha)(self.radius)(CIImage(image: UIImage(named: "i")!))
     }
     @IBAction func changeGradient(_ sender: UISlider) {
         self.alpha = CGFloat(sender.value)

@@ -7,7 +7,7 @@
 
 import UIKit
 import MetalKit
-
+@objc(AMCoreImageView)
 public class CoreImageView:UIView{
     private static var dispatchQueue:DispatchQueue = DispatchQueue(label: "CoreImageView")
     public var image:CIImage?{
@@ -16,9 +16,7 @@ public class CoreImageView:UIView{
             self.superview?.layoutIfNeeded()
             let bound = self.nativeBound
             let layer = self.mtlayer
-            CoreImageView.dispatchQueue.async {
-                self.render(renderImage: self.image, bound: bound, layer: layer)
-            }
+            self.render(renderImage: self.image, bound: bound, layer: layer)
             
         }
     }

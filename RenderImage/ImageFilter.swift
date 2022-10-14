@@ -343,6 +343,7 @@ public struct GradientGaussMask{
     public var smgradient = ImageLinearGradient(type: .SmoothLinear)
     public var gaussImage:ImageCropBlurImage = ImageCropBlurImage(type: .Gaussian)
     public var blend:ImageBlendMask = ImageBlendMask(type: .BlendAlphaMask)
+    public var crop:ImageCrop = ImageCrop()
     public init() {}
     public func filter(linear:Bool?,
                        point0:CGPoint?,
@@ -358,13 +359,16 @@ public struct GradientGaussMask{
             result = self.colorMask.filter(color: color, alpha: alpha, image: result)
         }
         if let radius = radius {
-            result = self.gaussImage.filter(radius: radius, crop: false, image: result)
+            result = self.gaussImage.filter(radius: radius, crop: true, image: result)
         }
         if let po = point0, let p1 = point1,let result = result{
             let cv1 = CIVector(x: po.x * result.extent.width, y: po.y * result.extent.height)
             let cv2 = CIVector(x: p1.x * result.extent.width, y: p1.y * result.extent.height)
             let g = (linear ?? true) ? self.gradient.filter(point0: cv1, point1: cv2, color0: CIColor(red: 0, green: 0, blue: 0, alpha: 0), color1: CIColor(red: 0, green: 0, blue: 0, alpha: 1)) : self.smgradient.filter(point0: cv1, point1: cv2, color0: CIColor(red: 0, green: 0, blue: 0, alpha: 0), color1: CIColor(red: 0, green: 0, blue: 0, alpha: 1))
-            return self.blend.filter(image: result, mask: g, background: nil)
+            guard let img = self.blend.filter(image: result, mask: g, background: nil) else {
+                return image
+            }
+            return img
             
         }
         return image
