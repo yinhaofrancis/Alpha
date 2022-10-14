@@ -218,7 +218,7 @@ public struct ImageColoredSquares{
             self.pixellate?.setValue(scale, forKey: kCIInputRadiusKey)
         }else{
             self.pixellate?.setValue(image, forKey: kCIInputImageKey)
-            self.pixellate?.setValue(center ?? CIVector(x:0,y:0), forKey: kCIInputCenterKey)
+            self.pixellate?.setValue(center, forKey: kCIInputCenterKey)
             self.pixellate?.setValue(scale, forKey: kCIInputScaleKey)
         }
         

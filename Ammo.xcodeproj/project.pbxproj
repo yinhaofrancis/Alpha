@@ -21,6 +21,7 @@
 		A943B7EA28B8BB800063FA45 /* CokeConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A943B7E628B8BB7F0063FA45 /* CokeConfig.swift */; };
 		A943B7EB28B8BB800063FA45 /* CokeCompute.swift in Sources */ = {isa = PBXBuildFile; fileRef = A943B7E728B8BB800063FA45 /* CokeCompute.swift */; };
 		A943B7EC28B8BB800063FA45 /* CokeConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A943B7E828B8BB800063FA45 /* CokeConfiguration.swift */; };
+		A95A06ED28F83B5400FA64D9 /* ImageFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95A06EC28F83B5400FA64D9 /* ImageFile.swift */; };
 		A95BCB732824C491000982D0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95BCB722824C491000982D0 /* AppDelegate.swift */; };
 		A95BCB752824C491000982D0 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95BCB742824C491000982D0 /* SceneDelegate.swift */; };
 		A95BCB772824C491000982D0 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95BCB762824C491000982D0 /* ViewController.swift */; };
@@ -46,6 +47,8 @@
 		A992EFAC28F58DCD002AA4AC /* RenderImage.ci.metal in Sources */ = {isa = PBXBuildFile; fileRef = A992EFAB28F58DCD002AA4AC /* RenderImage.ci.metal */; };
 		A9A3FBA8283F11BF003582F2 /* DataBaseUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A3FBA7283F11BF003582F2 /* DataBaseUpdate.swift */; };
 		A9B5DEB628D8D714008E5C15 /* Kate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9B5DEB528D8D714008E5C15 /* Kate.swift */; };
+		A9C16F5428F8FB3900F2D682 /* c.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9C16F5328F8FB3900F2D682 /* c.swift */; };
+		A9C16F5628F948CA00F2D682 /* p.png in Resources */ = {isa = PBXBuildFile; fileRef = A9C16F5528F948CA00F2D682 /* p.png */; };
 		A9CD687E28425CC000ABD882 /* DataBaseConcurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9CD687D28425CC000ABD882 /* DataBaseConcurrency.swift */; };
 		A9CED30F28EBEA7F00BA9070 /* AMPager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9CED30E28EBEA7F00BA9070 /* AMPager.swift */; };
 		A9DC4EE428BC55EF00DACFA9 /* default.metal in Sources */ = {isa = PBXBuildFile; fileRef = A9DC4EE328BC55EF00DACFA9 /* default.metal */; };
@@ -145,6 +148,7 @@
 		A943B7E628B8BB7F0063FA45 /* CokeConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CokeConfig.swift; sourceTree = "<group>"; };
 		A943B7E728B8BB800063FA45 /* CokeCompute.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CokeCompute.swift; sourceTree = "<group>"; };
 		A943B7E828B8BB800063FA45 /* CokeConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CokeConfiguration.swift; sourceTree = "<group>"; };
+		A95A06EC28F83B5400FA64D9 /* ImageFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFile.swift; sourceTree = "<group>"; };
 		A95BCB702824C491000982D0 /* Data.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Data.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A95BCB722824C491000982D0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A95BCB742824C491000982D0 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -168,6 +172,8 @@
 		A9B5DEB528D8D714008E5C15 /* Kate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Kate.swift; path = ../../../../../Kate.swift; sourceTree = "<group>"; };
 		A9C0811428F01DAD00CCEBC3 /* ImageRender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageRender.swift; sourceTree = "<group>"; };
 		A9C0811628F1121900CCEBC3 /* ImageRenderModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageRenderModel.swift; sourceTree = "<group>"; };
+		A9C16F5328F8FB3900F2D682 /* c.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = c.swift; sourceTree = "<group>"; };
+		A9C16F5528F948CA00F2D682 /* p.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = p.png; sourceTree = "<group>"; };
 		A9CD687D28425CC000ABD882 /* DataBaseConcurrency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBaseConcurrency.swift; sourceTree = "<group>"; };
 		A9CED30E28EBEA7F00BA9070 /* AMPager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AMPager.swift; sourceTree = "<group>"; };
 		A9DC4EE328BC55EF00DACFA9 /* default.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = default.metal; sourceTree = "<group>"; };
@@ -283,6 +289,7 @@
 				A95BCB7B2824C493000982D0 /* Assets.xcassets */,
 				A95BCB7D2824C493000982D0 /* LaunchScreen.storyboard */,
 				A95BCB802824C493000982D0 /* Info.plist */,
+				A9C16F5528F948CA00F2D682 /* p.png */,
 				A9EE8383289940CB004217A8 /* iconfont.ttf */,
 				A95BCB8A2824C4F3000982D0 /* Settings.bundle */,
 				A97623902869AEC100BAC1FC /* data.json */,
@@ -332,6 +339,7 @@
 				A9C0811428F01DAD00CCEBC3 /* ImageRender.swift */,
 				A9C0811628F1121900CCEBC3 /* ImageRenderModel.swift */,
 				A985434928F129FD0041D401 /* Curry.swift */,
+				A95A06EC28F83B5400FA64D9 /* ImageFile.swift */,
 				A97FF76328F301F300D55D9B /* VideoPlayer.swift */,
 				A985434B28F138F30041D401 /* ImageFilter.swift */,
 				A992EFAB28F58DCD002AA4AC /* RenderImage.ci.metal */,
@@ -406,6 +414,7 @@
 			isa = PBXGroup;
 			children = (
 				A9FB79AB281A6A0A008CCF39 /* DatabaseTest.swift */,
+				A9C16F5328F8FB3900F2D682 /* c.swift */,
 				A9FB79A3281A69CA008CCF39 /* AmmoTests.swift */,
 			);
 			path = AmmoTests;
@@ -645,6 +654,7 @@
 				A95BCB7F2824C493000982D0 /* LaunchScreen.storyboard in Resources */,
 				A9EE8384289940CB004217A8 /* iconfont.ttf in Resources */,
 				A95BCB7C2824C493000982D0 /* Assets.xcassets in Resources */,
+				A9C16F5628F948CA00F2D682 /* p.png in Resources */,
 				A97623912869AEC100BAC1FC /* data.json in Resources */,
 				A95BCB7A2824C491000982D0 /* Main.storyboard in Resources */,
 			);
@@ -719,6 +729,7 @@
 				A992EFAA28F53C9E002AA4AC /* ImageRenderModel.swift in Sources */,
 				A992EFA928F53C9E002AA4AC /* ImageFilter.swift in Sources */,
 				A992EFA828F53C9E002AA4AC /* Curry.swift in Sources */,
+				A95A06ED28F83B5400FA64D9 /* ImageFile.swift in Sources */,
 				A992EFA628F53C9E002AA4AC /* ImageRender.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -759,6 +770,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A9C16F5428F8FB3900F2D682 /* c.swift in Sources */,
 				A9FB79AC281A6A0A008CCF39 /* DatabaseTest.swift in Sources */,
 				A9FB79A4281A69CA008CCF39 /* AmmoTests.swift in Sources */,
 			);
@@ -1016,7 +1028,7 @@
 					"@loader_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				MTLLINKER_FLAGS = "-cikernel";
+				MTLLINKER_FLAGS = "-fcikernel";
 				MTL_COMPILER_FLAGS = "-fcikernel";
 				PRODUCT_BUNDLE_IDENTIFIER = com.yinhao.RenderImage;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
@@ -1047,7 +1059,7 @@
 					"@loader_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				MTLLINKER_FLAGS = "-cikernel";
+				MTLLINKER_FLAGS = "-fcikernel";
 				MTL_COMPILER_FLAGS = "-fcikernel";
 				PRODUCT_BUNDLE_IDENTIFIER = com.yinhao.RenderImage;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";

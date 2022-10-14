@@ -45,25 +45,31 @@ class ViewController2: UIViewController {
     let g = curry(GradientGaussMask().filter(linear:point0:point1:color:alpha:radius:image:))(false)(CGPoint(x: 0, y: 0))(CGPoint(x: 0, y: 1))(CIColor(color: UIColor.cyan))
     let tras = ImageDissolveTransition()
     let exo = ImageExposureAdjust()
-    let blur = imageShadow()
+    let blur = ImageBlur(type: .Gaussian)
     let k =  RemoveAlpha()
-    
+    var c:CGImage?
     override func viewDidLoad() {
         super.viewDidLoad()
+        let url = Bundle.main.url(forResource: "p", withExtension: "png")!
+        let data = try! Data(contentsOf: url)
         
+        let img = RIImage(finalData: data)?[0]
+        c = img
     }
     @IBAction func changeRadius(_ sender: UISlider) {
         self.radius = CGFloat(sender.value)
-//        self.render.image = g(self.alpha)(self.radius)(CIImage(image: UIImage(named: "o")!))
+//        self.render.image = g(self.alpha)(self.radius)(CIImage(cgImage: c!))
         self.image()
     }
     func image(){
 //        (radius: self.radius, image: )
-        self.render.image = self.blur.filter(image: CIImage(image: UIImage(named: "o")!), color: CIColor(red: 0, green: 0, blue: 0), offset: CGSize(width: 20, height: 20), radius: self.radius)
+        self.render.image = self.blur.filter(radius: self.radius, image: CIImage(cgImage: UIImage(named: "o")!.cgImage!))
     }
     @IBAction func changeGradient(_ sender: UISlider) {
         self.alpha = CGFloat(sender.value)
-        let v = CIImage(image: UIImage(named: "o")!)
+//        self.render.image = g(self.alpha)(self.radius)(CIImage(cgImage: c!))
+        self.image()
+        
 //        let data = Data(bytes: [SIMD2<Float>.init(x: 1, y: 0),SIMD2<Float>.init(x: 1, y: 1)], count: MemoryLayout<SIMD2<Float>>.stride * 2)
 ////        self.render.image = self.a.apply(extent: CGRect(x: 0, y: 0, width: 200, height: 200),roiCallback: { i, rect in
 ////            print(rect)

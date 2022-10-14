@@ -28,5 +28,5 @@ public class ImageDisplayMode:ImageRenderModel{
         self.fillModel.filter(img: img, mode: mode, bound: bound)
         
     }
-    public var displayMode:ImageFillMode.DisplayMode = .scaleToFill
+    public var displayMode:ImageFillMode.DisplayMode = .scaleAspectFit
 }

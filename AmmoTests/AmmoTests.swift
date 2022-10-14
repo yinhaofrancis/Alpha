@@ -34,31 +34,31 @@ class AmmoTests: XCTestCase {
     }
     
     
-    func testExample() throws {
-        let data = DataSortSet<Int>()
-        
-        for i in 0 ..< 10{
-            data.insert(index: (9 - i) * 5, content: (9 - i) * 5)
-            print(data.holes)
-        }
-        for i in 0 ..< 10{
-            data.insert(index: (9 - i) * 5 + 1, content: (9 - i) * 5 + 1)
-            print(data.holes)
-        }
-        for i in 0 ..< 10{
-            data.insert(index: (9 - i) * 5 + 2, content: (9 - i) * 5 + 2)
-            print(data.holes)
-        }
-        for i in 0 ..< 10{
-            data.insert(index: (9 - i) * 5 + 3, content: (9 - i) * 5 + 3)
-            print(data.holes)
-        }
-        for i in 0 ..< 10{
-            data.insert(index: (9 - i) * 5 + 4, content: (9 - i) * 5 + 4)
-            print(data.holes)
-        }
-        print(data.data)
-    }
+//    func testExample() throws {
+//        let data = DataSortSet<Int>()
+//        
+//        for i in 0 ..< 10{
+//            data.insert(index: (9 - i) * 5, content: (9 - i) * 5)
+//            print(data.holes)
+//        }
+//        for i in 0 ..< 10{
+//            data.insert(index: (9 - i) * 5 + 1, content: (9 - i) * 5 + 1)
+//            print(data.holes)
+//        }
+//        for i in 0 ..< 10{
+//            data.insert(index: (9 - i) * 5 + 2, content: (9 - i) * 5 + 2)
+//            print(data.holes)
+//        }
+//        for i in 0 ..< 10{
+//            data.insert(index: (9 - i) * 5 + 3, content: (9 - i) * 5 + 3)
+//            print(data.holes)
+//        }
+//        for i in 0 ..< 10{
+//            data.insert(index: (9 - i) * 5 + 4, content: (9 - i) * 5 + 4)
+//            print(data.holes)
+//        }
+//        print(data.data)
+//    }
     func testPerformanceExample() throws {
         // This is an example of a performance test case.
         measure {

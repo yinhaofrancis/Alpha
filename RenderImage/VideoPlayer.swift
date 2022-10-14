@@ -96,8 +96,8 @@ public class VideoView:CoreImageView{
     
     private func createLink(){
         let displayer = self.mtlayer
-        self.link = RenderLoop {[weak self] in
-            guard let ws = self else { return }
+        self.link = RenderLoop {[weak self] i in
+            guard let ws = self else { i.stop();return }
             if(ws.currentItem == nil && ws.player?.currentItem != nil){
                 ws.currentItem = ws.player?.currentItem
                 ws.currentItem?.add(ws.output)
