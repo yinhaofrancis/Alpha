@@ -337,6 +337,13 @@ public struct ImageColorMask{
         return self.blend.filter(image: img, mask: image, background: nil)
     }
 }
+public struct ImageScale{
+    public init() {}
+    public var transform = ImageAffine(type: .Transform)
+    public func filter(scale:CGFloat,image:CIImage?)->CIImage?{
+        self.transform.filter(transform: CGAffineTransform(scaleX: scale, y: scale), image: image)
+    }
+}
 public struct GradientGaussMask{
     public var colorMask:ImageColorMask = ImageColorMask()
     public var gradient = ImageLinearGradient(type: .Linear)

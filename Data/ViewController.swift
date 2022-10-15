@@ -74,7 +74,9 @@ class ViewController2: UIViewController {
     let exo = ImageExposureAdjust()
     let blur = ImageBlur(type: .Gaussian)
     let k =  RemoveAlpha()
+    let scale = ImageScale()
     var c:CGImage?
+    var sm:CGImage?
     override func viewDidLoad() {
         super.viewDidLoad()
         let url = Bundle.main.url(forResource: "p", withExtension: "png")!
@@ -82,15 +84,18 @@ class ViewController2: UIViewController {
         
         let img = RIImage(finalData: data)?[0]
         c = img
+        sm = MetalRender.shared.renderOffscreen(img: self.scale.filter(scale: 0.1, image: CIImage(cgImage: c!))!)
     }
     @IBAction func changeRadius(_ sender: UISlider) {
         self.radius = CGFloat(sender.value)
+        
 //        self.render.image = g(self.alpha)(self.radius)(CIImage(cgImage: c!))
         self.image()
     }
     func image(){
 //        (radius: self.radius, image: )
-        self.render.image = g(self.alpha)(self.radius)(CIImage(image: UIImage(named: "i")!))
+//        self.render.image = g(self.alpha)(self.radius)(CIImage(image: UIImage(named: "i")!))
+        self.render.image = g(self.alpha)(self.radius)(CIImage(cgImage: sm!))
     }
     @IBAction func changeGradient(_ sender: UISlider) {
         self.alpha = CGFloat(sender.value)

@@ -36,56 +36,6 @@ public class WeakHashProxy<T:AnyObject>:Hashable where T:Hashable{
     }
 }
 
-//public protocol Cache:AnyObject{
-//    associatedtype Content:AnyObject
-//    var map:[String:WeakProxy<Content>] { get set }
-//    var lock:DispatchSemaphore { get }
-//    var queue:DispatchQueue { get }
-//}
-//extension Cache{
-//    public func store(key:String,data:Content){
-//        self.queue.sync {
-//            self.lock.wait()
-//            defer{
-//                self.lock.signal()
-//            }
-//            self.map[key] = WeakProxy(content: data)
-//        }
-//    }
-//    public func content(key:String)->Content?{
-//        var c:Content?
-//        self.queue.sync {
-//            self.lock.wait()
-//            defer{
-//                self.lock.signal()
-//            }
-//            c = self.map[key]?.content
-//        }
-//        return c
-//    }
-//    private func cleanEmpty(){
-//        self.lock.wait()
-//        defer{
-//            self.lock.signal()
-//        }
-//        self.map = self.map.filter({$0.value.content != nil})
-//    }
-//}
-
-//public class imageDataCache:Cache{
-//    public var queue: DispatchQueue = DispatchQueue(label: "cache", qos: .background, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil)
-//    
-//    public var group: DispatchGroup = DispatchGroup()
-//    
-//    public var map: [String : WeakProxy<CGImage>] = [:]
-//    
-//    public var lock: DispatchSemaphore = DispatchSemaphore(value: 1)
-//    
-//    public typealias Content = CGImage
-//    
-//}
-
-
 
 public struct RIImage{
     private var source:CGImageSource

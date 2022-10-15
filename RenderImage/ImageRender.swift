@@ -12,8 +12,10 @@ public class CoreImageView:UIView{
     private static var dispatchQueue:DispatchQueue = DispatchQueue(label: "CoreImageView")
     public var image:CIImage?{
         didSet{
-            self.invalidateIntrinsicContentSize()
-            self.superview?.layoutIfNeeded()
+            if(oldValue?.extent != image?.extent){
+                self.invalidateIntrinsicContentSize()
+                self.superview?.layoutIfNeeded()
+            }
             let bound = self.nativeBound
             let layer = self.mtlayer
             self.render(renderImage: self.image, bound: bound, layer: layer)
@@ -42,7 +44,6 @@ public class CoreImageView:UIView{
         }else{
             self.model?.image = img
             self.model?.bound = bound
-            self.model?.target = layer
             self.model?.filter = self.displayfilter
         }
         guard let md = self.model else { return }
@@ -82,7 +83,7 @@ public class MetalRender{
         var image:CIImage
         var bound:CGRect
         var filter:ImageRenderModel
-        var target:CAMetalLayer
+        let target:CAMetalLayer
         public init(image:CIImage,bound:CGRect,filter:ImageRenderModel,target:CAMetalLayer){
             self.image = image
             self.bound = bound
