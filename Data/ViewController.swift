@@ -83,8 +83,8 @@ class ViewController2: UIViewController {
         let data = try! Data(contentsOf: url)
         
         let img = RIImage(finalData: data)?[0]
-        c = img
-        sm = MetalRender.shared.renderOffscreen(img: self.scale.filter(scale: 0.1, image: CIImage(cgImage: c!))!)
+        c = img?.jpg(quality: 0)
+        sm = MetalRender.shared.renderOffscreen(img: self.scale.filter(scale: 0.5, image: CIImage(cgImage: c!))!)?.jpg(quality: 0.8)
     }
     @IBAction func changeRadius(_ sender: UISlider) {
         self.radius = CGFloat(sender.value)

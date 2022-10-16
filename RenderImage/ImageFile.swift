@@ -9,11 +9,8 @@ import Foundation
 import ImageIO
 import UIKit
 import UniformTypeIdentifiers
+import MobileCoreServices
 
-
-public class MemoryImage{
-    public var image:CGImage?
-}
 
 public class WeakProxy<T:AnyObject>{    
     weak var content:T?
@@ -71,5 +68,35 @@ extension CGImage{
         guard let dp = self.dataProvider?.data else { return self }
         let md = CFDataCreateMutableCopy(kCFAllocatorDefault, CFDataGetLength(dp), dp)
         return CGContext(data: CFDataGetMutableBytePtr(md), width: self.width, height: self.height, bitsPerComponent: self.bitsPerComponent, bytesPerRow: self.bytesPerRow, space: self.colorSpace ?? CGColorSpaceCreateDeviceRGB(), bitmapInfo: self.bitmapInfo.rawValue)?.makeImage()
+    }
+    public var png:CGImage?{
+        guard let data = CFDataCreateMutable(kCFAllocatorDefault, 0) else { return nil }
+        guard let destination = CGImageDestinationCreateWithData(data,CGImage.pngType as CFString, 1, nil) else { return nil }
+        CGImageDestinationAddImage(destination, self, nil)
+        CGImageDestinationFinalize(destination)
+        guard let dp = CGDataProvider(data: data) else { return nil }
+        return CGImage(pngDataProviderSource: dp, decode: nil, shouldInterpolate: true, intent: .defaultIntent)
+    }
+    public func jpg(quality:Float)->CGImage?{
+        guard let data = CFDataCreateMutable(kCFAllocatorDefault, 0) else { return nil }
+        guard let destination = CGImageDestinationCreateWithData(data,CGImage.jpgType as CFString, 1, [kCGImageDestinationLossyCompressionQuality:quality] as CFDictionary) else { return nil }
+        CGImageDestinationAddImage(destination, self, [kCGImageDestinationLossyCompressionQuality:quality] as CFDictionary)
+        CGImageDestinationFinalize(destination)
+        guard let dp = CGDataProvider(data: data) else { return nil }
+        return CGImage(jpegDataProviderSource: dp, decode: nil, shouldInterpolate: true, intent: .defaultIntent)
+    }
+    public static var pngType:String{
+        if #available(iOS 14.0, *) {
+            return UTType.png.identifier
+        } else {
+            return kUTTypePNG as String
+        }
+    }
+    public static var jpgType:String{
+        if #available(iOS 14.0, *) {
+            return UTType.jpeg.identifier
+        } else {
+            return kUTTypeJPEG as String
+        }
     }
 }
