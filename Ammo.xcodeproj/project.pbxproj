@@ -45,6 +45,7 @@
 		A9CED30F28EBEA7F00BA9070 /* AMPager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9CED30E28EBEA7F00BA9070 /* AMPager.swift */; };
 		A9DC4EE428BC55EF00DACFA9 /* default.metal in Sources */ = {isa = PBXBuildFile; fileRef = A9DC4EE328BC55EF00DACFA9 /* default.metal */; };
 		A9DC4EE628BDEB9F00DACFA9 /* CokeRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9DC4EE528BDEB9F00DACFA9 /* CokeRender.swift */; };
+		A9E6DEA528FF0A5E00A0CABE /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9E6DEA428FF0A5E00A0CABE /* Cache.swift */; };
 		A9EE8384289940CB004217A8 /* iconfont.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A9EE8383289940CB004217A8 /* iconfont.ttf */; };
 		A9EEA3DF289AADAB00F6F938 /* IconFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9EEA3DE289AADAB00F6F938 /* IconFont.swift */; };
 		A9F411A428B72123003372B2 /* AMPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9F411A328B72123003372B2 /* AMPageView.swift */; };
@@ -151,6 +152,7 @@
 		A9CED30E28EBEA7F00BA9070 /* AMPager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AMPager.swift; sourceTree = "<group>"; };
 		A9DC4EE328BC55EF00DACFA9 /* default.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = default.metal; sourceTree = "<group>"; };
 		A9DC4EE528BDEB9F00DACFA9 /* CokeRender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CokeRender.swift; sourceTree = "<group>"; };
+		A9E6DEA428FF0A5E00A0CABE /* Cache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cache.swift; sourceTree = "<group>"; };
 		A9EE8383289940CB004217A8 /* iconfont.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = iconfont.ttf; sourceTree = "<group>"; };
 		A9EEA3DE289AADAB00F6F938 /* IconFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconFont.swift; sourceTree = "<group>"; };
 		A9F411A328B72123003372B2 /* AMPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AMPageView.swift; sourceTree = "<group>"; };
@@ -289,6 +291,7 @@
 				A9820C7B28FEE7DF005F1988 /* CoreImage.ci.metal */,
 				A9C0811628F1121900CCEBC3 /* ImageRenderModel.swift */,
 				A985434928F129FD0041D401 /* Curry.swift */,
+				A9E6DEA428FF0A5E00A0CABE /* Cache.swift */,
 				A95A06EC28F83B5400FA64D9 /* ImageFile.swift */,
 				A97FF76328F301F300D55D9B /* VideoPlayer.swift */,
 				A985434B28F138F30041D401 /* ImageFilter.swift */,
@@ -613,6 +616,7 @@
 			files = (
 				A9820C7C28FEE7DF005F1988 /* CoreImage.ci.metal in Sources */,
 				A992EFA728F53C9E002AA4AC /* VideoPlayer.swift in Sources */,
+				A9E6DEA528FF0A5E00A0CABE /* Cache.swift in Sources */,
 				A992EFAA28F53C9E002AA4AC /* ImageRenderModel.swift in Sources */,
 				A992EFA928F53C9E002AA4AC /* ImageFilter.swift in Sources */,
 				A992EFA828F53C9E002AA4AC /* Curry.swift in Sources */,
