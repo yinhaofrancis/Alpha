@@ -220,6 +220,7 @@ public class Downloader<Content:DataItem>:NSObject,URLSessionDownloadDelegate{
                 }
                 let task = self.session.downloadTask(with: URLRequest(url: url))
                 self.map[url] = Task(task: task, callback: [callback])
+                task.resume()
             }else{
                 self.map[url]?.callback.append(callback)
             }
@@ -251,22 +252,20 @@ public let sharedMemoryCache = MemoryCache<CIImage>()
 extension CoreImageView{
     public func load(url:URL,filter: Filter?){
         if let data = sharedMemoryCache.content(key: url.absoluteString){
-            self.image = data
+            self.image = filter?(data) ?? data
         }else{
             sharedDownloader.download(url: url) { data, flag in
                 if let data = data {
                     let source = CIImage(data: data)
                     let filter = filter?(source) ?? source
-                    if let needCache = filter{
+                    if let needCache = source{
                         sharedMemoryCache.cache(key: url.absoluteString, content: needCache)
                     }
-                    
                     DispatchQueue.main.async {
                         self.image = filter
                     }
                 }
             }
         }
-        
     }
 }
