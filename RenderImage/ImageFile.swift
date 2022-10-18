@@ -12,7 +12,7 @@ import UniformTypeIdentifiers
 import MobileCoreServices
 
 
-public class WeakProxy<T:AnyObject>{    
+public class WeakProxy<T:AnyObject>{
     weak var content:T?
     public init(content:T?){
         self.content = content
@@ -52,12 +52,6 @@ public struct RIImage{
     }
     public subscript(index:Int)->CGImage?{
         return CGImageSourceCreateImageAtIndex(self.source, index, [
-            kCGImageSourceShouldCacheImmediately:self.cache,
-            kCGImageSourceShouldCache:self.cache
-        ] as CFDictionary)
-    }
-    public func thumbnail(index:Int)->CGImage?{
-        return CGImageSourceCreateThumbnailAtIndex(self.source, index,[
             kCGImageSourceShouldCacheImmediately:self.cache,
             kCGImageSourceShouldCache:self.cache
         ] as CFDictionary)

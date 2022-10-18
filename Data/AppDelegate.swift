@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import RatioScreen
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 

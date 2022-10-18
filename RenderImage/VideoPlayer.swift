@@ -52,7 +52,7 @@ public class VideoHasBackgroundView:UIView,VideoViewDelegate{
                 self.imageBackground.image = nil
                 return
             }
-            guard let ci = self.delegate?.imagePixelCallBack(source: image, bound: self.video.nativeBound) else { return }
+            guard let ci = self.delegate?.imagePixelCallBack(source: image, bound: self.video.display.nativeBound) else { return }
             guard let cgi = MetalRender.shared.renderOffscreen(img: ci) else {
                 self.imageBackground.image = nil
                 return
@@ -61,18 +61,15 @@ public class VideoHasBackgroundView:UIView,VideoViewDelegate{
         }
     }
 }
-public class VideoView:CoreImageView{
-    public override var image: CIImage?{
-        didSet{
-            let displayBound:CGRect = self.nativeBound
-            let displayer:CAMetalLayer = self.mtlayer
-            if let img = self.image{
-                let result = self.delegate?.imagePixelCallBack(source: img, bound: displayBound)
-                self.render(renderImage: result, bound: displayBound, layer: displayer)
-            }
-        }
-    }
-    
+public class VideoView:UIView{
+
+    fileprivate lazy var display:CoreImageView = {
+        let c = CoreImageView()
+        self.addSubview(c)
+        c.frame = self.bounds
+        c.autoresizingMask = [.flexibleLeftMargin,.flexibleWidth,.flexibleRightMargin,. flexibleTopMargin,.flexibleHeight,.flexibleBottomMargin]
+        return c
+    }()
     public weak var delegate:VideoViewDelegate?
     
     public var player:AVPlayer?{
@@ -95,7 +92,7 @@ public class VideoView:CoreImageView{
     private var displayBound:CGRect = .zero
     
     private func createLink(){
-        let displayer = self.mtlayer
+        let displayer = self.display.mtlayer
         self.link = RenderLoop {[weak self] i in
             guard let ws = self else { i.stop();return }
             if(ws.currentItem == nil && ws.player?.currentItem != nil){
@@ -112,7 +109,7 @@ public class VideoView:CoreImageView{
                 let endImg = autoreleasepool {
                     ws.delegate?.videoPixelCallBack(source: img, bound: ws.displayBound) ?? img
                 }
-                ws.render(renderImage: endImg, bound: ws.displayBound, layer: displayer)
+                ws.display.render(renderImage: endImg, bound: ws.displayBound, layer: displayer)
             }
         }
         self.link?.start()
@@ -130,7 +127,9 @@ public class VideoView:CoreImageView{
     }
     public override func layoutSubviews() {
         super.layoutSubviews()
-        self.displayBound = self.nativeBound;
+        
+        self.display.frame = self.bounds
+        self.displayBound = self.display.nativeBound;
     }
     required init?(coder: NSCoder) {
         self.output = AVPlayerItemVideoOutput(outputSettings: [

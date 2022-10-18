@@ -92,6 +92,17 @@ public class MetalRender{
         }
     }
     private var callbuffer:Set<WeakHashProxy<Model>> = Set()
+#if targetEnvironment(simulator)
+    private var trans:ImageAffine = ImageAffine(type: .Transform)
+#endif
+    private func transformFilter(img:CIImage,bound:CGRect,filter:ImageRenderModel)->CIImage?{
+        guard let result = filter.filter(img: img, bound: bound) else { return nil }
+#if targetEnvironment(simulator)
+        return trans.filter(transform: CGAffineTransform(scaleX: 1, y: -1).translatedBy(x: 0, y: -img.extent.height), image: result)
+#else
+        return result
+#endif
+    }
     private func render(img:CIImage,bound:CGRect,filter:ImageRenderModel,target:CAMetalLayer){
         target.device = MetalRender.device
         target.pixelFormat = .bgra8Unorm
@@ -100,8 +111,7 @@ public class MetalRender{
         target.contentsScale = UIScreen.main.scale
         target.drawableSize = bound.size
         guard let buffer = self.buffer else { return }
-
-        guard let result = filter.filter(img: img, bound: bound) else { return }
+        guard let result = self.transformFilter(img: img, bound: bound, filter: filter) else { return }
         guard let ctx = self.ctx else { return }
         guard let drawable = target.nextDrawable() else { return }
         ctx.render(result, to: drawable.texture, commandBuffer: buffer, bounds:bound, colorSpace: CGColorSpaceCreateDeviceRGB())

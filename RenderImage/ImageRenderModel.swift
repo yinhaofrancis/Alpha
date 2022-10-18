@@ -23,10 +23,9 @@ public class ImageDisplayMode:ImageRenderModel{
         return image
     }
     private var fillModel = ImageFillMode()
+    private var transform = ImageAffine(type: .Transform)
     private func filter(img:CIImage,mode:ImageFillMode.DisplayMode,bound:CGRect)->CIImage?{
-        
         self.fillModel.filter(img: img, mode: mode, bound: bound)
-        
     }
     public var displayMode:ImageFillMode.DisplayMode = .scaleAspectFit
 }

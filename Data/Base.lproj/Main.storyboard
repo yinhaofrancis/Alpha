@@ -83,7 +83,7 @@
                                 <rect key="frame" x="0.0" y="348" width="414" height="200"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
-                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="200" translatesAutoresizingMaskIntoConstraints="NO" id="2tb-it-9kE">
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="30" translatesAutoresizingMaskIntoConstraints="NO" id="2tb-it-9kE">
                                 <rect key="frame" x="38" y="752" width="338" height="31"/>
                                 <connections>
                                     <action selector="changeRadius:" destination="CYK-tE-BmR" eventType="valueChanged" id="lq9-EM-eHp"/>

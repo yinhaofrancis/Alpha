@@ -40,6 +40,7 @@ class ViewController: UIViewController {
     @IBOutlet var de:testam!
     override func viewDidLoad() {
         super.viewDidLoad()
+        
     }
     @IBOutlet weak var pager: AMPageView!
     @IBAction public func reload(){
@@ -79,18 +80,20 @@ class ViewController2: UIViewController {
     var sm:CGImage?
     override func viewDidLoad() {
         super.viewDidLoad()
-        let url = Bundle.main.url(forResource: "p", withExtension: "png")!
-        let data = try! Data(contentsOf: url)
-        
+        self.render.load(url: URL(string: "https://www.gamesci.com.cn/assets/img/logo/logo_top.png")!) { i in
+            self.blur.filter(radius: 5, image: i)
+        }
+    }
+    func load(data:Data){
         let img = RIImage(finalData: data)?[0]
-        c = img?.jpg(quality: 0)
-        sm = MetalRender.shared.renderOffscreen(img: self.scale.filter(scale: 0.5, image: CIImage(cgImage: c!))!)?.jpg(quality: 0.8)
+        c = img?.png
+        sm = MetalRender.shared.renderOffscreen(img: self.scale.filter(scale: UIScreen.main.scale, image: CIImage(cgImage: c!))!)?.png
     }
     @IBAction func changeRadius(_ sender: UISlider) {
         self.radius = CGFloat(sender.value)
         
 //        self.render.image = g(self.alpha)(self.radius)(CIImage(cgImage: c!))
-        self.image()
+//        self.image()
     }
     func image(){
 //        (radius: self.radius, image: )
@@ -100,7 +103,7 @@ class ViewController2: UIViewController {
     @IBAction func changeGradient(_ sender: UISlider) {
         self.alpha = CGFloat(sender.value)
 //        self.render.image = g(self.alpha)(self.radius)(CIImage(cgImage: c!))
-        self.image()
+//        self.image()
         
 //        let data = Data(bytes: [SIMD2<Float>.init(x: 1, y: 0),SIMD2<Float>.init(x: 1, y: 1)], count: MemoryLayout<SIMD2<Float>>.stride * 2)
 ////        self.render.image = self.a.apply(extent: CGRect(x: 0, y: 0, width: 200, height: 200),roiCallback: { i, rect in
@@ -122,7 +125,7 @@ class ViewController3: UIViewController,VideoViewDelegate {
             var re = r.insetBy(dx: -50, dy: -50)
             return re
         }, arguments: [o!])
-        return img
+        return o
 //        let r = self.radius
 //        return self.pointil.filter(image: source, weight: CIVector(values: [r,2 * r,r,
 //                                                                            2 * r,4 * r,2 * r,
@@ -343,6 +346,4 @@ public class testam:NSObject,AMPageViewDelegate{
     public func contentOffsetAt(location: CGPoint) {
         print(location)
     }
-    
-    
 }
