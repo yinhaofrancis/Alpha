@@ -250,7 +250,7 @@ public let sharedDownloader:Downloader<Data> = Downloader()
 public typealias Filter = (CIImage?)->CIImage?
 public let sharedMemoryCache = MemoryCache<CIImage>()
 extension CoreImageView{
-    public func load(url:URL,filter: Filter?){
+    public func load(url:URL,filter: Filter? = nil){
         if let data = sharedMemoryCache.content(key: url.absoluteString){
             self.image = filter?(data) ?? data
         }else{

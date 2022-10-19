@@ -83,9 +83,7 @@ class ViewController2: UIViewController {
 //        self.render.load(url:  { i in
 //            self.blur.filter(radius: 5, image: i)
 //        }
-        self.render.load(url: URL(string: "https://www.gamesci.com.cn/assets/img/logo/logo_top.png")!, filter: { i in
-            self.blur.filter(radius: 5, image: i)
-        })
+        self.render.load(url: URL(string: "https://www.gamesci.com.cn/assets/img/logo/logo_top.png")!)
     }
     func load(data:Data){
         let img = RIImage(finalData: data)?[0]
