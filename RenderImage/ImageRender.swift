@@ -23,12 +23,13 @@ public class CoreImageView:UIView{
         }
     }
     private var render = MetalRender.shared
-    public var uiImage:UIImage?{
+    public var riimage:RIImage?{
         didSet{
-            guard let im = uiImage else { self.image = nil;return }
-            self.image = CIImage(image: im)
+            self.image = self.riimage?.primaryImage
         }
     }
+    private var renderloop:RenderLoop?
+
     public override class var layerClass: AnyClass{
         return CAMetalLayer.self
     }
@@ -180,22 +181,43 @@ public class MetalRender{
 
 
 public class RenderLoop:NSObject{
-    public lazy var thread:Thread = {
+    private lazy var thread:Thread = {
         return Thread {[weak self] in
-            self?.runloop = RunLoop.current
-            _ = self?.link
-            self?.runloop?.run()
+            if(self?.runloop == nil){
+                self?.runloop = RunLoop.current
+                _ = self?.link
+                self?.runloop?.run()
+            }
         }
     }()
     public lazy var link:CADisplayLink = {
         let link = CADisplayLink(target: self, selector: #selector(callbackFunc))
+        self.loadRate(rate: self.rate, link: link)
         if let runloop = self.runloop{
             link.add(to: runloop, forMode: .default)
         }
         return link
     }()
-    public func start(){
-        self.thread.start()
+    public func start(main:Bool = false){
+        if(main){
+            self.runloop = RunLoop.main
+            _ = self.link
+        }else{
+            self.thread.start()
+        }
+        
+    }
+    public var rate:Float = 60{
+        didSet{
+            self.loadRate(rate: self.rate, link: self.link)
+        }
+    }
+    private func loadRate(rate:Float,link:CADisplayLink){
+        if #available(iOSApplicationExtension 15.0, *) {
+            link.preferredFrameRateRange = CAFrameRateRange(minimum: rate, maximum: rate)
+        } else {
+            link.preferredFramesPerSecond = Int(rate)
+        }
     }
     public var callback:(RenderLoop)->Void
     public init(callback:@escaping (RenderLoop)->Void){

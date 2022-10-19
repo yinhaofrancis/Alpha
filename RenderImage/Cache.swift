@@ -8,6 +8,7 @@
 import Foundation
 import CryptoKit
 import CoreImage
+import UIKit
 
 public protocol DataItem{
     var data:Data { get }
@@ -247,22 +248,21 @@ public class Downloader<Content:DataItem>:NSObject,URLSessionDownloadDelegate{
     
 }
 public let sharedDownloader:Downloader<Data> = Downloader()
-public typealias Filter = (CIImage?)->CIImage?
-public let sharedMemoryCache = MemoryCache<CIImage>()
+
+public let sharedMemoryCache = MemoryCache<RIImage>()
 extension CoreImageView{
     public func load(url:URL,filter: Filter? = nil){
         if let data = sharedMemoryCache.content(key: url.absoluteString){
-            self.image = filter?(data) ?? data
+            data.filter = filter
+            self.riimage = data
         }else{
             sharedDownloader.download(url: url) { data, flag in
                 if let data = data {
-                    let source = CIImage(data: data)
-                    let filter = filter?(source) ?? source
-                    if let needCache = source{
-                        sharedMemoryCache.cache(key: url.absoluteString, content: needCache)
-                    }
+                    guard let img = RIImage(finalData: data) else { return }
+                    img.filter = filter
+                    sharedMemoryCache.cache(key: url.absoluteString, content: img)
                     DispatchQueue.main.async {
-                        self.image = filter
+                        self.riimage = img
                     }
                 }
             }

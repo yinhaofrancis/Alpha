@@ -64,7 +64,6 @@ class ViewController: UIViewController {
 
 let g = curry(GradientGaussMask().filter(linear:point0:point1:color:alpha:radius:image:))(false)(CGPoint(x: 0, y: 0))(CGPoint(x: 0, y: 1))(CIColor(color: UIColor.cyan))
 
-let a = try! KernelLibray.shared.kernel(function: "testSampler")
 class ViewController2: UIViewController {
    
     @IBOutlet var render: CoreImageView!
@@ -83,7 +82,12 @@ class ViewController2: UIViewController {
 //        self.render.load(url:  { i in
 //            self.blur.filter(radius: 5, image: i)
 //        }
-        self.render.load(url: URL(string: "https://www.gamesci.com.cn/assets/img/logo/logo_top.png")!)
+//    https://img.zonghangsl.com/images/xcx/common/lucky_draw_results_winning_lottery_double.webp
+//    https://www.gamesci.com.cn/assets/img/logo/logo_top.png
+//    https://www.w3school.com.cn/svg/path2.svg
+        self.render.load(url: URL(string: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F01ef345bcd8977a8012099c82483d3.gif&refer=http%3A%2F%2Fimg.zcool.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1668781818&t=e339525665f0aa1e29e480b1206ec22f")!) { i in
+            self.blur.filter(radius: 10, image: i)
+        }
     }
     func load(data:Data){
         let img = RIImage(finalData: data)?[0]
@@ -121,18 +125,7 @@ class ViewController2: UIViewController {
 
 class ViewController3: UIViewController,VideoViewDelegate {
     func videoPixelCallBack(source: CIImage,bound:CGRect) -> CIImage? {
-        let o = self.gauss.filter(bound: bound, image: source, radius: self.radius)
-        let img = a.apply(extent: o!.extent, roiCallback: { i, r in
-            var re = r.insetBy(dx: -50, dy: -50)
-            return re
-        }, arguments: [o!])
-        return o
-//        let r = self.radius
-//        return self.pointil.filter(image: source, weight: CIVector(values: [r,2 * r,r,
-//                                                                            2 * r,4 * r,2 * r,
-//                                                                            r,2 * r,r], count: 9), bias: 0)
-//        self.pointil.filter(image: source, center: nil, scale: self.radius)
-        
+        return self.gauss.filter(bound: bound, image: source, radius: self.radius)
     }
     func imagePixelCallBack(source: CIImage,bound:CGRect) -> CIImage?{
         source

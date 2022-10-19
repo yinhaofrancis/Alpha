@@ -33,8 +33,10 @@ public class WeakHashProxy<T:AnyObject>:Hashable where T:Hashable{
     }
 }
 
+public typealias Filter = (CIImage?)->CIImage?
 
-public struct RIImage{
+public class RIImage{
+    public var filter:Filter?
     private var source:CGImageSource
     private var cache:Bool = false
     public init?(finalData:Data){
@@ -44,8 +46,13 @@ public struct RIImage{
     public init(){
         self.source = CGImageSourceCreateIncremental(nil)
     }
-    public mutating func set(data:Data,final:Bool = false){
+    public func set(data:Data,final:Bool = false){
         CGImageSourceUpdateData(source, data as CFData, final)
+    }
+    public var primaryImage:CIImage?{
+        guard let cgimg = self[0] else { return nil }
+        let cii = CIImage(cgImage: cgimg)
+        return self.filter?(cii) ?? cii
     }
     public var count:Int{
         return CGImageSourceGetCount(self.source)

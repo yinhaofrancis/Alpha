@@ -24,22 +24,7 @@ class c: XCTestCase {
     }
 
     func testExample() throws {
-        let a = imageDataCache()
-        let cg = UIImage(named: "p.png")
-        var array:[CGImage] = []
-        
-        self.measure {
-            for i in 0 ..< 1000{
-                array.append(cg!.cgImage!)
-            }
-            for i in 0 ..< 1000{
-                a.store(key: "\(i)", data: array[i])
-            }
-            for i in 0 ..< 1000{
-                array.removeAll()
-            }
-        }
-        
+
         // Use XCTAssert and related functions to verify your tests produce the correct results.
         
     }
