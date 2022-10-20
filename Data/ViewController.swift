@@ -17,9 +17,14 @@ class tableViewController:UITableViewController{
         self.tableView.dataSource = self
         self.tableView .reloadData()
     }
+    let filter = ImageBlur(type: .Gaussian)
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let tableCell = tableView.dequeueReusableCell(withIdentifier: "mm", for: indexPath) as! tableCell
-        tableCell.ciimage.image = g(CGFloat(indexPath.row % 255) / 255.0)(CGFloat(indexPath.row % 100))(CIImage(image: UIImage(named: "i")!))
+        let u = "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F01ef345bcd8977a8012099c82483d3.gif&refer=http%3A%2F%2Fimg.zcool.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1668781818&t=e339525665f0aa1e29e480b1206ec22f"
+        
+        tableCell.ciimage.load(url: URL(string: u)!) { [weak self] i in
+            self?.filter.filter(radius: 10, image: i)
+        }
         return tableCell
     }
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -85,14 +90,9 @@ class ViewController2: UIViewController {
 //    https://img.zonghangsl.com/images/xcx/common/lucky_draw_results_winning_lottery_double.webp
 //    https://www.gamesci.com.cn/assets/img/logo/logo_top.png
 //    https://www.w3school.com.cn/svg/path2.svg
-        self.render.load(url: URL(string: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F01ef345bcd8977a8012099c82483d3.gif&refer=http%3A%2F%2Fimg.zcool.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1668781818&t=e339525665f0aa1e29e480b1206ec22f")!) { i in
-            self.blur.filter(radius: 10, image: i)
+        self.render.load(url: URL(string: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F01ef345bcd8977a8012099c82483d3.gif&refer=http%3A%2F%2Fimg.zcool.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1668781818&t=e339525665f0aa1e29e480b1206ec22f")!) { [weak self] i in
+            self?.blur.filter(radius: 10, image: i)
         }
-    }
-    func load(data:Data){
-        let img = RIImage(finalData: data)?[0]
-        c = img?.png
-        sm = MetalRender.shared.renderOffscreen(img: self.scale.filter(scale: UIScreen.main.scale, image: CIImage(cgImage: c!))!)?.png
     }
     @IBAction func changeRadius(_ sender: UISlider) {
         self.radius = CGFloat(sender.value)

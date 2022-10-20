@@ -36,6 +36,10 @@ public class WeakHashProxy<T:AnyObject>:Hashable where T:Hashable{
 public typealias Filter = (CIImage?)->CIImage?
 
 public class RIImage{
+    public struct AnimationFrame{
+        public var image:CIImage
+        public var delay:TimeInterval
+    }
     public var filter:Filter?
     private var source:CGImageSource
     private var cache:Bool = false
@@ -43,6 +47,7 @@ public class RIImage{
         guard let ds = CGImageSourceCreateWithData(finalData as CFData, nil) else { return nil }
         self.source = ds
     }
+    private var lock = DispatchSemaphore(value: 1)
     public init(){
         self.source = CGImageSourceCreateIncremental(nil)
     }
@@ -50,18 +55,58 @@ public class RIImage{
         CGImageSourceUpdateData(source, data as CFData, final)
     }
     public var primaryImage:CIImage?{
-        guard let cgimg = self[0] else { return nil }
-        let cii = CIImage(cgImage: cgimg)
-        return self.filter?(cii) ?? cii
+        guard let cgimg = self[0]?.image else { return nil }
+        
+        return self.filter?(cgimg) ?? cgimg
     }
+
     public var count:Int{
         return CGImageSourceGetCount(self.source)
     }
-    public subscript(index:Int)->CGImage?{
-        return CGImageSourceCreateImageAtIndex(self.source, index, [
+    private var cacheFrame:[Int:AnimationFrame] = [:]
+    public subscript(index:Int)->AnimationFrame?{
+        self.lock.wait()
+        if let fame = self.cacheFrame[index]{
+            self.lock.signal()
+            return fame
+        }else{
+            self.lock.signal()
+            guard let image = self.image(index: index) else { return nil }
+            let delay = self.delay(index: index)
+            let ci = CIImage(cgImage: image)
+            let frame = AnimationFrame(image: self.filter?(ci) ?? ci, delay: delay)
+            self.lock.wait()
+            self.cacheFrame[index] = frame
+            self.lock.signal()
+            return frame
+        }
+    }
+    public func image(index:Int)->CGImage?{
+        guard let image = CGImageSourceCreateImageAtIndex(self.source, index, [
             kCGImageSourceShouldCacheImmediately:self.cache,
             kCGImageSourceShouldCache:self.cache
-        ] as CFDictionary)
+        ] as CFDictionary) else { return nil }
+        return image
+    }
+    private func delay(index:Int)->TimeInterval{
+        guard let dic = CGImageSourceCopyPropertiesAtIndex(self.source, index, nil) as? Dictionary<String,Any> else {
+            return 0
+        }
+        if let gif = dic[kCGImagePropertyGIFDictionary as String] as? Dictionary<String,Any>{
+            return gif[kCGImagePropertyGIFDelayTime as String] as? Double ?? 0
+        }
+        if let apng = dic[kCGImagePropertyPNGDictionary as String] as? Dictionary<String,Any>{
+            return apng[kCGImagePropertyAPNGDelayTime as String] as? Double ?? 0
+        }
+        if let heic = dic[kCGImagePropertyHEICSDictionary as String] as? Dictionary<String,Any>{
+            return heic[kCGImagePropertyHEICSDelayTime as String] as? Double ?? 0
+        }
+        if #available(iOSApplicationExtension 14.0, *) {
+            if let WebP = dic[kCGImagePropertyWebPDictionary as String] as? Dictionary<String,Any>{
+                return WebP[kCGImagePropertyWebPDelayTime as String] as? Double ?? 0
+            }
+        }
+        return 0
     }
 }
 extension CGImage{

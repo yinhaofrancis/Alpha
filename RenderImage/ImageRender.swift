@@ -26,10 +26,53 @@ public class CoreImageView:UIView{
     public var riimage:RIImage?{
         didSet{
             self.image = self.riimage?.primaryImage
+            
+            if((self.riimage?.count ?? 0) > 1){
+                self.startAnimation()
+            }
         }
     }
     private var renderloop:RenderLoop?
+    
+    public func startAnimation(){
+        if(self.renderloop != nil){
+            self.renderloop?.stop()
+            self.renderloop = nil
+        }
+        var current:CFTimeInterval = 0
+        var index:Int = 0
+        var currentframe:RIImage.AnimationFrame?
+        self.renderloop = RenderLoop(callback: { [weak self] rl in
+            guard let ws = self else { rl.stop();return }
+            guard let ri = ws.riimage else { rl.stop();return }
+            if let currentFrame = currentframe{
+                if(current + currentFrame.delay < rl.currentTime){
+                    if(ri[index] == nil){
+                        index = 0
+                    }
+                    guard let frame = ri[index] else { rl.stop();return }
+                    currentframe = frame
+                    ws.loadFrame(image: frame)
+                    index += 1
+                    current = rl.currentTime
+                }
+            }else{
+                guard let frame = ri[index] else { rl.stop();return }
+                currentframe = frame
+                ws.loadFrame(image: frame)
+                index += 1
+                current = rl.currentTime
+            }
+        })
+        self.renderloop?.start()
+    }
 
+    private func loadFrame(image:RIImage.AnimationFrame?){
+        guard let image = image?.image else { return }
+        DispatchQueue.main.async {
+            self.image = image
+        }
+    }
     public override class var layerClass: AnyClass{
         return CAMetalLayer.self
     }
@@ -92,7 +135,7 @@ public class MetalRender{
             self.target = target
         }
     }
-    private var callbuffer:Set<WeakHashProxy<Model>> = Set()
+    private var callbuffer:Set<Model> = Set()
 #if targetEnvironment(simulator)
     private var trans:ImageAffine = ImageAffine(type: .Transform)
 #endif
@@ -159,18 +202,17 @@ public class MetalRender{
     public func prepare(model:Model){
         self.renderLoop?.runloop?.perform {
             if !self.contains(model: model){
-                self.callbuffer.insert(WeakHashProxy(content: model))
+                self.callbuffer.insert(model)
             }
         }
     }
     func contains(model:Model)->Bool{
-        self.callbuffer.contains(WeakHashProxy(content: model))
+        self.callbuffer.contains(model)
     }
     public init(){
         self.renderLoop = RenderLoop(callback: { [weak self] i in
             guard let ws = self else { i.stop();return  }
-            for i in ws.callbuffer {
-                guard let c = i.content else { continue }
+            for c in ws.callbuffer {
                 ws.render(img: c.image, bound: c.bound, filter: c.filter, target: c.target)
             }
             ws.callbuffer.removeAll()
@@ -183,41 +225,24 @@ public class MetalRender{
 public class RenderLoop:NSObject{
     private lazy var thread:Thread = {
         return Thread {[weak self] in
-            if(self?.runloop == nil){
-                self?.runloop = RunLoop.current
-                _ = self?.link
-                self?.runloop?.run()
+            guard let ws = self else { return }
+            
+            if(ws.runloop == nil){
+                ws.runloop = RunLoop.current
+                _ = ws.link
+                ws.runloop?.run()
             }
         }
     }()
     public lazy var link:CADisplayLink = {
         let link = CADisplayLink(target: self, selector: #selector(callbackFunc))
-        self.loadRate(rate: self.rate, link: link)
         if let runloop = self.runloop{
             link.add(to: runloop, forMode: .default)
         }
         return link
     }()
-    public func start(main:Bool = false){
-        if(main){
-            self.runloop = RunLoop.main
-            _ = self.link
-        }else{
-            self.thread.start()
-        }
-        
-    }
-    public var rate:Float = 60{
-        didSet{
-            self.loadRate(rate: self.rate, link: self.link)
-        }
-    }
-    private func loadRate(rate:Float,link:CADisplayLink){
-        if #available(iOSApplicationExtension 15.0, *) {
-            link.preferredFrameRateRange = CAFrameRateRange(minimum: rate, maximum: rate)
-        } else {
-            link.preferredFramesPerSecond = Int(rate)
-        }
+    public func start(){
+        self.thread.start()
     }
     public var callback:(RenderLoop)->Void
     public init(callback:@escaping (RenderLoop)->Void){
@@ -235,6 +260,9 @@ public class RenderLoop:NSObject{
             CFRunLoopStop(rl)
         }
         self.thread.cancel()
+    }
+    public var currentTime:CFTimeInterval{
+        CACurrentMediaTime()
     }
     public var runloop:RunLoop?
 }
