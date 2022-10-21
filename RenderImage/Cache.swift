@@ -175,8 +175,7 @@ public class DiskCache<T:DataItem>:CacheInDisk{
 public class Downloader<Content:DataItem>:NSObject,URLSessionDownloadDelegate{
     
     public typealias CallBack = (Content?,Bool)->Void
-    
-    struct Task{
+    struct DownloadTask{
         var task:URLSessionTask
         var callback:[CallBack]
     }
@@ -220,7 +219,7 @@ public class Downloader<Content:DataItem>:NSObject,URLSessionDownloadDelegate{
                     return
                 }
                 let task = self.session.downloadTask(with: URLRequest(url: url))
-                self.map[url] = Task(task: task, callback: [callback])
+                self.map[url] = DownloadTask(task: task, callback: [callback])
                 task.resume()
             }else{
                 self.map[url]?.callback.append(callback)
@@ -238,7 +237,7 @@ public class Downloader<Content:DataItem>:NSObject,URLSessionDownloadDelegate{
         super.init()
     }
     
-    private var map:[URL:Task] = [:]
+    private var map:[URL:DownloadTask] = [:]
     
     public var lock:pthread_mutex_t = .init()
     
