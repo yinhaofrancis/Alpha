@@ -136,16 +136,9 @@ public class MetalRender{
         }
     }
     private var callbuffer:Set<Model> = Set()
-#if targetEnvironment(simulator)
-    private var trans:ImageAffine = ImageAffine(type: .Transform)
-#endif
     private func transformFilter(img:CIImage,bound:CGRect,filter:ImageRenderModel)->CIImage?{
         guard let result = filter.filter(img: img, bound: bound) else { return nil }
-#if targetEnvironment(simulator)
-        return trans.filter(transform: CGAffineTransform(scaleX: 1, y: -1).translatedBy(x: 0, y: -img.extent.height), image: result)
-#else
         return result
-#endif
     }
     private func render(img:CIImage,bound:CGRect,filter:ImageRenderModel,target:CAMetalLayer){
         target.device = MetalRender.device
@@ -265,4 +258,13 @@ public class RenderLoop:NSObject{
         CACurrentMediaTime()
     }
     public var runloop:RunLoop?
+}
+
+public class ImageContext{
+    public static func context(size:CGSize,scale:CGFloat)->CGContext?{
+        let w = Int(size.width * scale)
+        let c = CGContext(data: nil, width:  w , height: Int(size.height * scale), bitsPerComponent: 8, bytesPerRow: 4 * w , space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue)
+        c?.scaleBy(x: scale, y: scale)
+        return c
+    }
 }

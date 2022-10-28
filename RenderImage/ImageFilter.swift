@@ -505,7 +505,16 @@ public class KernelLibray{
     }
     public static let shared:KernelLibray = try! KernelLibray()
 }
-
+public struct GenQrcode{
+    public init() {}
+    public var gen:CIFilter? = CIFilter(name: "CIQRCodeGenerator")
+    public func filter(data:Data,level:String)->CIImage?{
+        gen?.setDefaults()
+        gen?.setValue(data, forKey: "inputMessage")
+        gen?.setValue(level, forKey: "inputCorrectionLevel")
+        return gen?.outputImage
+    }
+}
 public struct RemoveAlpha{
     public init() {
         self.zip = try? KernelLibray.shared.colorKernel(function: "ZipAlpha")

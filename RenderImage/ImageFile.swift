@@ -131,14 +131,14 @@ extension CGImage{
         guard let dp = CGDataProvider(data: data) else { return nil }
         return CGImage(jpegDataProviderSource: dp, decode: nil, shouldInterpolate: true, intent: .defaultIntent)
     }
-    public static var pngType:String{
+    static var pngType:String{
         if #available(iOS 14.0, *) {
             return UTType.png.identifier
         } else {
             return kUTTypePNG as String
         }
     }
-    public static var jpgType:String{
+    static var jpgType:String{
         if #available(iOS 14.0, *) {
             return UTType.jpeg.identifier
         } else {
