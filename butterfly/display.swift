@@ -14,7 +14,7 @@ public protocol butterflyDisplay{
     func back(animation:Bool)
     var currentRoute:String? { get }
     
-    func display(url:URL)
+    func display(url:URL,extra:[String:Any]?)->Bool
 }
 
 public class butterFlyNavigationController:UINavigationController,butterflyDisplay{
@@ -45,8 +45,8 @@ public class butterFlyNavigationController:UINavigationController,butterflyDispl
     
     public var currentRoute: String?
     
-    public func display(url: URL) {
-        
+    public func display(url:URL,extra:[String:Any]?)->Bool {
+        return false
     }
     
     private func load(route: String, param: [String : Any]?)->UIViewController?{
@@ -54,4 +54,15 @@ public class butterFlyNavigationController:UINavigationController,butterflyDispl
         return uivc
     }
     
+}
+extension URL{
+    public var param:[String:String]{
+        var up = URLComponents(url: self, resolvingAgainstBaseURL: true)
+        let param:[String:String]? = up?.queryItems?.reduce(into: [:], { partialResult, item in
+            guard item.value != nil else { return }
+            partialResult[item.name] = item.value
+        })
+        guard let param  else { return [:] }
+        return param
+    }
 }
