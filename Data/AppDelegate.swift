@@ -30,6 +30,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         butterfly.shared(type: UIView.self).globalinterceptor = { i in
             i.routeName == "red" ? Route(routeName: "blue",param: i.param) : i
         }
+        UIViewController.register(router: Router<UIViewController>(path: "routeEdit", build: {
+            UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "RouteEdit")
+        }))
+        UIViewController.register(router: Router<UIViewController>(path: "route", build: {
+            UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "Route")
+        }))
         
         return true
     }

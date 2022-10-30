@@ -18,7 +18,7 @@ public enum MemeoryType{
 public protocol BaseRouter{
     associatedtype Out:AnyObject
     var path:String { get }
-    var build:()->Out { get }
+    var build:()-> Out { get }
     var mem:MemeoryType { get }
     var interceptor:Interceptor<Out>? { get }
 }
@@ -219,6 +219,9 @@ public class butterfly<T:AnyObject>{
     public func loadConfig(config:Config<T>){
         self.config.merge(dic: config.routerConfigMap)
     }
+    public func addRouter(router:Router<T>){
+        self.config[router.path] = router
+    }
     public init() { }
     
     func dequeue(route:String)->T?{
@@ -279,6 +282,9 @@ extension Routable{
             i.value is RouteName
         }.first?.value as? RouteName)?.wrappedValue
     }
+    public static func register(router:Router<Self>){
+        butterfly.shared(type: Self.self).addRouter(router: router)
+    }
 }
 extension UIViewController:Routable{
     
@@ -288,27 +294,32 @@ extension UIView:Routable{
 }
 
 @propertyWrapper
-public class RouteFactory<T:Routable>{
-    private var _wrappedValue:T?
+public class RoutableProperty<T:Routable>{
+   
+    public var wrappedValue: T?
     
-    public var wrappedValue: T?{
-        if let wv = self._wrappedValue{
-            return wv
-        }
-        let wv = T.route(route:route)
-        self._wrappedValue = wv
-        return wv
-    }
     private var route:Route<T>{
         didSet{
-            self._wrappedValue = nil
+            self.wrappedValue = nil
         }
     }
     
     public init(route:Route<T>) {
         self.route = route
     }
-    public var projectedValue:Route<T>{
-        return route
+    public var projectedValue:RoutableProperty<T>{
+        get{
+            return self
+        }
+    }
+    public func dequeue(param:[String:Any]? = nil){
+        if nil != self.wrappedValue{
+            return
+        }
+        if(param != nil){
+            self.route.param = param
+        }
+        
+        self.wrappedValue = T.route(route:route)
     }
 }
