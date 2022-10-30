@@ -6,15 +6,18 @@
 //
 
 import UIKit
-
+public enum RouteAction:String{
+    case show = "show"
+    case replace = "replace"
+    case backTo = "backTo"
+    case back = "back"
+}
 public protocol butterflyDisplay{
     func show(route:String,animation:Bool,param:[String:Any]?)->Bool
     func replace(route:String,animation:Bool,param:[String:Any]?)->Bool
     func back(toRoute:String,animation:Bool)->Bool
     func back(animation:Bool)
     var currentRoute:String? { get }
-    
-    func display(url:URL,extra:[String:Any]?)->Bool
 }
 
 public class butterFlyNavigationController:UINavigationController,butterflyDisplay{
@@ -44,20 +47,20 @@ public class butterFlyNavigationController:UINavigationController,butterflyDispl
     }
     
     public var currentRoute: String?
-    
-    public func display(url:URL,extra:[String:Any]?)->Bool {
-        return false
-    }
-    
+
     private func load(route: String, param: [String : Any]?)->UIViewController?{
-        guard let uivc = UIViewController.route(route: route, param: param) else { return nil }
+        guard let uivc = UIViewController.route(route: Route(routeName: route,param: param)) else { return nil }
         return uivc
     }
-    
+    private func merge(param:[String:String],extra:[String:Any])->[String:Any]{
+        return extra.merging(param) { i, j in
+            return j
+        }
+    }
 }
 extension URL{
     public var param:[String:String]{
-        var up = URLComponents(url: self, resolvingAgainstBaseURL: true)
+        let up = URLComponents(url: self, resolvingAgainstBaseURL: true)
         let param:[String:String]? = up?.queryItems?.reduce(into: [:], { partialResult, item in
             guard item.value != nil else { return }
             partialResult[item.name] = item.value
@@ -65,4 +68,25 @@ extension URL{
         guard let param  else { return [:] }
         return param
     }
+    public var plainPath:String{
+        if #available(iOS 16.0, *) {
+            return self.path()
+        } else {
+            return self.path
+        }
+    }
+    public var plainFragment:String?{
+        if #available(iOS 16.0, *) {
+            return self.fragment()
+        } else {
+            return self.fragment
+        }
+    }
+    public var plainRouteAction:RouteAction{
+        RouteAction(rawValue: self.plainFragment ?? "show") ?? .show
+    }
+}
+
+public class butterflyNavigationBar:UINavigationBar{
+    
 }

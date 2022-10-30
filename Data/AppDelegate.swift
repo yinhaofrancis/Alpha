@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import butterfly
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -13,6 +14,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
 //        RSScreenConfigration.shared().designSize = CGSize(width: 414, height: 480)
+        butterfly.shared(type: UIView.self).loadConfig(config: Config(callback: {
+            Router<UIView>(path: "red") {
+                let v = UIView()
+                v.backgroundColor = UIColor.red
+                v.tag = 1
+                return v
+            }
+            Router<UIView>(path: "blue") {
+                let v = UIView()
+                v.backgroundColor = UIColor.blue
+                return v
+            }
+        }))
+        butterfly.shared(type: UIView.self).globalinterceptor = { i in
+            i.routeName == "red" ? Route(routeName: "blue",param: i.param) : i
+        }
+        
         return true
     }
 

@@ -9,6 +9,7 @@ import UIKit
 import Ammo
 import AVFoundation
 import RenderImage
+import butterfly
 
 class tableViewController:UITableViewController{
     override func viewDidLoad() {
@@ -16,6 +17,8 @@ class tableViewController:UITableViewController{
         self.tableView.delegate = self
         self.tableView.dataSource = self
         self.tableView .reloadData()
+        
+        
     }
     let filter = ImageBlur(type: .Gaussian)
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -93,6 +96,10 @@ class ViewController2: UIViewController {
         self.render.load(url: URL(string: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F01ef345bcd8977a8012099c82483d3.gif&refer=http%3A%2F%2Fimg.zcool.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1668781818&t=e339525665f0aa1e29e480b1206ec22f")!) { [weak self] i in
             self?.blur.filter(radius: 10, image: i)
         }
+        let v = butterfly.shared(type: UIView.self).dequeue(route: Route(routeName: "red"))
+        
+        self.view.addSubview(v!)
+        v?.frame = CGRect(x: 0, y: 0, width: 100, height: 100);
     }
     @IBAction func changeRadius(_ sender: UISlider) {
         self.radius = CGFloat(sender.value)

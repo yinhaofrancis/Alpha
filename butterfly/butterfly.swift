@@ -16,38 +16,46 @@ public enum MemeoryType{
 }
 
 public protocol BaseRouter{
+    associatedtype Out:AnyObject
     var path:String { get }
-    var build:()->AnyObject { get }
+    var build:()->Out { get }
     var mem:MemeoryType { get }
+    var interceptor:Interceptor<Out>? { get }
 }
 
 
 public struct Router<T:AnyObject>:BaseRouter{
+    
+    public typealias Out = T
+    
+    public var interceptor: Interceptor<T>?
+    
     public var mem: MemeoryType
     
-    public var build: () -> AnyObject
+    public var build: () -> T
  
     public var path: String
-    
-    public init(path: String,mem:MemeoryType = .new,build:@escaping ()->T) {
+
+    public init(path: String,mem:MemeoryType = .new,interceptor:Interceptor<T>? = nil,build:@escaping ()->T) {
         self.path = path
         self.mem = mem
+        self.interceptor = nil
         self.build = build
     }
 }
 
 @resultBuilder
-public struct routeBuilder{
-    public static func buildBlock(_ components: BaseRouter...) -> Dictionary<String,BaseRouter> {
+public struct routerBuilder<T:AnyObject>{
+    public static func buildBlock(_ components: Router<T>...) -> Dictionary<String,Router<T>> {
         components.reduce(into: [:]) { partialResult, br in
             partialResult[br.path] = br
         }
     }
 }
 
-public struct Config{
-    public private(set) var routerConfigMap:Dictionary<String,BaseRouter> = [:]
-    public init(@routeBuilder callback:()->Dictionary<String,BaseRouter>){
+public struct Config<T:AnyObject>{
+    public private(set) var routerConfigMap:Dictionary<String,Router<T>> = [:]
+    public init(@routerBuilder<T> callback:()->Dictionary<String,Router<T>>){
         self.routerConfigMap = callback()
     }
 }
@@ -152,39 +160,88 @@ public class RouteName:BaseRouteParam{
 }
 
 
-public class butterfly{
-    public static var shared:butterfly = butterfly()
-    public var config:RWDictionary<String,BaseRouter> = RWDictionary()
-    public var singlton:RWDictionary<String,AnyObject> = RWDictionary()
-    public var weakSinglton:RWDictionary<String,WeakContent<AnyObject>> = RWDictionary()
-    public func loadConfig(config:Config){
+public struct Route<T:AnyObject>:Hashable{
+    public static func == (lhs:Route<T>, rhs: Route<T>) -> Bool {
+        lhs.hashValue == rhs.hashValue
+    }
+    
+    public var routeName:String
+    public var param:[String:Any]?
+    public init(routeName: String, param: [String : Any]? = nil) {
+        self.routeName = routeName
+        self.param = param
+    }
+    public func hash(into hasher: inout Hasher) {
+        self.routeName.hash(into: &hasher)
+    }
+}
+
+
+
+//public class Interceptor<Target:AnyObject>{
+//    func filter(route:Route<Target>)->Route<Target>{
+//        return route
+//    }
+//}
+
+public typealias Interceptor<T:AnyObject> = (Route<T>)->Route<T>
+
+public func +<T:AnyObject> (l: @escaping Interceptor<T>,r:@escaping Interceptor<T>)->Interceptor<T>{
+    return { i in
+        let l = l(i)
+        if i != l{
+            return l
+        }
+        let r = r(l)
+        if l != r{
+            return r
+        }
+        return r
+    }
+}
+
+
+private var map:RWDictionary<String,Any> = RWDictionary()
+public class butterfly<T:AnyObject>{
+    
+    public static func shared(type:T.Type)->butterfly<T>{
+        if let ob = map["\(type)"]{
+            return ob as! butterfly<T>
+        }
+        let b = butterfly<T>()
+        map["\(type)"] = b
+        return b
+    }
+    public var config:RWDictionary<String,Router<T>> = RWDictionary()
+    public var singlton:RWDictionary<String,T> = RWDictionary()
+    public var weakSinglton:RWDictionary<String,WeakContent<T>> = RWDictionary()
+    public var globalinterceptor:Interceptor<T>?
+    public func loadConfig(config:Config<T>){
         self.config.merge(dic: config.routerConfigMap)
     }
     public init() { }
     
-    func dequeue<T:AnyObject>(route:String)->T?{
+    func dequeue(route:String)->T?{
         
         guard let config = self.config[route] else { return nil}
-        
         if let s = self.singlton[route] ?? self.weakSinglton[route]?.content{
-            return s as? T
+            return s
         }
+        let a = config.build()
         switch(config.mem){
             
         case .singlton:
-            let a = config.build()
             self.singlton[route] = a
-            return a as? T
+            return a
         case .weakSinglton:
-            let a = config.build()
             self.weakSinglton[route] = WeakContent(content: a)
-            return a as? T
+            return a
         case .new:
-            return config.build() as? T
+            return a
         }
         
     }
-    func bind<T:AnyObject>(param:[String:Any],content:T,route:String)->T{
+    func bind(param:[String:Any],content:T,route:String)->T{
         let map = Mirror(reflecting: content).children.filter { i in
             i.value is BaseRouteParam
         }.map { i in
@@ -199,18 +256,23 @@ public class butterfly{
             
         }
         return content
-    }
-    
-    public func dequeue<T:AnyObject>(route:String,param:[String:Any]?)->T?{
-        let t:T? = self.dequeue(route: route)
-        guard let param else { return t }
+    }    
+    public func dequeue(route:Route<T>)->T?{
+        guard let config = self.config[route.routeName] else { return nil }
+        let bas = self.globalinterceptor?(route) ?? route
+        let route = config.interceptor?(bas) ?? bas
+        let t:T? = self.dequeue(route: route.routeName)
+        guard let param = route.param else { return t }
         guard let t else { return t}
-        return self.bind(param: param, content: t, route: route)
+        return self.bind(param: param, content: t, route: route.routeName)
     }
 }
-extension UIViewController{
-    public static func route(route:String,param:[String:Any]?)->UIViewController?{
-        butterfly.shared.dequeue(route: route, param: param)
+public protocol Routable:AnyObject{
+    
+}
+extension Routable{
+    public static func route(route:Route<Self>)->Self?{
+        butterfly.shared(type: Self.self).dequeue(route:route)
     }
     public var route:String?{
         return (Mirror(reflecting: self).children.filter { i in
@@ -218,10 +280,35 @@ extension UIViewController{
         }.first?.value as? RouteName)?.wrappedValue
     }
 }
-
-extension UIView{
-    public static func route(route:String,param:[String:Any]?)->UIView?{
-        butterfly.shared.dequeue(route: route, param: param)
-    }
+extension UIViewController:Routable{
+    
+}
+extension UIView:Routable{
+    
 }
 
+@propertyWrapper
+public class RouteFactory<T:Routable>{
+    private var _wrappedValue:T?
+    
+    public var wrappedValue: T?{
+        if let wv = self._wrappedValue{
+            return wv
+        }
+        let wv = T.route(route:route)
+        self._wrappedValue = wv
+        return wv
+    }
+    private var route:Route<T>{
+        didSet{
+            self._wrappedValue = nil
+        }
+    }
+    
+    public init(route:Route<T>) {
+        self.route = route
+    }
+    public var projectedValue:Route<T>{
+        return route
+    }
+}
