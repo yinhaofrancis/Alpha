@@ -7,54 +7,32 @@
 
 import UIKit
 import butterfly
+public var controller:Controller = Controller(window: UIWindow(frame: UIScreen.main.bounds))
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-    
+    var window: UIWindow?
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
-//        RSScreenConfigration.shared().designSize = CGSize(width: 414, height: 480)
-        butterfly.shared(type: UIView.self).loadConfig(config: Config(callback: {
-            Router<UIView>(path: "red") {
-                let v = UIView()
-                v.backgroundColor = UIColor.red
-                v.tag = 1
-                return v
-            }
-            Router<UIView>(path: "blue") {
-                let v = UIView()
-                v.backgroundColor = UIColor.blue
-                return v
-            }
-        }))
-        butterfly.shared(type: UIView.self).globalinterceptor = { i in
-            i.routeName == "red" ? Route(routeName: "blue",param: i.param) : i
-        }
         UIViewController.register(router: Router<UIViewController>(path: "routeEdit", build: {
             UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "RouteEdit")
         }))
         UIViewController.register(router: Router<UIViewController>(path: "route", build: {
             UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "Route")
         }))
-        
+        UIViewController.register(router: Router<UIViewController>(path: "navi1",mem: .weakSinglton, build: {
+            UINavigationController()
+        }))
+        UIViewController.register(router: Router<UIViewController>(path: "navi2", mem: .weakSinglton, build: {
+            UINavigationController()
+        }))
+        self.window = controller.window
+        self.window?.makeKeyAndVisible()
+        _ = controller.openUrl(url: URL(string: "/navi1/routeEdit/navi2/route")!)
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(10)) {
+            _ = controller.openUrl(url: URL(string: "/navi1/route")!)
+        }
         return true
     }
-
-    // MARK: UISceneSession Lifecycle
-
-    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
-        // Called when a new scene session is being created.
-        // Use this method to select a configuration to create the new scene with.
-        return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
-    }
-
-    func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
-        // Called when the user discards a scene session.
-        // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
-        // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
-    }
-
-
 }
 
 @propertyWrapper

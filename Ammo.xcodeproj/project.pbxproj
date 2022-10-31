@@ -19,7 +19,6 @@
 		A943B7EC28B8BB800063FA45 /* CokeConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A943B7E828B8BB800063FA45 /* CokeConfiguration.swift */; };
 		A95A06ED28F83B5400FA64D9 /* ImageFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95A06EC28F83B5400FA64D9 /* ImageFile.swift */; };
 		A95BCB732824C491000982D0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95BCB722824C491000982D0 /* AppDelegate.swift */; };
-		A95BCB752824C491000982D0 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95BCB742824C491000982D0 /* SceneDelegate.swift */; };
 		A95BCB772824C491000982D0 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95BCB762824C491000982D0 /* ViewController.swift */; };
 		A95BCB7A2824C491000982D0 /* back.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A95BCB782824C491000982D0 /* back.storyboard */; };
 		A95BCB7C2824C493000982D0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A95BCB7B2824C493000982D0 /* Assets.xcassets */; };
@@ -49,7 +48,7 @@
 		A9D85D83290BF2A2003F247A /* butterfly.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9D85D7D290BF2A2003F247A /* butterfly.framework */; };
 		A9D85D84290BF2A2003F247A /* butterfly.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A9D85D7D290BF2A2003F247A /* butterfly.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A9D85D8A290BF2B7003F247A /* butterfly.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D85D88290BF2B7003F247A /* butterfly.swift */; };
-		A9D85D8B290BF2B7003F247A /* display.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D85D89290BF2B7003F247A /* display.swift */; };
+		A9D85D8B290BF2B7003F247A /* controller.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D85D89290BF2B7003F247A /* controller.swift */; };
 		A9DC4EE428BC55EF00DACFA9 /* default.metal in Sources */ = {isa = PBXBuildFile; fileRef = A9DC4EE328BC55EF00DACFA9 /* default.metal */; };
 		A9DC4EE628BDEB9F00DACFA9 /* CokeRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9DC4EE528BDEB9F00DACFA9 /* CokeRender.swift */; };
 		A9E6DEA528FF0A5E00A0CABE /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9E6DEA428FF0A5E00A0CABE /* Cache.swift */; };
@@ -142,7 +141,6 @@
 		A95A06EC28F83B5400FA64D9 /* ImageFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFile.swift; sourceTree = "<group>"; };
 		A95BCB702824C491000982D0 /* Data.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Data.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A95BCB722824C491000982D0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		A95BCB742824C491000982D0 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		A95BCB762824C491000982D0 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		A95BCB792824C491000982D0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/back.storyboard; sourceTree = "<group>"; };
 		A95BCB7B2824C493000982D0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -168,7 +166,7 @@
 		A9CED30E28EBEA7F00BA9070 /* AMPager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AMPager.swift; sourceTree = "<group>"; };
 		A9D85D7D290BF2A2003F247A /* butterfly.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = butterfly.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9D85D88290BF2B7003F247A /* butterfly.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = butterfly.swift; sourceTree = "<group>"; };
-		A9D85D89290BF2B7003F247A /* display.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = display.swift; sourceTree = "<group>"; };
+		A9D85D89290BF2B7003F247A /* controller.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = controller.swift; sourceTree = "<group>"; };
 		A9DC4EE328BC55EF00DACFA9 /* default.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = default.metal; sourceTree = "<group>"; };
 		A9DC4EE528BDEB9F00DACFA9 /* CokeRender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CokeRender.swift; sourceTree = "<group>"; };
 		A9E6DEA428FF0A5E00A0CABE /* Cache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cache.swift; sourceTree = "<group>"; };
@@ -264,7 +262,6 @@
 			isa = PBXGroup;
 			children = (
 				A95BCB722824C491000982D0 /* AppDelegate.swift */,
-				A95BCB742824C491000982D0 /* SceneDelegate.swift */,
 				A95BCB762824C491000982D0 /* ViewController.swift */,
 				A95BCB782824C491000982D0 /* back.storyboard */,
 				A90A75F5290ED6AA000F0EE0 /* Main.storyboard */,
@@ -332,7 +329,7 @@
 			isa = PBXGroup;
 			children = (
 				A9D85D88290BF2B7003F247A /* butterfly.swift */,
-				A9D85D89290BF2B7003F247A /* display.swift */,
+				A9D85D89290BF2B7003F247A /* controller.swift */,
 			);
 			path = butterfly;
 			sourceTree = "<group>";
@@ -678,7 +675,6 @@
 				A95BCB732824C491000982D0 /* AppDelegate.swift in Sources */,
 				A9F411A428B72123003372B2 /* AMPageView.swift in Sources */,
 				A90A75F8290ED70B000F0EE0 /* RouteViewController.swift in Sources */,
-				A95BCB752824C491000982D0 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -709,7 +705,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A9D85D8B290BF2B7003F247A /* display.swift in Sources */,
+				A9D85D8B290BF2B7003F247A /* controller.swift in Sources */,
 				A9D85D8A290BF2B7003F247A /* butterfly.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

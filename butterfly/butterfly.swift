@@ -134,14 +134,7 @@ public class BaseRouteParam{
 public class RouteParam<T>:BaseRouteParam{
     
     public var wrappedValue: T? {
-        #if DEBUG
-        let t = innerValue as? T
-        assert(t != nil)
-        return t
-        #else
         return innerValue as? T
-        #endif
-        
     }
     public init(key:String,innerValue: T? = nil) {
         super.init(key: key, innerValue: innerValue)
@@ -225,11 +218,10 @@ public class butterfly<T:AnyObject>{
     public init() { }
     
     func dequeue(route:String)->T?{
-        
-        guard let config = self.config[route] else { return nil}
-        if let s = self.singlton[route] ?? self.weakSinglton[route]?.content{
+        if let s = self.singlton(route: route){
             return s
         }
+        guard let config = self.config[route] else { return nil}
         let a = config.build()
         switch(config.mem){
             
@@ -243,6 +235,12 @@ public class butterfly<T:AnyObject>{
             return a
         }
         
+    }
+    public func singlton(route:String)->T?{
+        if let s = self.singlton[route] ?? self.weakSinglton[route]?.content{
+            return s
+        }
+        return nil
     }
     func bind(param:[String:Any],content:T,route:String)->T{
         let map = Mirror(reflecting: content).children.filter { i in
