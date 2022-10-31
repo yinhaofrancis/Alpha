@@ -11,6 +11,8 @@ public enum RouteAction:String{
     case replace = "replace"
     case backTo = "backTo"
     case back = "back"
+    case dismiss = "dismiss"
+    case present = "present"
 }
 extension URL{
     public var param:[String:String]{
@@ -50,6 +52,7 @@ public protocol butterflyDisplay:AnyObject{
     func show(route: Route<UIViewController>,animation:Bool)->UIViewController?
     func replace(route: Route<UIViewController>,animation:Bool)->UIViewController?
     func back(toRoute:String,animation:Bool)->UIViewController?
+    func model(route: Route<UIViewController>,animation:Bool)->UIViewController?
     func back(animation:Bool)
     var currentRoute:String? { get }
     func openUrl(route:String,
@@ -68,22 +71,28 @@ extension UINavigationController:butterflyDisplay{
         case .backTo:
             return self.back(toRoute: route, animation: animation)
         case .back:
-            self.back(animation: true)
-            return self.topViewController
+            self.back(animation: animation)
+            return nil
+        case .dismiss:
+            self.dismiss(animated: animation)
+            return nil
+        case .present:
+            return self.model(route: Route(routeName: route,param: param), animation: animation)
+            
         }
     }
     
     public func show(route: Route<UIViewController>,animation:Bool)->UIViewController? {
         if(route.routeName == currentRoute){
-            return nil
+            return self
         }
         guard let curr = self.load(route: route) else { return nil }
         self.pushViewController(curr, animated: animation)
         return curr
     }
-    public func preset(route: Route<UIViewController>,animation:Bool)->UIViewController? {
+    public func model(route: Route<UIViewController>,animation:Bool)->UIViewController? {
         if(route.routeName == currentRoute){
-            return nil
+            return self
         }
         guard let curr = self.load(route: route) else { return nil }
         self.present(curr, animated: animation)
@@ -91,7 +100,7 @@ extension UINavigationController:butterflyDisplay{
     }
     public func replace(route: Route<UIViewController>,animation:Bool)->UIViewController? {
         if(route.routeName == currentRoute){
-            return nil
+            return self
         }
         guard let vc = self.load(route: route) else { return nil }
         var array = self.viewControllers
@@ -103,7 +112,7 @@ extension UINavigationController:butterflyDisplay{
     
     public func back(toRoute: String,animation:Bool)->UIViewController? {
         if(toRoute == currentRoute){
-            return nil
+            return self
         }
         guard let vc = self.viewControllers.reversed().first(where:{ $0.route != nil && $0.route! == toRoute }) else { return nil }
         self.popToViewController(vc, animated: animation)
@@ -147,29 +156,31 @@ public class Controller{
                  animation:Bool = true)->Bool{
         var display:(UIViewController & butterflyDisplay)?
         for i in routes{
-            if i == routes.first{
-                if let r = routeManager.singlton(route: i){
-                    display = r as? any UIViewController & butterflyDisplay
-                    if(window.rootViewController == nil){
-                        window.rootViewController = display
-                    }
-                }else{
-                    guard let c = self.routeManager.dequeue(route: i) else { return false }
-                    display = c as? any UIViewController & butterflyDisplay
-                    if(window.rootViewController == nil){
-                        window.rootViewController = display
-                    }else{
-                        self.window.rootViewController?.present(c, animated: true)
-                    }
+            if(i == "~"){
+                display = nil
+                continue
+            }
+            if let a = routeManager.singlton(route: i){
+                display = a as? (UIViewController & butterflyDisplay)
+                if(self.window.rootViewController == nil){
+                    self.window.rootViewController = a
                 }
             }else{
-                if let _display = display{
-                    let d = _display.openUrl(route: i,param: param, action: action, animation: animation)
-                    display = d as? any UIViewController & butterflyDisplay ?? nil
+                if(display == nil){
+                    guard let vc = routeManager.dequeue(route: Route(routeName: i,param: param)) else { return false }
+                    if(self.window.rootViewController == nil){
+                        self.window.rootViewController = vc
+                        display = vc as? (UIViewController & butterflyDisplay)
+                    }else{
+                        self.window.rootViewController?.present(vc, animated: i == routes.last ? true : false)
+                        display = vc as? (UIViewController & butterflyDisplay)
+                    }
                 }else{
-                    guard let c = self.routeManager.dequeue(route: i) else { return false }
-                    display = c as? any UIViewController & butterflyDisplay
-                    self.window.rootViewController?.present(c, animated: true)
+                
+                    let newdisplay = display?.openUrl(route: i, param: param, action: action, animation: i == routes.last ? true : false) as? (UIViewController & butterflyDisplay)
+                    if let newdisplay{
+                        display = newdisplay
+                    }
                     
                 }
             }

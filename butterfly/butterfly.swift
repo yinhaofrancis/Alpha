@@ -217,19 +217,19 @@ public class butterfly<T:AnyObject>{
     }
     public init() { }
     
-    func dequeue(route:String)->T?{
-        if let s = self.singlton(route: route){
+    func dequeue(routeName:String)->T?{
+        if let s = self.singlton(route: routeName){
             return s
         }
-        guard let config = self.config[route] else { return nil}
+        guard let config = self.config[routeName] else { return nil}
         let a = config.build()
         switch(config.mem){
             
         case .singlton:
-            self.singlton[route] = a
+            self.singlton[routeName] = a
             return a
         case .weakSinglton:
-            self.weakSinglton[route] = WeakContent(content: a)
+            self.weakSinglton[routeName] = WeakContent(content: a)
             return a
         case .new:
             return a
@@ -242,7 +242,18 @@ public class butterfly<T:AnyObject>{
         }
         return nil
     }
-    func bind(param:[String:Any],content:T,route:String)->T{
+    func bind(param:[String:Any],content:T)->T{
+        let map = Mirror(reflecting: content).children.filter { i in
+            i.value is BaseRouteParam
+        }.map { i in
+            i.value as! BaseRouteParam
+        }
+        for i in map{
+            i.innerValue = param[i.key]
+        }
+        return content
+    }
+    func bindRouteName(content:T,route:String){
         let map = Mirror(reflecting: content).children.filter { i in
             i.value is BaseRouteParam
         }.map { i in
@@ -251,21 +262,22 @@ public class butterfly<T:AnyObject>{
         for i in map{
             if(i.key == "__route__"){
                 i.innerValue = route
-            }else{
-                i.innerValue = param[i.key]
             }
-            
         }
-        return content
-    }    
+    }
     public func dequeue(route:Route<T>)->T?{
+        if let vc = self.singlton(route: route.routeName){
+            return vc
+        }
+        
         guard let config = self.config[route.routeName] else { return nil }
         let bas = self.globalinterceptor?(route) ?? route
         let route = config.interceptor?(bas) ?? bas
-        let t:T? = self.dequeue(route: route.routeName)
-        guard let param = route.param else { return t }
+        let t:T? = self.dequeue(routeName: route.routeName)
         guard let t else { return t}
-        return self.bind(param: param, content: t, route: route.routeName)
+        self.bindRouteName(content: t, route: route.routeName)
+        guard let param = route.param else { return t }
+        return self.bind(param: param, content: t)
     }
 }
 public protocol Routable:AnyObject{

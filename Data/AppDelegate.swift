@@ -19,6 +19,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UIViewController.register(router: Router<UIViewController>(path: "route", build: {
             UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "Route")
         }))
+        
+        UIViewController.register(router: Router<UIViewController>(path: "route2", build: {
+            let v = UIViewController()
+            v.view.backgroundColor = UIColor.gray
+            return v
+        }))
         UIViewController.register(router: Router<UIViewController>(path: "navi1",mem: .weakSinglton, build: {
             UINavigationController()
         }))
@@ -27,9 +33,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }))
         self.window = controller.window
         self.window?.makeKeyAndVisible()
-        _ = controller.openUrl(url: URL(string: "/navi1/routeEdit/navi2/route")!)
-        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(10)) {
-            _ = controller.openUrl(url: URL(string: "/navi1/route")!)
+        _ = controller.openUrl(url: URL(string: "/navi1/route2/routeEdit/route/route2/route")!)
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2)) {
+            _ = controller.openUrl(url: URL(string: "/navi1/routeEdit#backTo")!)
         }
         return true
     }

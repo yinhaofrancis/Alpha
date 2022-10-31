@@ -21,9 +21,12 @@ class RouteEditViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        print(self.string)
+        print(self.name)
         // Do any additional setup after loading the view.
     }
     @RouteParam(key: "key")
     var string:String?
+    
+    @RouteName
+    var name:String?
 }
