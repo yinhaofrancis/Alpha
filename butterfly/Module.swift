@@ -6,13 +6,13 @@
 //
 
 import Foundation
-
-public struct ModuleRouter{
-    public var 
-}
-
 public class Module{
-    public func addRoute(name:String){
-        butterfly.shared(type: type, name: "__module__").addRouter(router: router)
+    public static var shared:Module = Module()
+    public func addRoute(router:Router<AnyObject>){
+        butterfly.shared(name: "__module__").addRouter(router: router)
+    }
+    public func dequeue<T>(route:Route<T>)->T?{
+        
+        butterfly.shared(name: "__module__").dequeue(route: Route(routeName: route.routeName,param: route.param)) as? T
     }
 }

@@ -16,15 +16,14 @@ public enum MemeoryType{
 }
 
 public protocol BaseRouter{
-    associatedtype Out:AnyObject
+    associatedtype Out
     var path:String { get }
     var build:()-> Out { get }
     var mem:MemeoryType { get }
-    var interceptor:Interceptor<Out>? { get }
 }
 
 
-public struct Router<T:AnyObject>:BaseRouter{
+public struct Router<T>:BaseRouter{
     
     public typealias Out = T
     
@@ -39,13 +38,16 @@ public struct Router<T:AnyObject>:BaseRouter{
     public init(path: String,mem:MemeoryType = .new,interceptor:Interceptor<T>? = nil,build:@escaping ()->T) {
         self.path = path
         self.mem = mem
-        self.interceptor = nil
+        self.interceptor = interceptor
         self.build = build
+    }
+    public init<P>(proto: P.Type,mem:MemeoryType = .new,interceptor:Interceptor<T>? = nil,build:@escaping ()->T){
+        self.init(path: "\(proto)",mem: mem,interceptor: interceptor, build: build)
     }
 }
 
 @resultBuilder
-public struct routerBuilder<T:AnyObject>{
+public struct routerBuilder<T>{
     public static func buildBlock(_ components: Router<T>...) -> Dictionary<String,Router<T>> {
         components.reduce(into: [:]) { partialResult, br in
             partialResult[br.path] = br
@@ -53,10 +55,16 @@ public struct routerBuilder<T:AnyObject>{
     }
 }
 
-public struct Config<T:AnyObject>{
+public struct Config<T>{
     public private(set) var routerConfigMap:Dictionary<String,Router<T>> = [:]
     public init(@routerBuilder<T> callback:()->Dictionary<String,Router<T>>){
         self.routerConfigMap = callback()
+    }
+}
+public class StrongContent<T>{
+    var content:T?
+    public init(content: T? = nil) {
+        self.content = content
     }
 }
 public class WeakContent<T:AnyObject>{
@@ -153,7 +161,7 @@ public class RouteName:BaseRouteParam{
 }
 
 
-public struct Route<T:AnyObject>:Hashable{
+public struct Route<T>:Hashable{
     public static func == (lhs:Route<T>, rhs: Route<T>) -> Bool {
         lhs.hashValue == rhs.hashValue
     }
@@ -164,6 +172,10 @@ public struct Route<T:AnyObject>:Hashable{
         self.routeName = routeName
         self.param = param
     }
+    public init(proto: T.Type, param: [String : Any]? = nil) {
+        self.routeName = "\(proto)"
+        self.param = param
+    }
     public func hash(into hasher: inout Hasher) {
         self.routeName.hash(into: &hasher)
     }
@@ -171,15 +183,15 @@ public struct Route<T:AnyObject>:Hashable{
 
 
 
-//public class Interceptor<Target:AnyObject>{
+//public class Interceptor<TargeT>{
 //    func filter(route:Route<Target>)->Route<Target>{
 //        return route
 //    }
 //}
 
-public typealias Interceptor<T:AnyObject> = (Route<T>)->Route<T>
+public typealias Interceptor<T> = (Route<T>)->Route<T>
 
-public func +<T:AnyObject> (l: @escaping Interceptor<T>,r:@escaping Interceptor<T>)->Interceptor<T>{
+public func +<T> (l: @escaping Interceptor<T>,r:@escaping Interceptor<T>)->Interceptor<T>{
     return { i in
         let l = l(i)
         if i != l{
@@ -196,7 +208,7 @@ public func +<T:AnyObject> (l: @escaping Interceptor<T>,r:@escaping Interceptor<
 
 private var map:RWDictionary<String,Any> = RWDictionary()
 public class butterfly<T:AnyObject>{
-    public static func shared(type:T.Type,name:String? = nil)->butterfly<T>{
+    public static func shared(type:T.Type = AnyObject.self ,name:String? = nil)->butterfly<T>{
         if let ob = map[name ?? "\(type)"]{
             return ob as! butterfly<T>
         }

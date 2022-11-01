@@ -15,13 +15,25 @@ class RouteViewController: UIViewController {
         // Do any additional setup after loading the view.
     }
 }
-
+protocol p{
+    func make()
+}
+public class a:p{
+    func make() {
+        print("a:p")
+    }
+    
+    
+}
 class RouteEditViewController: UIViewController {
 
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        print(self.name)
+        Module.shared.addRoute(router: Router(proto: p.self, build: {
+            a()
+        }))
+        Module.shared.dequeue(route: Route(proto: p.self))?.make()
         // Do any additional setup after loading the view.
     }
     @RouteParam(key: "key")
