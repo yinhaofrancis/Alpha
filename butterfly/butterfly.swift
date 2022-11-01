@@ -196,13 +196,12 @@ public func +<T:AnyObject> (l: @escaping Interceptor<T>,r:@escaping Interceptor<
 
 private var map:RWDictionary<String,Any> = RWDictionary()
 public class butterfly<T:AnyObject>{
-    
-    public static func shared(type:T.Type)->butterfly<T>{
-        if let ob = map["\(type)"]{
+    public static func shared(type:T.Type,name:String? = nil)->butterfly<T>{
+        if let ob = map[name ?? "\(type)"]{
             return ob as! butterfly<T>
         }
         let b = butterfly<T>()
-        map["\(type)"] = b
+        map[name ?? "\(type)"] = b
         return b
     }
     public var config:RWDictionary<String,Router<T>> = RWDictionary()

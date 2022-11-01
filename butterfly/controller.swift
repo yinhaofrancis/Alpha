@@ -49,87 +49,43 @@ extension URL{
     }
 }
 public protocol butterflyDisplay:AnyObject{
-    func show(route: Route<UIViewController>,animation:Bool)->UIViewController?
-    func replace(route: Route<UIViewController>,animation:Bool)->UIViewController?
-    func back(toRoute:String,animation:Bool)->UIViewController?
-    func model(route: Route<UIViewController>,animation:Bool)->UIViewController?
+    func loadViewController(viewControllers:[UIViewController],animation:Bool)
+    func replaceViewController(viewController:[UIViewController],animation:Bool)
+    func back(toRoute:String,animation:Bool)
     func back(animation:Bool)
     var currentRoute:String? { get }
-    func openUrl(route:String,
-                 param:[String:Any]?,
-                 action:RouteAction,
-                 animation:Bool)->UIViewController?
 }
 extension UINavigationController:butterflyDisplay{
-    public func openUrl(route: String, param: [String : Any]?, action: RouteAction, animation: Bool) -> UIViewController? {
-        switch(action){
-            
-        case .show:
-            return self.show(route: Route(routeName: route,param: param), animation: animation)
-        case .replace:
-            return self.replace(route: Route(routeName: route,param: param), animation: animation)
-        case .backTo:
-            return self.back(toRoute: route, animation: animation)
-        case .back:
-            self.back(animation: animation)
-            return nil
-        case .dismiss:
-            self.dismiss(animated: animation)
-            return nil
-        case .present:
-            return self.model(route: Route(routeName: route,param: param), animation: animation)
-            
+    public func back(toRoute: String, animation: Bool) {
+        if(toRoute == currentRoute){
+            return
         }
+        guard let vc = self.viewControllers.reversed().first(where:{ $0.route != nil && $0.route! == toRoute }) else { return }
+        self.popToViewController(vc, animated: animation)
     }
-    
-    public func show(route: Route<UIViewController>,animation:Bool)->UIViewController? {
-        if(route.routeName == currentRoute){
-            return self
-        }
-        guard let curr = self.load(route: route) else { return nil }
-        self.pushViewController(curr, animated: animation)
-        return curr
-    }
-    public func model(route: Route<UIViewController>,animation:Bool)->UIViewController? {
-        if(route.routeName == currentRoute){
-            return self
-        }
-        guard let curr = self.load(route: route) else { return nil }
-        self.present(curr, animated: animation)
-        return curr
-    }
-    public func replace(route: Route<UIViewController>,animation:Bool)->UIViewController? {
-        if(route.routeName == currentRoute){
-            return self
-        }
-        guard let vc = self.load(route: route) else { return nil }
+    public func replaceViewController(viewController: [UIViewController], animation: Bool) {
         var array = self.viewControllers
         array.removeLast()
-        array.append(vc)
+        array.append(contentsOf: viewController)
         self.setViewControllers(array, animated: animation)
-        return vc
     }
     
-    public func back(toRoute: String,animation:Bool)->UIViewController? {
-        if(toRoute == currentRoute){
-            return self
-        }
-        guard let vc = self.viewControllers.reversed().first(where:{ $0.route != nil && $0.route! == toRoute }) else { return nil }
-        self.popToViewController(vc, animated: animation)
-        return vc
+    public func loadViewController(viewController: UIViewController, animation: Bool) {
+        self.pushViewController(viewController, animated: animation)
     }
-    
+
+    public func loadViewController(viewControllers vcs: [UIViewController], animation: Bool) {
+        var array = self.viewControllers
+        array.append(contentsOf: vcs)
+        self.setViewControllers(array, animated: animation)
+    }
+
     public func back(animation:Bool) {
         self.popViewController(animated: true)
     }
     
     public var currentRoute: String?{
         self.topViewController?.route
-    }
-
-    private func load(route: Route<UIViewController>)->UIViewController?{
-        guard let uivc = UIViewController.route(route: route) else { return nil }
-        return uivc
     }
 }
 
@@ -149,41 +105,153 @@ public class Controller{
         let action = url.plainRouteAction
         return self.openUrl(routes: routes,param: param,action: action,animation: animation)
     }
-    
     func openUrl(routes:[String],
                  param:[String:Any]? = nil,
                  action:RouteAction = .show,
                  animation:Bool = true)->Bool{
-        var display:(UIViewController & butterflyDisplay)?
-        for i in routes{
-            if(i == "~"){
-                display = nil
-                continue
-            }
-            if let a = routeManager.singlton(route: i){
-                display = a as? (UIViewController & butterflyDisplay)
-                if(self.window.rootViewController == nil){
-                    self.window.rootViewController = a
+        switch(action){
+            
+        case .show:
+            return self.showUrls(routes: routes,param: param,animation: animation)
+        case .replace:
+            return self.replaceUrls(routes: routes,param: param,animation: animation)
+        case .backTo:
+            return self.backToUrls(routes: routes,animation: animation)
+        case .back:
+            return self.back(routes: routes,animation: animation)
+        case .dismiss:
+            return self.dismiss(routes: routes,animation: animation)
+        case .present:
+            return self.present(routes: routes,param: param,animation: animation)
+        }
+    }
+    func showUrls(routes:[String],
+                 param:[String:Any]? = nil,
+                 animation:Bool = true)->Bool{
+        var lastVC:UIViewController?
+        var vc:[UIViewController] = []
+        for i in routes.reversed(){
+            if let newVC = self.routeManager.dequeue(route: Route(routeName: i,param: param)){
+                lastVC = newVC
+                let display:(UIViewController & butterflyDisplay)? = newVC as? (UIViewController & butterflyDisplay)
+                if display == nil{
+                    vc.insert(newVC, at: 0)
+                }else{
+                    display?.loadViewController(viewControllers: vc, animation: animation)
+                    vc.removeAll()
+                    vc.append(newVC)
                 }
             }else{
-                if(display == nil){
-                    guard let vc = routeManager.dequeue(route: Route(routeName: i,param: param)) else { return false }
-                    if(self.window.rootViewController == nil){
-                        self.window.rootViewController = vc
-                        display = vc as? (UIViewController & butterflyDisplay)
-                    }else{
-                        self.window.rootViewController?.present(vc, animated: i == routes.last ? true : false)
-                        display = vc as? (UIViewController & butterflyDisplay)
-                    }
-                }else{
-                
-                    let newdisplay = display?.openUrl(route: i, param: param, action: action, animation: i == routes.last ? true : false) as? (UIViewController & butterflyDisplay)
-                    if let newdisplay{
-                        display = newdisplay
-                    }
-                    
-                }
+                return false
             }
+        }
+        
+        if self.window.rootViewController == nil{
+            self.window.rootViewController = lastVC
+        }else if lastVC?.presentingViewController == nil && self.window.rootViewController != lastVC{
+            self.window.rootViewController?.present(lastVC!, animated: animation)
+        }
+        return true
+    }
+    func replaceUrls(routes:[String],
+                 param:[String:Any]? = nil,
+                 animation:Bool = true)->Bool{
+        var lastVC:UIViewController?
+        var vc:[UIViewController] = []
+        for i in routes.reversed(){
+            if let newVC = self.routeManager.dequeue(route: Route(routeName: i,param: param)){
+                lastVC = newVC
+                let display:(UIViewController & butterflyDisplay)? = newVC as? (UIViewController & butterflyDisplay)
+                if display == nil{
+                    vc.insert(newVC, at: 0)
+                }else{
+                    display?.replaceViewController(viewController: vc, animation: animation)
+                    vc.removeAll()
+                    vc.append(newVC)
+                }
+            }else{
+                return false
+            }
+        }
+        
+        if self.window.rootViewController == nil{
+            self.window.rootViewController = lastVC
+        }else if lastVC?.presentingViewController == nil{
+            self.window.rootViewController?.present(lastVC!, animated: animation)
+        }
+        return true
+    }
+    func backToUrls(routes:[String],
+                 animation:Bool = true)->Bool{
+        for i in routes.reversed(){
+            if let newVC = self.routeManager.dequeue(routeName: i){
+                let display:(UIViewController & butterflyDisplay)? = newVC as? (UIViewController & butterflyDisplay)
+                if display != nil{
+                    display?.back(toRoute: routes.last ?? "", animation: animation)
+                    return true
+                }
+            }else{
+                return false
+            }
+        }
+        return false
+    }
+    
+    func back(routes:[String],
+                 animation:Bool = true)->Bool{
+        for i in routes.reversed(){
+            if let newVC = self.routeManager.dequeue(routeName: i){
+                let display:(UIViewController & butterflyDisplay)? = newVC as? (UIViewController & butterflyDisplay)
+                if display != nil{
+                    display?.back(animation: animation)
+                    return true
+                }
+            }else{
+                return false
+            }
+        }
+        return false
+    }
+    func dismiss(routes:[String],
+                 animation:Bool = true)->Bool{
+        for i in routes.reversed(){
+            if let newVC = self.routeManager.dequeue(routeName: i){
+                let display:(UIViewController & butterflyDisplay)? = newVC as? (UIViewController & butterflyDisplay)
+                if display != nil{
+                    display?.dismiss(animated: animation)
+                    return true
+                }
+            }else{
+                return false
+            }
+        }
+        return false
+    }
+    func present(routes:[String],
+                 param:[String:Any]? = nil,
+                 animation:Bool = true)->Bool{
+        var lastVC:UIViewController?
+        var vc:[UIViewController] = []
+        for i in routes.reversed(){
+            if let newVC = self.routeManager.dequeue(route: Route(routeName: i,param: param)){
+                lastVC = newVC
+                let display:(UIViewController & butterflyDisplay)? = newVC as? (UIViewController & butterflyDisplay)
+                if display == nil{
+                    vc.insert(newVC, at: 0)
+                }else{
+                    display?.loadViewController(viewControllers: vc, animation: animation)
+                    vc.removeAll()
+                    vc.append(newVC)
+                }
+            }else{
+                return false
+            }
+        }
+        
+        if self.window.rootViewController == nil{
+            self.window.rootViewController = lastVC
+        }else{
+            self.window.rootViewController?.present(lastVC!, animated: animation)
         }
         return true
     }
