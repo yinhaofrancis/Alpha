@@ -61,12 +61,7 @@ public struct Config<T>{
         self.routerConfigMap = callback()
     }
 }
-public class StrongContent<T>{
-    var content:T?
-    public init(content: T? = nil) {
-        self.content = content
-    }
-}
+
 public class WeakContent<T:AnyObject>{
     weak var content:T?
     public init(content: T? = nil) {

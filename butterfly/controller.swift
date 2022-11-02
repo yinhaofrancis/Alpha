@@ -91,7 +91,7 @@ extension UINavigationController:butterflyDisplay{
 
 
 
-public class Controller{
+public class navigation{
     public var window:UIWindow
     public init(window: UIWindow) {
         self.window = window
@@ -255,5 +255,78 @@ public class Controller{
         }
         return true
     }
+}
+
+public protocol RouteNavigator{
     
+    var window:UIWindow { get }
+    
+    var currentRouteStack:[(String,WeakContent<UIViewController>)] { get }
+    
+    var routeStack:[String] { get }
+    
+    var currentParam:[String:Any]? { get }
+    
+    func back(route:String?,animation:Bool)
+    
+    func show(route: String, param: [String : Any]?, animation: Bool)
+    
+    func replace(route: String, param: [String : Any]?, animation: Bool)
+}
+
+
+public protocol NavigatorDisplay{
+    func load(viewControllers:[UIViewController],animation:Bool)
+    func load(viewController:UIViewController,animation:Bool)
+    func back(viewController:UIViewController?,animation:Bool)
+}
+
+public class Controller:RouteNavigator{
+    
+    public func replace(route: String, param: [String : Any]?, animation: Bool) {
+        guard let vc = self.routeManager.dequeue(route: Route(routeName: route, param: param)) else { return }
+        var vcs = self.viewControllerStack
+        vcs.removeLast()
+        vcs.append(vc)
+        self.display.load(viewControllers: vcs, animation: animation)
+    }
+    
+    public var routeStack: [String]{
+        self.currentRouteStack.map({$0.0})
+    }
+    
+    public var window: UIWindow
+    
+    public var display:NavigatorDisplay
+    
+    public var currentRouteStack: [(String, WeakContent<UIViewController>)] = []
+    
+    private var routeManager:butterfly = butterfly.shared(type: UIViewController.self)
+    
+    public var viewControllerStack:[UIViewController]{
+        return self.currentRouteStack.compactMap(({$0.1.content}))
+    }
+    
+    public var currentParam: [String : Any]?
+    
+    public func show(route: String, param: [String : Any]?, animation: Bool) {
+        guard let vc = self.routeManager.dequeue(route: Route(routeName: route, param: param)) else { return }
+        self.currentRouteStack.append((route,WeakContent(content: vc)))
+        self.display.load(viewController: vc, animation: animation)
+    }
+    
+    public func back(route: String?, animation: Bool) {
+        if let r = route{
+            guard let vc = currentRouteStack.reversed().first(where: {$0.0 == r})?.1.content else { return }
+            self.display.back(viewController: vc, animation: animation)
+        }else{
+            self.display.back(viewController: nil, animation: animation)
+        }
+        
+    }
+    
+    public init(window: UIWindow,display:NavigatorDisplay) {
+        self.window = window
+        self.display = display
+    }
 }

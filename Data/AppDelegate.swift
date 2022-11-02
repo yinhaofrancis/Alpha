@@ -7,11 +7,14 @@
 
 import UIKit
 import butterfly
-public var controller:Controller = Controller(window: UIWindow(frame: UIScreen.main.bounds))
+
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-    var window: UIWindow?
+    lazy var window: UIWindow? = {
+        self.controller.window
+    }()
+    public var controller:navigation = navigation(window: UIWindow(frame: UIScreen.main.bounds))
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         UIViewController.register(router: Router<UIViewController>(path: "routeEdit", build: {
             let v = RouteEditViewController()
@@ -48,22 +51,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)){
-            _ = controller.openUrl(url: URL(string: "/navi1/route2/route/route/route")!)
+            _ = self.controller.openUrl(url: URL(string: "/navi1/route2/route/route/route")!)
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2)){
-            _ = controller.openUrl(url: URL(string: "/navi2/route2")!)
+            _ = self.controller.openUrl(url: URL(string: "/navi2/route2")!)
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2)){
-            _ = controller.openUrl(url: URL(string: "/navi2/routeEdit#replace")!)
+            _ = self.controller.openUrl(url: URL(string: "/navi2/routeEdit#replace")!)
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(4)) {
-            _ = controller.openUrl(url: URL(string: "/navi2/routeEdit#dismiss")!)
+            _ = self.controller.openUrl(url: URL(string: "/navi2/routeEdit#dismiss")!)
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(6)) {
-            _ = controller.openUrl(url: URL(string: "/navi1/routeEdit#backTo")!)
+            _ = self.controller.openUrl(url: URL(string: "/navi1/routeEdit#backTo")!)
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(8)) {
-            _ = controller.openUrl(url: URL(string: "/navi1#back")!)
+            _ = self.controller.openUrl(url: URL(string: "/navi1#back")!)
         }
 //
         return true

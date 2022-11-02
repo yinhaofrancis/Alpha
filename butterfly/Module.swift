@@ -16,3 +16,11 @@ public class Module{
         butterfly.shared(name: "__module__").dequeue(route: Route(routeName: route.routeName,param: route.param)) as? T
     }
 }
+
+public func interface<T>(proto:T)->T?{
+    Module.shared.dequeue(route: Route(proto: T.self))
+}
+
+public func register<T,O:AnyObject>(proto:T.Type,mem:MemeoryType = .weakSinglton,callback:@escaping ()->O){
+    Module.shared.addRoute(router: Router(proto: proto, mem: mem,build: callback))
+}
