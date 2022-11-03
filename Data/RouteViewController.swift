@@ -7,7 +7,7 @@
 
 import UIKit
 import butterfly
-
+import TextDetect
 class RouteViewController: UIViewController {
     
     override func viewDidLoad() {

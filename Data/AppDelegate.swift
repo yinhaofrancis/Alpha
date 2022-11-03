@@ -7,7 +7,7 @@
 
 import UIKit
 import butterfly
-
+import TextDetect
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -30,10 +30,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }))
         
         UIViewController.register(router: Router<UIViewController>(path: "route2", build: {
-            let v = UIViewController()
-            v.view.backgroundColor = UIColor.gray
-            v.title = "route2"
-            return v
+            let v = UIStoryboard(name: "back", bundle: Bundle(for: TextDetect.self)).instantiateInitialViewController()
+            return v!
         }))
         UIViewController.register(router: Router<UIViewController>(path: "navi1",mem: .weakSinglton, build: {
             UINavigationController()

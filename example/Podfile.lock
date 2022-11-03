@@ -1,0 +1,26 @@
+PODS:
+  - butterfly (0.1.0)
+  - Database (0.1.0)
+  - RenderImage (0.1.0)
+
+DEPENDENCIES:
+  - butterfly (from `../butterfly`)
+  - Database (from `../Database`)
+  - RenderImage (from `../RenderImage`)
+
+EXTERNAL SOURCES:
+  butterfly:
+    :path: "../butterfly"
+  Database:
+    :path: "../Database"
+  RenderImage:
+    :path: "../RenderImage"
+
+SPEC CHECKSUMS:
+  butterfly: 41b083462f4b2aa2686944c0e9eae58ab238d17a
+  Database: b0f13cf309db592be7e5c9ba4819dced8e19d6fd
+  RenderImage: 87b66596c6175aa480deb798dadb4ebbdc4d3d0a
+
+PODFILE CHECKSUM: 2523656204a08ce55803829f919125e3b5ecc7fa
+
+COCOAPODS: 1.11.3

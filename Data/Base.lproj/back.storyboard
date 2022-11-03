@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21225" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="HBA-xk-K5k">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="NwH-bI-62U">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21207"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -40,13 +40,13 @@
         <!--Table View Controller-->
         <scene sceneID="0nE-WO-JaF">
             <objects>
-                <tableViewController id="zol-GF-SWe" customClass="tableViewController" customModule="Data" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController id="zol-GF-SWe" customClass="tableViewController" customModule="TextDetect" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="YYY-uM-pgq">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="804"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="mm" id="BMm-GK-8Ld" customClass="tableCell" customModule="Data" customModuleProvider="target">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="mm" id="BMm-GK-8Ld" customClass="tableCell" customModule="TextDetect" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="50" width="414" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="BMm-GK-8Ld" id="Vyt-Ro-G74">
@@ -81,10 +81,43 @@
             </objects>
             <point key="canvasLocation" x="189.85507246376812" y="838.39285714285711"/>
         </scene>
+        <!--View Controller-->
+        <scene sceneID="jgM-bf-jU7">
+            <objects>
+                <viewController id="NwH-bI-62U" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="u1E-U2-C3i">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WVM-up-nwx">
+                                <rect key="frame" x="173.5" y="437" width="67" height="22"/>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" title="Button" image="live_ct_kill">
+                                    <color key="titleColor" name="Color"/>
+                                </state>
+                            </button>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="i" translatesAutoresizingMaskIntoConstraints="NO" id="OzJ-Ob-Hjc">
+                                <rect key="frame" x="83" y="274.5" width="248" height="120.5"/>
+                            </imageView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="HNm-8V-bCD"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="WVM-up-nwx" firstAttribute="centerY" secondItem="u1E-U2-C3i" secondAttribute="centerY" id="2k2-IL-hkr"/>
+                            <constraint firstItem="WVM-up-nwx" firstAttribute="top" secondItem="OzJ-Ob-Hjc" secondAttribute="bottom" constant="42" id="D0B-pf-pJa"/>
+                            <constraint firstItem="WVM-up-nwx" firstAttribute="centerX" secondItem="u1E-U2-C3i" secondAttribute="centerX" id="TMA-EC-MvC"/>
+                            <constraint firstItem="OzJ-Ob-Hjc" firstAttribute="centerX" secondItem="u1E-U2-C3i" secondAttribute="centerX" id="awb-5n-oHv"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="duN-KW-zRE" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-22" y="-415"/>
+        </scene>
         <!--View Controller2-->
         <scene sceneID="KD5-PU-IYJ">
             <objects>
-                <viewController id="CYK-tE-BmR" customClass="ViewController2" customModule="Data" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="CYK-tE-BmR" customClass="ViewController2" customModule="TextDetect" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleAspectFit" id="nCa-8Y-op2">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="804"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -131,7 +164,7 @@
         <!--View Controller3-->
         <scene sceneID="iEm-Vm-DZx">
             <objects>
-                <viewController id="4Om-Oe-Pwj" customClass="ViewController3" customModule="Data" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="4Om-Oe-Pwj" customClass="ViewController3" customModule="TextDetect" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Pdu-nA-Mud" customClass="VideoHasBackgroundView" customModule="RenderImage">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="804"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -163,7 +196,7 @@
         <!--View Controller-->
         <scene sceneID="LMb-ye-tR8">
             <objects>
-                <viewController id="3B3-3S-Z17" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="test" id="3B3-3S-Z17" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="fBr-wO-Qcr">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="804"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -192,11 +225,14 @@
                                 <segue destination="CYK-tE-BmR" kind="show" id="HK4-dO-dvv"/>
                             </connections>
                         </barButtonItem>
-                        <button key="titleView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" id="LjV-r4-W8S">
-                            <rect key="frame" x="169.5" y="5" width="75" height="34.5"/>
+                        <button key="titleView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="LjV-r4-W8S">
+                            <rect key="frame" x="164" y="4.5" width="86" height="35"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <state key="normal" title="Button"/>
-                            <buttonConfiguration key="configuration" style="plain" title="Button"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" title="Button" image="live_timeout">
+                                <color key="titleColor" name="Color"/>
+                                <color key="titleShadowColor" name="Color2"/>
+                            </state>
                             <connections>
                                 <segue destination="zol-GF-SWe" kind="show" id="LQX-cE-yQs"/>
                             </connections>
@@ -216,7 +252,7 @@
         <!--View Controller-->
         <scene sceneID="Cob-nK-S87">
             <objects>
-                <viewController id="DnG-fv-shb" customClass="ViewController" customModule="Data" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="DnG-fv-shb" customClass="ViewController" customModule="TextDetect" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="gyI-Os-wQu">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -251,7 +287,7 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="2Q7-vV-waP" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-                <customObject id="KTy-4c-vI9" customClass="testam" customModule="Data" customModuleProvider="target"/>
+                <customObject id="KTy-4c-vI9" customClass="testam" customModule="TextDetect" customModuleProvider="target"/>
             </objects>
             <point key="canvasLocation" x="2348" y="349"/>
         </scene>
@@ -297,6 +333,12 @@
         </scene>
     </scenes>
     <resources>
+        <image name="i" width="248" height="120.66666412353516"/>
+        <image name="live_ct_kill" width="13" height="12"/>
+        <image name="live_timeout" width="11" height="12"/>
+        <namedColor name="Color">
+            <color red="0.47999998927116394" green="0.88400000333786011" blue="0.8320000171661377" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
         <namedColor name="Color2">
             <color red="1" green="0.60000002384185791" blue="0.62099999189376831" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

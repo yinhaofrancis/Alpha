@@ -20,8 +20,6 @@
 		A95A06ED28F83B5400FA64D9 /* ImageFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95A06EC28F83B5400FA64D9 /* ImageFile.swift */; };
 		A95BCB732824C491000982D0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95BCB722824C491000982D0 /* AppDelegate.swift */; };
 		A95BCB772824C491000982D0 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95BCB762824C491000982D0 /* ViewController.swift */; };
-		A95BCB7A2824C491000982D0 /* back.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A95BCB782824C491000982D0 /* back.storyboard */; };
-		A95BCB7C2824C493000982D0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A95BCB7B2824C493000982D0 /* Assets.xcassets */; };
 		A95BCB7F2824C493000982D0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A95BCB7D2824C493000982D0 /* LaunchScreen.storyboard */; };
 		A95BCB852824C49F000982D0 /* Ammo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9FB7976281A68B0008CCF39 /* Ammo.framework */; };
 		A95BCB862824C49F000982D0 /* Ammo.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A9FB7976281A68B0008CCF39 /* Ammo.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -45,6 +43,9 @@
 		A9C16F5628F948CA00F2D682 /* p.png in Resources */ = {isa = PBXBuildFile; fileRef = A9C16F5528F948CA00F2D682 /* p.png */; };
 		A9CD687E28425CC000ABD882 /* DataBaseConcurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9CD687D28425CC000ABD882 /* DataBaseConcurrency.swift */; };
 		A9CED30F28EBEA7F00BA9070 /* AMPager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9CED30E28EBEA7F00BA9070 /* AMPager.swift */; };
+		A9D574072913649B0025BAE3 /* back.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A95BCB782824C491000982D0 /* back.storyboard */; };
+		A9D5740A29136C720025BAE3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A95BCB7B2824C493000982D0 /* Assets.xcassets */; };
+		A9D5740B29136C7B0025BAE3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A95BCB7B2824C493000982D0 /* Assets.xcassets */; };
 		A9D85D83290BF2A2003F247A /* butterfly.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9D85D7D290BF2A2003F247A /* butterfly.framework */; };
 		A9D85D84290BF2A2003F247A /* butterfly.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A9D85D7D290BF2A2003F247A /* butterfly.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A9D85D8A290BF2B7003F247A /* butterfly.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D85D88290BF2B7003F247A /* butterfly.swift */; };
@@ -263,12 +264,12 @@
 			children = (
 				A95BCB722824C491000982D0 /* AppDelegate.swift */,
 				A95BCB762824C491000982D0 /* ViewController.swift */,
-				A95BCB782824C491000982D0 /* back.storyboard */,
 				A90A75F7290ED70B000F0EE0 /* RouteViewController.swift */,
-				A95BCB7B2824C493000982D0 /* Assets.xcassets */,
 				A95BCB7D2824C493000982D0 /* LaunchScreen.storyboard */,
+				A95BCB782824C491000982D0 /* back.storyboard */,
 				A95BCB802824C493000982D0 /* Info.plist */,
 				A9C16F5528F948CA00F2D682 /* p.png */,
+				A95BCB7B2824C493000982D0 /* Assets.xcassets */,
 				A9EE8383289940CB004217A8 /* iconfont.ttf */,
 				A95BCB8A2824C4F3000982D0 /* Settings.bundle */,
 				A97623902869AEC100BAC1FC /* data.json */,
@@ -621,10 +622,9 @@
 				A95BCB8B2824C4F3000982D0 /* Settings.bundle in Resources */,
 				A95BCB7F2824C493000982D0 /* LaunchScreen.storyboard in Resources */,
 				A9EE8384289940CB004217A8 /* iconfont.ttf in Resources */,
-				A95BCB7C2824C493000982D0 /* Assets.xcassets in Resources */,
 				A9C16F5628F948CA00F2D682 /* p.png in Resources */,
+				A9D5740A29136C720025BAE3 /* Assets.xcassets in Resources */,
 				A97623912869AEC100BAC1FC /* data.json in Resources */,
-				A95BCB7A2824C491000982D0 /* back.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -632,6 +632,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A9D5740B29136C7B0025BAE3 /* Assets.xcassets in Resources */,
+				A9D574072913649B0025BAE3 /* back.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

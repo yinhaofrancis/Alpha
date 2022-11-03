@@ -1,0 +1,6 @@
+framework module RenderImage {
+  umbrella header "RenderImage-umbrella.h"
+
+  export *
+  module * { export * }
+}
