@@ -1,5 +1,5 @@
 //
-//  DatabaseWorkFlow.swift
+//  DatabaseWorkflow.swift
 //  Ammo
 //
 //  Created by hao yin on 2022/4/26.
@@ -7,8 +7,8 @@
 
 import Foundation
 
-public class DatabaseWorkFlow{
-    fileprivate var writeQueue:DispatchQueue = DispatchQueue(label: "DatabaseWorkFlow", qos: .userInitiated, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil)
+public class DatabaseWorkflow{
+    fileprivate var writeQueue:DispatchQueue = DispatchQueue(label: "DatabaseWorkflow", qos: .userInitiated, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil)
     public private(set) var wdb:Database
     private var semaphore:DispatchSemaphore = DispatchSemaphore(value: 1)
     public init(name:String) throws {
@@ -77,16 +77,16 @@ public class DatabaseWorkFlow{
     
     private static var lock:DispatchSemaphore = DispatchSemaphore(value: 1)
     
-    private static var workFlow:[String:DatabaseWorkFlow] = [:]
+    private static var workFlow:[String:DatabaseWorkflow] = [:]
     
-    public static func getWorkFlow(name:String)->DatabaseWorkFlow{
+    public static func getWorkFlow(name:String)->DatabaseWorkflow{
         defer{
             lock.signal()
         }
         lock.wait()
-        guard let a = DatabaseWorkFlow.workFlow[name] else {
-            DatabaseWorkFlow.workFlow[name] = try! DatabaseWorkFlow(name: name)
-            return DatabaseWorkFlow.workFlow[name]!
+        guard let a = DatabaseWorkflow.workFlow[name] else {
+            DatabaseWorkflow.workFlow[name] = try! DatabaseWorkflow(name: name)
+            return DatabaseWorkflow.workFlow[name]!
         }
         return a
     }
@@ -100,9 +100,9 @@ public struct DBWorkFlow{
                                  
     public var name:String
     
-    public var wrappedValue:DatabaseWorkFlow{
+    public var wrappedValue:DatabaseWorkflow{
         
-        return DatabaseWorkFlow.getWorkFlow(name: self.name)
+        return DatabaseWorkflow.getWorkFlow(name: self.name)
     }
     
     public init(name:String){
@@ -120,10 +120,10 @@ public class DBContent<T:DatabaseProtocol>{
         return self.origin
     }
     private var origin:Array<T> = []
-    private var work:DatabaseWorkFlow
+    private var work:DatabaseWorkflow
     private var lock:DispatchSemaphore = DispatchSemaphore(value: 1)
     public init(DatabaseName:String){
-        self.work = DatabaseWorkFlow.getWorkFlow(name: DatabaseName)
+        self.work = DatabaseWorkflow.getWorkFlow(name: DatabaseName)
         self.work.workflow { db in
             _ = try T.init(db: db)
         }
@@ -170,12 +170,12 @@ public struct DBFetchContent<T:DatabaseFetchObject>{
     }
     private var origin:[T] = []
     private var fetch:DatabaseFetchObject.Fetch
-    private var work:DatabaseWorkFlow
+    private var work:DatabaseWorkflow
     private var param:[String:DBType]?
     public init(DatabaseName:String,fetch:DatabaseFetchObject.Fetch,param:[String:DBType]? = nil){
         self.fetch = fetch
         self.param = param
-        self.work = DatabaseWorkFlow.getWorkFlow(name: DatabaseName)
+        self.work = DatabaseWorkflow.getWorkFlow(name: DatabaseName)
         self.query()
     }
     public mutating func query(){
@@ -192,7 +192,7 @@ public struct DBFetchContent<T:DatabaseFetchObject>{
 @propertyWrapper
 public struct DBFetchView<T,V:DatabaseFetchViewProtocol> where T == V.Objects{
     public var view:V
-    public var work:DatabaseWorkFlow
+    public var work:DatabaseWorkflow
     public var condition:QueryCondition?{
         didSet{
             self.param = nil
@@ -201,7 +201,7 @@ public struct DBFetchView<T,V:DatabaseFetchViewProtocol> where T == V.Objects{
     public var param:[String:DBType]?
     public init(view:V,name:String){
         self.view = view
-        self.work = DatabaseWorkFlow.getWorkFlow(name: name)
+        self.work = DatabaseWorkflow.getWorkFlow(name: name)
         self.work.workflow { db in
             try V().createView(db: db)
         }
@@ -251,9 +251,9 @@ public class DBObject<T:DatabaseProtocol>{
         })
     }
     public var originValue: T
-    private var work:DatabaseWorkFlow
+    private var work:DatabaseWorkflow
     public init(wrappedValue: T,DatabaseName:String){
         self.originValue = wrappedValue
-        self.work = DatabaseWorkFlow.getWorkFlow(name: DatabaseName)
+        self.work = DatabaseWorkflow.getWorkFlow(name: DatabaseName)
     }
 }

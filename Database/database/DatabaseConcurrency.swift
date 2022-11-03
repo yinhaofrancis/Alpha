@@ -24,7 +24,7 @@ public actor DatabaseConcurrency{
     private var Database:Database
     
     public init(DatabaseName:String){
-        self.Database = DatabaseWorkFlow.getWorkFlow(name: DatabaseName).wdb
+        self.Database = DatabaseWorkflow.getWorkFlow(name: DatabaseName).wdb
     }
     public func create(type:DatabaseProtocol.Type) async throws{
         try await Task {
