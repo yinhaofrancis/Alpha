@@ -160,6 +160,13 @@ public class MetalRender{
         guard let ctx = self.ctx else { return nil }
         return ctx.createCGImage(img, from: img.extent)
     }
+    public func renderOffscreen(img:CIImage) async throws ->CGImage{
+        return try await Task {
+            guard let ctx = self.ctx else { throw NSError(domain: "no ctx", code: 0) }
+            guard let img =  ctx.createCGImage(img, from: img.extent) else { throw NSError(domain: "create image fail", code: 1) }
+            return img
+        }.value
+    }
     private var buffer:MTLCommandBuffer?{
         MetalRender.queue?.makeCommandBuffer()
     }
