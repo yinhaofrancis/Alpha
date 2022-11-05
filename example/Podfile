@@ -1,5 +1,5 @@
 # Uncomment the next line to define a global platform for your project
-include abc
+
 source 'https://cdn.cocoapods.org/'
 platform :ios, '13.0'
 use_frameworks!
