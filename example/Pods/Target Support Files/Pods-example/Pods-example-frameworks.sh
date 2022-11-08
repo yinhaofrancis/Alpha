@@ -178,11 +178,13 @@ code_sign_if_enabled() {
 if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/Database/Database.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/RenderImage/RenderImage.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/SPUAlert/SPUAlert.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/butterfly/butterfly.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/Database/Database.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/RenderImage/RenderImage.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/SPUAlert/SPUAlert.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/butterfly/butterfly.framework"
 fi
 if [ "${COCOAPODS_PARALLEL_CODE_SIGN}" == "true" ]; then

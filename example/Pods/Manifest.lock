@@ -2,11 +2,13 @@ PODS:
   - butterfly (0.1.0)
   - Database (0.1.0)
   - RenderImage (0.1.0)
+  - SPUAlert (0.1.0)
 
 DEPENDENCIES:
   - butterfly (from `../butterfly`)
   - Database (from `../Database`)
   - RenderImage (from `../RenderImage`)
+  - SPUAlert (from `../SPUAlert`)
 
 EXTERNAL SOURCES:
   butterfly:
@@ -15,12 +17,15 @@ EXTERNAL SOURCES:
     :path: "../Database"
   RenderImage:
     :path: "../RenderImage"
+  SPUAlert:
+    :path: "../SPUAlert"
 
 SPEC CHECKSUMS:
   butterfly: 41b083462f4b2aa2686944c0e9eae58ab238d17a
   Database: b0f13cf309db592be7e5c9ba4819dced8e19d6fd
   RenderImage: 87b66596c6175aa480deb798dadb4ebbdc4d3d0a
+  SPUAlert: c8d7ecf7589a169d8a5c9c67e04ba3192c6d53fc
 
-PODFILE CHECKSUM: 3d8619808025b564c4b25c9bdc544b9b43eeb57b
+PODFILE CHECKSUM: 566c768df23141eb3ac5f1dd3cca5b4b1cc90d64
 
 COCOAPODS: 1.11.3

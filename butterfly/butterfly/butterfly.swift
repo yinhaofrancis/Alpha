@@ -29,8 +29,18 @@ public struct Router<T:AnyObject>{
         self.name = name
     }
 }
+protocol kk{
+    
+}
+public indirect enum Route<T>{
+    case interface(name:Any,memory:MemeoryType,build: () -> T)
+}
 
-
+func s(){
+    Route.interface(name: kk.self, memory: .new) {
+        UIViewController()
+    }
+}
 public class butterfly<T:AnyObject>{
     
     @resultBuilder

@@ -1,0 +1,26 @@
+{
+  "name": "SPUAlert",
+  "version": "0.1.0",
+  "summary": "SPUAlert",
+  "description": "SPUAlert",
+  "homepage": "https://github.com/yinhaofrancis/Alpha",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "yinhaofrancis": "yinhao@5eplay.com"
+  },
+  "source": {
+    "git": "https://github.com/yinhaofrancis/Alpha.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "ios": "11.0"
+  },
+  "source_files": "Classes/**/*.swift",
+  "resources": "Resources/**/*.xcassets",
+  "info_plist": {
+    "CFBundleIdentifier": "com.spu.alert"
+  }
+}

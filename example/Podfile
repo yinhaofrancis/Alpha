@@ -9,4 +9,5 @@ target 'example' do
   pod 'butterfly',:path =>'../butterfly'
   pod 'RenderImage',:path =>'../RenderImage'
   pod 'Database',:path =>'../Database'
+  pod 'SPUAlert',:path =>'../SPUAlert'
 end

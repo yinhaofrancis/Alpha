@@ -7,7 +7,7 @@
 
 import UIKit
 import SwiftUI
-
+import SPUAlert
 
 class ViewController: UIViewController {
 
@@ -16,8 +16,8 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view.
         
         if #available(iOS 15.0, *) {
-            DispatchQueue.main.async {
-                self.present(UIHostingController(rootView: Sender()), animated: true)
+            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
+                self.present(AlertViewController(title: "title", content: "content", titles: ["a","b"]), animated: true)
             }
         } else {
             // Fallback on earlier versions
@@ -26,4 +26,5 @@ class ViewController: UIViewController {
 
 
 }
+
 
