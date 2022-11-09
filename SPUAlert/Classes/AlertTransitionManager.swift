@@ -224,12 +224,16 @@ public class AlertTransitionAnimation:NSObject,UIViewControllerAnimatedTransitio
             transitionContext.completeTransition(true)
             return
         }
-        transitionContext.containerView.addSubview(top)
+        if(isPresentation){
+            transitionContext.containerView.addSubview(top)
+        }
+        
         let bottom = self.bottom(transitionContext: transitionContext)
         if  let bottom {
-            transitionContext.containerView.addSubview(bottom)
-            transitionContext.containerView.sendSubviewToBack(bottom)
-            return
+            if(self.isPresentation){
+                transitionContext.containerView.addSubview(bottom)
+                transitionContext.containerView.sendSubviewToBack(bottom)
+            }
         }
         if(isPresentation){
             self.delegate.present(top: top, bottom: bottom) { b in

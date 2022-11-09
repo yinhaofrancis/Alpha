@@ -15,13 +15,11 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
-        if #available(iOS 15.0, *) {
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
-                self.present(AlertViewController(title: "title", content: "content", titles: ["a","b"]), animated: true)
-            }
-        } else {
-            // Fallback on earlier versions
-        }
+    }
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.present(AlertViewController(title:"dasdasd",content: "asdjadfjas fkajsdhfasjdfha sdkf askdf `", cancel: "cancel", primary: "OK", callback: { i in
+            
+        }), animated: true)
     }
 
 
