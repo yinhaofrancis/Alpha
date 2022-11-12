@@ -229,7 +229,7 @@ public class AlertTransitionAnimation:NSObject,UIViewControllerAnimatedTransitio
         }
         
         let bottom = self.bottom(transitionContext: transitionContext)
-        if  let bottom {
+        if  let bottom = bottom {
             if(self.isPresentation){
                 transitionContext.containerView.addSubview(bottom)
                 transitionContext.containerView.sendSubviewToBack(bottom)

@@ -7,111 +7,102 @@
 
 import Foundation
 
-public struct Router<T:AnyObject>{
-    
-    public var build:()->T
-    
-    public var memory:MemeoryType  = .new
-    
-    public var name:String
-    
-    public init<I>(proto:I.Type,
-                   memory: MemeoryType = .new,
-                   build: @escaping () -> T) {
-        self.init(name: "\(proto)",memory: memory, build: build)
-    }
-    
-    public init(name:String,
-                   memory: MemeoryType = .new,
-                   build: @escaping () -> T) {
-        self.build = build
-        self.memory = memory
-        self.name = name
-    }
+public enum MemoryType{
+    case singlton
+    case weakSingle
+    case new
 }
-protocol kk{
+public protocol Routable:AnyObject{
     
-}
-public indirect enum Route<T>{
-    case interface(name:Any,memory:MemeoryType,build: () -> T)
+    init() throws
 }
 
-func s(){
-    Route.interface(name: kk.self, memory: .new) {
-        UIViewController()
+public protocol RouterProtocol{
+    
+    associatedtype R:Routable
+    
+    
+    var name:String { get }
+    
+    var cls:R.Type { get }
+    
+    var memory:MemoryType { get }
+}
+
+public struct Router<T:Routable>:RouterProtocol{
+    
+    public var name: String
+    
+    public var cls: T.Type
+    
+    public var memory: MemoryType
+    
+    public typealias R = T
+    
+    public init(proto:Any ,memory:MemoryType = .new,cls:T.Type){
+        self.init(name: "\(proto)", memory: memory, cls: cls)
+    }
+    public init(name:String ,memory:MemoryType = .new,cls:T.Type){
+        self.name = name
+        self.memory = memory
+        self.cls = cls
     }
 }
-public class butterfly<T:AnyObject>{
+
+public class ButterFlyRouter<T:Routable>{
     
-    @resultBuilder
-    public struct RouterBuilder<T:AnyObject>{
-        public static func buildBlock(_ components: Router<T>...) -> [String:Router<T>] {
-            return components.reduce(into: [:]) { partialResult, router in
-                partialResult[router.name] = router
-            }
-        }
-        public static func buildLimitedAvailability(_ component: [String : Router<T>]) -> [String : Router<T>] {
-            return component
-        }
-        public static func buildEither(first component: [String : Router<T>]) -> [String : Router<T>] {
-            return component
-        }
-        public static func buildEither(second component: [String : Router<T>]) -> [String : Router<T>] {
-            return component
-        }
-        public static func buildArray(_ components: [[String : Router<T>]]) -> [String : Router<T>] {
-            components.reduce(into: [:]) { partialResult, i in
-                partialResult.merge(i) { a, b in
-                    b
-                }
-            }
-        }
-        public static func buildOptional(_ component: [String : Router<T>]?) -> [String : Router<T>] {
-            return component ?? [:]
-        }
+    private var register = RWDictionary<String,any RouterProtocol>()
+    
+    private var singleton = RWDictionary<String,T>()
+    
+    private var weakSingleton = RWDictionary<String,WeakContent<T>>()
+    
+    public func register(route: any RouterProtocol){
+        
+        self.register[route.name] = route
     }
-    
-    private var singlten:RWDictionary<String,T> = RWDictionary()
-    
-    private var weakSinglten:RWDictionary<String,WeakContent<T>> = RWDictionary()
-    
-    private var config:RWDictionary<String,Router<T>> = RWDictionary()
-    
-    public func register(router:Router<T>){
-        self.config[router.name] = router
+    private func dequeueRouter(name:String)->(any RouterProtocol)?{
+        self.register[name]
     }
-    
-    public func register(@RouterBuilder<T> builder:()->[String:Router<T>]){
-        config.merge(dic: builder())
-    }
-    
-    func dequeue(route:String)->T?{
-        if let instant = self.singlten[route] {
-            return instant
-        }
-        if let instant = self.weakSinglten[route]?.content {
-            return instant
-        }
-        guard let config = self.config[route] else { return nil }
-        let instant = config.build()
-        switch(config.memory){
-            
-        case .singlton:
-            self.singlten[route] = instant
-            return instant
-        case .weakSinglton:
-            self.weakSinglten[route] = WeakContent(content: instant)
-            return instant
-        case .new:
-            return instant
+    public func dequeue<P>(proto:P.Type) throws -> P?{
+        let name = "\(proto)"
+        guard let router = self.dequeueRouter(name: name) else { return nil }
+        let key = "\(router.cls)"
+        if let inst = self.singleton[key]{
+            return inst as? P
         }
         
-    }
-    
-    public func dequeue<INF>()->INF?{
-        self.dequeue(route: "\(INF.self)") as? INF
+        if let inst = self.weakSingleton[key]?.content{
+            return inst as? P
+        }
+        
+        let inst = try router.cls.init()
+        
+        switch(router.memory){
+            
+        case .singlton:
+            self.singleton[key] = inst as? T
+            break
+        case .weakSingle:
+            self.weakSingleton[key] = WeakContent(content: inst as? T)
+            break
+        case .new:
+            break
+        }
+        return inst as? P
     }
 }
-public let sharedButterfly = butterfly<AnyObject>()
 
-public let viewButterfly = butterfly<UIView>()
+extension UIView:Routable{
+    
+}
+
+extension UIViewController:Routable{
+    
+}
+
+public let butterFlyViewManager = ButterFlyRouter<UIView>()
+
+public let butterFlyViewControllerManager = ButterFlyRouter<UIViewController>()
+
+

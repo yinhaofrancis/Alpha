@@ -26,6 +26,7 @@ public func moduleBundle(module:String)->Bundle?{
 
 public let currentBundle:Bundle? = moduleBundle(module: "SPUAlert")
 
+@objc(SPUAlertViewController)
 public class AlertViewController: UIViewController {
     let dialogImage:UIImageView = UIImageView()
     let dialogContent:UILabel = UILabel()
@@ -41,7 +42,7 @@ public class AlertViewController: UIViewController {
     
     public var callback:(Int)->Void
     
-    public init(title:String? = nil,content:String,cancel:String,primary:String,callback:@escaping (Int)->Void) {
+    @objc public init(title:String? = nil,content:String,cancel:String,primary:String,callback:@escaping (Int)->Void) {
         self.textContent = content
         self.buttonCancelText = cancel
         self.buttonPrimaryText = primary
