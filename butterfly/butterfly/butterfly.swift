@@ -21,7 +21,6 @@ public protocol RouterProtocol{
     
     associatedtype R:Routable
     
-    
     var name:String { get }
     
     var cls:R.Type { get }
@@ -58,16 +57,20 @@ public class ButterFlyRouter<T:Routable>{
     private var weakSingleton = RWDictionary<String,WeakContent<T>>()
     
     public func register(route: any RouterProtocol){
-        
         self.register[route.name] = route
     }
+    
     private func dequeueRouter(name:String)->(any RouterProtocol)?{
         self.register[name]
     }
+    
     public func dequeue<P>(proto:P.Type) throws -> P?{
         let name = "\(proto)"
+        
         guard let router = self.dequeueRouter(name: name) else { return nil }
+        
         let key = "\(router.cls)"
+        
         if let inst = self.singleton[key]{
             return inst as? P
         }

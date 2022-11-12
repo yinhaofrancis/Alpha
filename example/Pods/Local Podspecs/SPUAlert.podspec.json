@@ -18,9 +18,8 @@
   "platforms": {
     "ios": "11.0"
   },
+  "swift_versions": "5.0",
   "source_files": "Classes/**/*.swift",
   "resources": "Resources/**/*.xcassets",
-  "info_plist": {
-    "CFBundleIdentifier": "com.spu.alert"
-  }
+  "swift_version": "5.0"
 }

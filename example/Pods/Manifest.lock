@@ -21,10 +21,10 @@ EXTERNAL SOURCES:
     :path: "../SPUAlert"
 
 SPEC CHECKSUMS:
-  butterfly: 41b083462f4b2aa2686944c0e9eae58ab238d17a
+  butterfly: e9fc7286bf9140a0328a221adc9448238ccb0ebb
   Database: b0f13cf309db592be7e5c9ba4819dced8e19d6fd
   RenderImage: 87b66596c6175aa480deb798dadb4ebbdc4d3d0a
-  SPUAlert: c8d7ecf7589a169d8a5c9c67e04ba3192c6d53fc
+  SPUAlert: 4adb27e15a60a2794044424bac7d54565ac2fca8
 
 PODFILE CHECKSUM: 566c768df23141eb3ac5f1dd3cca5b4b1cc90d64
 
