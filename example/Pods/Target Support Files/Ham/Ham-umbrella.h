@@ -24,16 +24,13 @@
 #import "HMModuleManager.h"
 #import "HMOCRunTimeTool.h"
 #import "HMWeakContainer.h"
-#import "HMBundle.h"
 #import "HMDrawImage.h"
-#import "HMLinearGradient.h"
 #import "HMRenderImage.h"
 #import "Render.h"
 #import "HMControllerManager.h"
 #import "HMProtocol.h"
 #import "HMWindow.h"
 #import "HMWindowManager.h"
-#import "HMResourceLoader.h"
 
 FOUNDATION_EXPORT double HamVersionNumber;
 FOUNDATION_EXPORT const unsigned char HamVersionString[];

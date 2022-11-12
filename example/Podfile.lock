@@ -32,7 +32,7 @@ EXTERNAL SOURCES:
     :path: "../SPUAlert"
 
 SPEC CHECKSUMS:
-  butterfly: e9fc7286bf9140a0328a221adc9448238ccb0ebb
+  butterfly: a86a0229662dc58f40eeb3fa3c184713679481a1
   Database: b0f13cf309db592be7e5c9ba4819dced8e19d6fd
   Ham: e6f8e9bf2dac28eb569eecfc68ce2e088568f87e
   RenderImage: 87b66596c6175aa480deb798dadb4ebbdc4d3d0a

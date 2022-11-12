@@ -30,6 +30,6 @@ route module
 
   s.ios.deployment_target = '13.0'
   
-  s.source_files = 'butterfly/**/*.{swift,m}'
+  s.source_files = 'butterfly/**/*.{swift,c}'
 
 end

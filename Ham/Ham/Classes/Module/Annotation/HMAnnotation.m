@@ -71,7 +71,8 @@ static void dyld_callback(const struct mach_header *mhp, intptr_t vmaddr_slide){
     }
 }
 
+
 __attribute__((constructor(100)))
-void initModule() {
+void initModule(void) {
     _dyld_register_func_for_add_image(dyld_callback);
 }
