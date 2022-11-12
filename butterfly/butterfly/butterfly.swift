@@ -48,13 +48,13 @@ public struct Router<T:Routable>:RouterProtocol{
     }
 }
 
-public class ButterFlyRouter<T:Routable>{
+public class ButterFlyRouter{
     
     private var register = RWDictionary<String,any RouterProtocol>()
     
-    private var singleton = RWDictionary<String,T>()
+    private var singleton = RWDictionary<String,Routable>()
     
-    private var weakSingleton = RWDictionary<String,WeakContent<T>>()
+    private var weakSingleton = RWDictionary<String,WeakContent<AnyObject>>()
     
     public func register(route: any RouterProtocol){
         self.register[route.name] = route
@@ -84,16 +84,22 @@ public class ButterFlyRouter<T:Routable>{
         switch(router.memory){
             
         case .singlton:
-            self.singleton[key] = inst as? T
+            self.singleton[key] = inst
             break
         case .weakSingle:
-            self.weakSingleton[key] = WeakContent(content: inst as? T)
+            self.weakSingleton[key] = WeakContent(content: inst)
             break
         case .new:
             break
         }
         return inst as? P
     }
+    
+    private func bind(module:Routable){
+        
+    }
+    
+    public static let shared:ButterFlyRouter = ButterFlyRouter()
 }
 
 extension UIView:Routable{
@@ -103,9 +109,4 @@ extension UIView:Routable{
 extension UIViewController:Routable{
     
 }
-
-public let butterFlyViewManager = ButterFlyRouter<UIView>()
-
-public let butterFlyViewControllerManager = ButterFlyRouter<UIViewController>()
-
 

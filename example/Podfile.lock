@@ -1,12 +1,21 @@
 PODS:
   - butterfly (0.1.0)
   - Database (0.1.0)
+  - Ham/H5 (0.2.25):
+    - Ham/iOS
+  - Ham/iOS (0.2.25):
+    - Ham/Module
+  - Ham/Module (0.2.25)
+  - Ham/Render (0.2.25):
+    - Ham/Module
   - RenderImage (0.1.0)
   - SPUAlert (0.1.0)
 
 DEPENDENCIES:
   - butterfly (from `../butterfly`)
   - Database (from `../Database`)
+  - Ham/H5 (from `../Ham`)
+  - Ham/Render (from `../Ham`)
   - RenderImage (from `../RenderImage`)
   - SPUAlert (from `../SPUAlert`)
 
@@ -15,6 +24,8 @@ EXTERNAL SOURCES:
     :path: "../butterfly"
   Database:
     :path: "../Database"
+  Ham:
+    :path: "../Ham"
   RenderImage:
     :path: "../RenderImage"
   SPUAlert:
@@ -23,9 +34,10 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   butterfly: e9fc7286bf9140a0328a221adc9448238ccb0ebb
   Database: b0f13cf309db592be7e5c9ba4819dced8e19d6fd
+  Ham: e6f8e9bf2dac28eb569eecfc68ce2e088568f87e
   RenderImage: 87b66596c6175aa480deb798dadb4ebbdc4d3d0a
   SPUAlert: 4adb27e15a60a2794044424bac7d54565ac2fca8
 
-PODFILE CHECKSUM: 566c768df23141eb3ac5f1dd3cca5b4b1cc90d64
+PODFILE CHECKSUM: a8c7da819c24a5105c2b1f9488b83d0fb1d7e598
 
 COCOAPODS: 1.11.3

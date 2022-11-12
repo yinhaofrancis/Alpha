@@ -15,19 +15,17 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
-        butterFlyViewManager.register(route: Router<UIView>(proto: mm.self, memory: .singlton,cls: VV.self))
-        butterFlyViewManager.register(route: Router<UIView>(proto: mmm.self, memory: .singlton,cls: VV.self))
-        let a = try? butterFlyViewManager.dequeue(proto: mm.self)
+        ButterFlyRouter.shared.register(route: Router<UIView>(proto: mm.self, memory: .singlton,cls: VV.self))
+        ButterFlyRouter.shared.register(route: Router<UIView>(name:"/a/b/c",cls: VV.self))
+        ButterFlyRouter.shared.register(route: Router<UIView>(proto: mmm.self, memory: .singlton,cls: VV.self))
         
-        let b = try? butterFlyViewManager.dequeue(proto: mmm.self)
-        
-        print(a,b)
+        print(a)
     }
-
-
+    @butterfly
+    var a:mm?
 }
 
-public protocol mm:UIView{
+public protocol mm{
     var s:String? { get set }
 }
 public protocol mmm:UIView{
