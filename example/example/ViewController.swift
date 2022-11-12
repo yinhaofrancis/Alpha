@@ -7,22 +7,32 @@
 
 import UIKit
 import SwiftUI
-
+import SPUAlert
+import butterfly
 class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
-        if #available(iOS 15.0, *) {
-            DispatchQueue.main.async {
-                self.present(UIHostingController(rootView: Sender()), animated: true)
-            }
-        } else {
-            // Fallback on earlier versions
-        }
+        ButterFlyRouter.shared.register(route: Router<UIView>(proto: mm.self, memory: .singlton,cls: VV.self))
+        ButterFlyRouter.shared.register(route: Router<UIView>(name:"/a/b/c",cls: VV.self))
+        ButterFlyRouter.shared.register(route: Router<UIView>(proto: mmm.self, memory: .singlton,cls: VV.self))
+        
+        print(a)
     }
-
-
+    @butterfly
+    var a:mm?
 }
 
+public protocol mm{
+    var s:String? { get set }
+}
+public protocol mmm:UIView{
+    var ss:String? { get set }
+}
+public class VV:UIView,mm,mmm{
+    public var ss: String?
+    
+    public var s: String?
+}

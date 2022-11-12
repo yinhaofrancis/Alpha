@@ -18,5 +18,5 @@
   "platforms": {
     "ios": "13.0"
   },
-  "source_files": "butterfly/**/*.swift"
+  "source_files": "butterfly/**/*.{swift,c}"
 }

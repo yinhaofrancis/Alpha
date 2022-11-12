@@ -1,4 +1,6 @@
 ${PODS_ROOT}/Target Support Files/Pods-example/Pods-example-frameworks.sh
 ${BUILT_PRODUCTS_DIR}/Database/Database.framework
+${BUILT_PRODUCTS_DIR}/Ham/Ham.framework
 ${BUILT_PRODUCTS_DIR}/RenderImage/RenderImage.framework
+${BUILT_PRODUCTS_DIR}/SPUAlert/SPUAlert.framework
 ${BUILT_PRODUCTS_DIR}/butterfly/butterfly.framework

@@ -1,0 +1,6 @@
+framework module SPUAlert {
+  umbrella header "SPUAlert-umbrella.h"
+
+  export *
+  module * { export * }
+}
