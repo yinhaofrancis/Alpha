@@ -28,7 +28,7 @@ public protocol RouterProtocol{
     var memory:MemoryType { get }
 }
 
-public struct Router<T:Routable>:RouterProtocol{
+public struct Router<P,T:Routable>:RouterProtocol{
     
     public var name: String
     
@@ -38,12 +38,27 @@ public struct Router<T:Routable>:RouterProtocol{
     
     public typealias R = T
     
-    public init(proto:Any ,memory:MemoryType = .new,cls:T.Type){
-        self.init(name: "\(proto)", memory: memory, cls: cls)
+    public init(proto:P.Type ,memory:MemoryType = .new,cls:T.Type){
+        self.name = "\(proto)"
+        self.memory = memory
+        self.cls = cls
     }
+}
+public struct PathRouter<T:Routable>:RouterProtocol{
+    
+    public var name: String
+    
+    public var cls: T.Type
+    
+    public var memory: MemoryType
+    
+    public typealias R = T
+    
     public init(name:String ,memory:MemoryType = .new,cls:T.Type){
         self.name = name
         self.memory = memory
         self.cls = cls
     }
 }
+
+

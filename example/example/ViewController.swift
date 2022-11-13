@@ -15,9 +15,9 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
-        ButterFlyRouter.shared.register(route: Router<UIView>(proto: mm.self, memory: .singlton,cls: VV.self))
-        ButterFlyRouter.shared.register(route: Router<UIView>(name:"/a/b/c",cls: VV.self))
-        ButterFlyRouter.shared.register(route: Router<UIView>(proto: mmm.self, memory: .singlton,cls: VV.self))
+        ButterFlyRouter.shared.register(route: Router(proto: mm.self, memory: .singlton,cls: VV.self))
+        ButterFlyRouter.shared.register(route: PathRouter(name:"/a/b/c",cls: VV.self))
+        ButterFlyRouter.shared.register(route: Router(proto: mmm.self, memory: .singlton,cls: VV.self))
         
         print(a)
     }
