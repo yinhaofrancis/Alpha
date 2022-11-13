@@ -12,10 +12,23 @@ public enum MemoryType{
     case weakSingle
     case new
 }
+
 public protocol Routable:AnyObject{
-    
+
     init() throws
 }
+
+public protocol PathRoutable:Routable{
+    
+    var path:URL? { get }
+}
+public protocol ParamRoutable:Routable{
+    
+    associatedtype T
+    
+    var param:RouteParam<T>? { get }
+}
+
 
 public protocol RouterProtocol{
     
@@ -62,3 +75,31 @@ public struct PathRouter<T:Routable>:RouterProtocol{
 }
 
 
+@dynamicMemberLookup
+public struct RouteParam<T>{
+    
+    var content:T
+    
+    public subscript<P>(dynamicMember dynamicMember:KeyPath<T,P>)->P{
+        self.content[keyPath: dynamicMember]
+    }
+
+    public init(content:T){
+        self.content = content
+    }
+    public init?(content:Optional<T>) {
+        switch(content){
+        case let .some(c):
+            self.content = c
+            break
+        default:
+            return nil
+        }
+        
+    }
+}
+extension RouteParam where T == Dictionary<String,Any>{
+    public subscript(dynamicMember dynamicMember:String)->Any?{
+        self.content[dynamicMember]
+    }
+}

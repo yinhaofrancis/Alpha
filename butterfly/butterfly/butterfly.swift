@@ -5,7 +5,9 @@
 //  Created by hao yin on 2022/10/28.
 //
 
-import Foundation
+import UIKit
+import ObjectiveC
+
 public class ButterFlyRouter{
     
     private var register = RWDictionary<String,any RouterProtocol>()
@@ -61,6 +63,21 @@ public class ButterFlyRouter{
 }
 
 extension UIView:Routable{}
+var __param_key = "___param"
+var __path_key = "___path"
+extension UIViewController:PathRoutable{
 
-extension UIViewController:Routable{}
+    public var path: URL?  {
+        get{
+            objc_getAssociatedObject(self, &__path_key) as? URL
+        }
+        set{
+            objc_setAssociatedObject(self, &__path_key, newValue,.OBJC_ASSOCIATION_COPY_NONATOMIC)
+        }
+    }
+    
+}
 
+public class BTFViewController<T>:UIViewController,ParamRoutable{
+    public var param: RouteParam<T>?
+}

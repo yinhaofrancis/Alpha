@@ -18,6 +18,9 @@ public class butterfly<T>{
         get{
             return obj
         }
+        set{
+            obj = newValue
+        }
     }
     public init(){}
 }

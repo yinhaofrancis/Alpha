@@ -18,8 +18,23 @@ class ViewController: UIViewController {
         ButterFlyRouter.shared.register(route: Router(proto: mm.self, memory: .singlton,cls: VV.self))
         ButterFlyRouter.shared.register(route: PathRouter(name:"/a/b/c",cls: VV.self))
         ButterFlyRouter.shared.register(route: Router(proto: mmm.self, memory: .singlton,cls: VV.self))
+        a?.s = "ddddsasd"
         
-        print(a)
+        let n = self.a
+        let rp = RouteParam(content: ["s":"dic","d":44])
+        
+        print(rp.s)
+        let aa = UIViewController()
+        aa.path = URL(string: "aa")
+      
+        let bb = UIViewController()
+        bb.path = URL(string: "bb")
+
+        let cc = UIViewController()
+        cc.path = URL(string: "cc")
+
+        print(aa.path,bb.path,cc.path)
+        
     }
     @butterfly
     var a:mm?
