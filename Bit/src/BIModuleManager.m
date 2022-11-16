@@ -203,10 +203,22 @@ static BIModuleManager *instance;
 -(id)parserObject:(NSString *)type baseClass:(Class)bcls{
     if([type hasPrefix:@"<"] && [type hasSuffix:@">"]){
         type = [type substringWithRange:NSMakeRange(1, type.length - 2)];
+    }else if([type containsString:@"<"] && [type hasSuffix:@">"]){
+        NSString *temp_type = [type substringWithRange:NSMakeRange(0, type.length - 1)];
+        NSArray* temp = [temp_type componentsSeparatedByString:@"<"];
+        if(temp.count > 1){
+            type = temp[1];
+            bcls = NSClassFromString(temp[0]);
+        }else{
+            return nil;
+        }
+    }
+    if([type hasPrefix:@"<"] && [type hasSuffix:@">"]){
+        type = [type substringWithRange:NSMakeRange(1, type.length - 2)];
     }
     Class cls = [self getInstanceClassByName:type baseClass:bcls];
     if(cls){
-        return [self getInstanceByName:type];
+        return [self getInstanceByName:type baseClass:bcls withParam:nil];
     }
     return nil;
 }

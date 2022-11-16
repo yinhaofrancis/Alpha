@@ -16,7 +16,7 @@
 @end
 
 @interface ViewController ()<MarkTool>
-
+@property(nonatomic,strong) UIViewController<MarkTool> *vc;
 @end
 
 @implementation ViewController
@@ -25,9 +25,11 @@
     [super viewDidLoad];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        UIViewController<MarkTool> *mark = BIInstantProtocolWithClass(MarkTool, UIViewController);
-        mark.index = self.index + 1;
-        [self presentViewController:mark animated:true completion:nil];
+        if(self.vc == nil){
+            UIViewController<MarkTool> *mark = BIInstantProtocolWithClass(MarkTool, UIViewController);
+            mark.index = self.index + 1;
+            [self presentViewController:mark animated:true completion:nil];
+        }
     });
     NSLog(@"index = %@",@(self.index));
     
