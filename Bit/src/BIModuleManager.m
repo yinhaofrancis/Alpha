@@ -84,9 +84,13 @@ static BIModuleManager *instance;
         return nil;
     }
     NSString *instKey = bcls == nil ? NSStringFromClass(cls) : [NSString stringWithFormat:@"%@|%@",NSStringFromClass(bcls),NSStringFromClass(cls)];
+    dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
     id inst = singletons[instKey];
+    dispatch_semaphore_signal(sem);
     if(inst == nil){
+        dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
         inst = weaksingletons[instKey].content;
+        dispatch_semaphore_signal(sem);
     }
     if(inst){
         return inst;
@@ -134,11 +138,15 @@ static BIModuleManager *instance;
            }
             if([cls respondsToSelector:@selector(memoryType)]){
                 if([cls memoryType] == BIModuleSinglten){
+                    dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
                     singletons[instKey] = inst;
+                    dispatch_semaphore_signal(sem);
                 }else if([cls memoryType] == BIModuleWeakSinglten){
                     BIWeakContainer* weak = [[BIWeakContainer alloc] init];
                     weak.content = inst;
+                    dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
                     weaksingletons[instKey] = weak;
+                    dispatch_semaphore_signal(sem);
                 }
             }
             if([inst class] == BIProxy.class){
