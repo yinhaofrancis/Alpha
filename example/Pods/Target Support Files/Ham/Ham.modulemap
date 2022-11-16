@@ -1,6 +1,0 @@
-framework module Ham {
-  umbrella header "Ham-umbrella.h"
-
-  export *
-  module * { export * }
-}

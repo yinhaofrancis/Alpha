@@ -1,0 +1,23 @@
+{
+  "name": "Bit",
+  "version": "0.2.25",
+  "summary": "francis private Module",
+  "description": "francis private Module with objective-C",
+  "homepage": "https://github.com/yinhaofrancis/Bit",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "yinhaofrancis": "1833918721@qq.com"
+  },
+  "source": {
+    "git": "https://github.com/yinhaofrancis/Bit.git",
+    "tag": "0.2.25"
+  },
+  "platforms": {
+    "ios": "9.0"
+  },
+  "source_files": "src/**/*",
+  "public_header_files": "header/*.h"
+}

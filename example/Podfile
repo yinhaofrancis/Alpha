@@ -10,6 +10,14 @@ target 'example' do
   pod 'RenderImage',:path =>'../RenderImage'
   pod 'Database',:path =>'../Database'
   pod 'SPUAlert',:path =>'../SPUAlert'
-  pod 'Ham/Render',:path =>'../Ham'
-  pod 'Ham/H5',:path =>'../Ham'
+  pod 'Bit',:path =>'../Bit'
+end
+
+target 'testBIT' do
+
+  pod 'butterfly',:path =>'../butterfly'
+  pod 'RenderImage',:path =>'../RenderImage'
+  pod 'Database',:path =>'../Database'
+  pod 'SPUAlert',:path =>'../SPUAlert'
+  pod 'Bit',:path =>'../Bit'
 end
