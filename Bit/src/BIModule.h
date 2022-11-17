@@ -15,9 +15,10 @@ typedef NS_ENUM(NSUInteger, BIModuleMemoryType) {
     BIModuleNew,
 };
 @protocol BIModule <NSObject>
-+ (BIModuleMemoryType) memoryType;
 
 @optional
+
++ (BIModuleMemoryType) memoryType;
 
 +(BOOL) isAsync;
 
@@ -30,6 +31,7 @@ typedef NS_ENUM(NSUInteger, BIModuleMemoryType) {
 @protocol BIModuleThreadConfigure <NSObject>
 
 @optional
+
 + (const char *) qosName;
 
 + (dispatch_queue_attr_t) queueAttribute;
