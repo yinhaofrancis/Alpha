@@ -10,8 +10,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 typedef NS_ENUM(NSUInteger, BIModuleMemoryType) {
+    
     BIModuleSinglten,
+    
     BIModuleWeakSinglten,
+    
     BIModuleNew,
 };
 @protocol BIModule <NSObject>
