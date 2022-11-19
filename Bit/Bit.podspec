@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Bit'
-  s.version          = '0.2.25'
+  s.version          = '0.3.0'
   s.summary          = 'francis private Module'
 
 # This description is used to generate tags and improve search results.
@@ -31,5 +31,7 @@ francis private Module with objective-C
   s.ios.deployment_target = '9.0'
 
   s.source_files = 'src/**/*'
+  
   s.public_header_files = 'header/*.h'
+  
 end

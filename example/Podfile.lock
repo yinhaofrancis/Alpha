@@ -1,5 +1,5 @@
 PODS:
-  - Bit (0.2.25)
+  - Bit (0.3.0)
   - butterfly (0.1.0)
   - Database (0.1.0)
   - RenderImage (0.1.0)
@@ -25,7 +25,7 @@ EXTERNAL SOURCES:
     :path: "../SPUAlert"
 
 SPEC CHECKSUMS:
-  Bit: 3e21be05615a52ff655aae6ac74234d4a7f91ce0
+  Bit: e5ee616111616555e51b486cec1549af53aa1ab1
   butterfly: a86a0229662dc58f40eeb3fa3c184713679481a1
   Database: b0f13cf309db592be7e5c9ba4819dced8e19d6fd
   RenderImage: 87b66596c6175aa480deb798dadb4ebbdc4d3d0a

@@ -12,6 +12,9 @@ import butterfly
 import Bit
 class ViewController: UIViewController {
 
+    lazy var bi = {
+        return BIProxy(object: self)
+    }()
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -21,15 +24,12 @@ class ViewController: UIViewController {
         ButterFlyRouter.shared.register(route: Router(proto: mmm.self, cls: VV.self))
         
         self.load(vc: self, frame: CGRect(x: 0, y: 0, width: 300, height: 300), count: 5)
-        
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
-            let a = UIViewController()
-            a.view.backgroundColor = UIColor(named: "test")
-            a.view.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
-            self .present(a, animated: true)
+        Task {
+            
+            
         }
     }
+
     @butterfly
     var a:mm?
     

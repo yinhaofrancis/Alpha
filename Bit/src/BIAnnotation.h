@@ -58,7 +58,6 @@ BICustomAnnotationString(baseClass,path,cls)
 __attribute__((constructor(1001 + level)))
 #endif
 
-
 NS_ASSUME_NONNULL_BEGIN
 @interface BIAnnotation : NSObject
 

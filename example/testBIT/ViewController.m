@@ -15,11 +15,12 @@
 
 @end
 
-@interface ViewController ()<MarkTool>
+@interface vViewController ()<MarkTool>
 @property(nonatomic,strong) UIViewController<MarkTool> *vc;
+
 @end
 
-@implementation ViewController
+@implementation vViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -35,7 +36,6 @@
     
     // Do any additional setup after loading the view.
 }
-
 
 @synthesize index;
 

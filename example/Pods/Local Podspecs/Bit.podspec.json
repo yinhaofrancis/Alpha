@@ -1,6 +1,6 @@
 {
   "name": "Bit",
-  "version": "0.2.25",
+  "version": "0.3.0",
   "summary": "francis private Module",
   "description": "francis private Module with objective-C",
   "homepage": "https://github.com/yinhaofrancis/Bit",
@@ -13,7 +13,7 @@
   },
   "source": {
     "git": "https://github.com/yinhaofrancis/Bit.git",
-    "tag": "0.2.25"
+    "tag": "0.3.0"
   },
   "platforms": {
     "ios": "9.0"
