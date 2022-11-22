@@ -41,4 +41,4 @@
 
 @end
 
-BIRouter(UIViewController, MarkTool, ViewController)
+BIRouter(UIViewController, MarkTool, vViewController)

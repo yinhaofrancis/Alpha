@@ -29,10 +29,6 @@ typedef NS_ENUM(NSUInteger, ProxyMatchType) {
 
 - (instancetype)initWithQueue:(nullable dispatch_queue_t)queue withObject:(id)object;
 
-- (void)getObject:(void (^)(id _Nullable,BOOL))callback
-NS_SWIFT_ASYNC_THROWS_ON_TRUE(2)
-NS_SWIFT_ASYNC_NAME("BIProxy.gObject(_:)");
-
 @end
 
 

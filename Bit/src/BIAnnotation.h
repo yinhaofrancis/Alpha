@@ -53,7 +53,7 @@ BICustomAnnotationString(baseClass,path,cls)
 (cls<proto> *)[BIModuleManager.shared getInstanceByProtocol:@protocol(proto) baseClass:[cls class]]\
 
 
-#define Configure(level) \
+#define BIConfigure(level) \
 @class BIAnnotation;   \
 __attribute__((constructor(1001 + level)))
 #endif

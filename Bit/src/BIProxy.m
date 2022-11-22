@@ -73,14 +73,4 @@
 - (BOOL)isMemberOfClass:(Class)aClass{
     return [self isMemberOfClass:aClass];
 }
-- (void)getObject:(void (^)(id _Nonnull))callback{
-    dispatch_async(self.queue, ^{
-        callback(self.object);
-    });
-}
-- (void)asyncMethod:(void (^)(char, int, float))handler{
-    dispatch_async(dispatch_get_global_queue(0, 0), ^{
-        handler('g',1,0.009);
-    });
-}
 @end
