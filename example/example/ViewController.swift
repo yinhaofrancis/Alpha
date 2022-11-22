@@ -33,6 +33,7 @@ class ViewController: UIViewController {
             Label(text: "kkkk", font: .systemFont(ofSize: 12), textColor: UIColor.red)
         }
         self.view.backgroundColor = UIColor(color64: "0x0000ffff0000_0x0000ff00ff00")
+        DessertStorage
     }
 
     @butterfly

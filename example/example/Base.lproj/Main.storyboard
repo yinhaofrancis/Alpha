@@ -23,12 +23,59 @@
                                     <action selector="change:" destination="BYZ-38-t0r" eventType="valueChanged" id="vi4-9R-fge"/>
                                 </connections>
                             </switch>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="Peh-G7-rVf">
+                                <rect key="frame" x="0.0" y="91" width="390" height="109.33333333333331"/>
+                                <subviews>
+                                    <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="Z7Y-xG-8DI">
+                                        <rect key="frame" x="0.0" y="0.0" width="390" height="34.333333333333336"/>
+                                        <subviews>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PLK-XX-QUj">
+                                                <rect key="frame" x="0.0" y="0.0" width="130" height="34.333333333333336"/>
+                                                <state key="normal" title="Button"/>
+                                                <buttonConfiguration key="configuration" style="plain" title="Button"/>
+                                            </button>
+                                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="flO-mf-ciE">
+                                                <rect key="frame" x="130" y="0.0" width="130" height="35.333333333333336"/>
+                                                <segments>
+                                                    <segment title="First"/>
+                                                    <segment title="Second"/>
+                                                </segments>
+                                            </segmentedControl>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HV6-Zh-dkX">
+                                                <rect key="frame" x="260" y="0.0" width="130" height="34.333333333333336"/>
+                                                <state key="normal" title="Button"/>
+                                                <buttonConfiguration key="configuration" style="plain" title="Button"/>
+                                            </button>
+                                        </subviews>
+                                    </stackView>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yZx-8X-Nrv">
+                                        <rect key="frame" x="0.0" y="34.333333333333329" width="390" height="20.333333333333329"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TIV-Mn-t7h">
+                                        <rect key="frame" x="0.0" y="54.666666666666664" width="390" height="20.333333333333336"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bw3-Uh-o5x">
+                                        <rect key="frame" x="0.0" y="75" width="390" height="34.333333333333343"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="plain" title="Button"/>
+                                    </button>
+                                </subviews>
+                            </stackView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="Peh-G7-rVf" secondAttribute="trailing" id="EpS-VU-lt0"/>
                             <constraint firstItem="pQ6-8d-uGl" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="UPo-BK-f6M"/>
+                            <constraint firstItem="Peh-G7-rVf" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="g6Y-Ii-2wC"/>
                             <constraint firstItem="pQ6-8d-uGl" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="hJg-Dh-7CV"/>
+                            <constraint firstItem="Peh-G7-rVf" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="n8s-dH-DdP"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="dasdas" id="cgF-61-Frg"/>
