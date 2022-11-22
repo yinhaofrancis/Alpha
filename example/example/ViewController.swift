@@ -28,6 +28,7 @@ class ViewController: UIViewController {
             
             
         }
+        self.view.backgroundColor = UIColor(color64: "0x0000ffff0000_0x0000ff00ff00")
     }
 
     @butterfly
