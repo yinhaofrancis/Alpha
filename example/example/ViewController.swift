@@ -10,6 +10,7 @@ import SwiftUI
 import SPUAlert
 import butterfly
 import Bit
+import Dessert
 class ViewController: UIViewController {
 
     lazy var bi = {
@@ -23,10 +24,13 @@ class ViewController: UIViewController {
         ButterFlyRouter.shared.register(route: PathRouter(name:"/a/b/c",cls: VV.self))
         ButterFlyRouter.shared.register(route: Router(proto: mmm.self, cls: VV.self))
         
-        self.load(vc: self, frame: CGRect(x: 0, y: 0, width: 300, height: 300), count: 5)
-        Task {
-            
-            
+//        self.load(vc: self, frame: CGRect(x: 0, y: 0, width: 300, height: 300), count: 5)
+        let a = Stack(axis: .vertical,distribution: .fillEqually) {
+            Label(text: "kkkk", font: .systemFont(ofSize: 12), textColor: UIColor.red)
+            Label(text: "kkkk", font: .systemFont(ofSize: 12), textColor: UIColor.red)
+            Label(text: "kkkk", font: .systemFont(ofSize: 12), textColor: UIColor.red)
+            Label(text: "kkkk", font: .systemFont(ofSize: 12), textColor: UIColor.red)
+            Label(text: "kkkk", font: .systemFont(ofSize: 12), textColor: UIColor.red)
         }
         self.view.backgroundColor = UIColor(color64: "0x0000ffff0000_0x0000ff00ff00")
     }

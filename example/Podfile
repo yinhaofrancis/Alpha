@@ -11,6 +11,7 @@ target 'example' do
   pod 'Database',:path =>'../Database'
   pod 'SPUAlert',:path =>'../SPUAlert'
   pod 'Bit',:path =>'../Bit'
+  pod 'Dessert',:path =>'../Dessert'
 end
 
 target 'testBIT' do
@@ -20,4 +21,5 @@ target 'testBIT' do
   pod 'Database',:path =>'../Database'
   pod 'SPUAlert',:path =>'../SPUAlert'
   pod 'Bit',:path =>'../Bit'
+  pod 'Dessert',:path =>'../Dessert'
 end

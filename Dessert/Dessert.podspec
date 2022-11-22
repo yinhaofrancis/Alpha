@@ -1,5 +1,5 @@
 #
-# Be sure to run `pod lib lint Ham.podspec' to ensure this is a
+# Be sure to run `pod lib lint Alpha.podspec' to ensure this is a
 # valid spec before submitting.
 #
 # Any lines starting with a # are optional, but their use is encouraged
@@ -7,9 +7,9 @@
 #
 
 Pod::Spec.new do |s|
-  s.name             = 'Bit'
-  s.version          = '0.3.0'
-  s.summary          = 'francis private Module'
+  s.name             = 'Dessert'
+  s.version          = '0.1.0'
+  s.summary          = 'Dessert'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -18,20 +18,20 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-francis private Module with objective-C
+  Dessert
                        DESC
 
-  s.homepage         = 'https://github.com/yinhaofrancis/Bit'
+  s.homepage         = 'https://github.com/yinhaofrancis/Alpha'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'yinhaofrancis' => '1833918721@qq.com' }
-  s.source           = { :git => 'https://github.com/yinhaofrancis/Bit.git', :tag => s.version.to_s }
+  s.author           = { 'yinhaofrancis' => 'yinhao@5eplay.com' }
+  s.source           = { :git => 'https://github.com/yinhaofrancis/Alpha.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '12.0'
+  
+  s.swift_versions = "5.0";
+  
+  s.source_files = 'Dessert/**/*.swift'
 
-  s.source_files = 'src/**/*'
-  
-  s.public_header_files = 'header/*.h'
-  
 end

@@ -2,6 +2,7 @@ PODS:
   - Bit (0.3.0)
   - butterfly (0.1.0)
   - Database (0.1.0)
+  - Dessert (0.1.0)
   - RenderImage (0.1.0)
   - SPUAlert (0.1.0)
 
@@ -9,6 +10,7 @@ DEPENDENCIES:
   - Bit (from `../Bit`)
   - butterfly (from `../butterfly`)
   - Database (from `../Database`)
+  - Dessert (from `../Dessert`)
   - RenderImage (from `../RenderImage`)
   - SPUAlert (from `../SPUAlert`)
 
@@ -19,18 +21,21 @@ EXTERNAL SOURCES:
     :path: "../butterfly"
   Database:
     :path: "../Database"
+  Dessert:
+    :path: "../Dessert"
   RenderImage:
     :path: "../RenderImage"
   SPUAlert:
     :path: "../SPUAlert"
 
 SPEC CHECKSUMS:
-  Bit: e5ee616111616555e51b486cec1549af53aa1ab1
+  Bit: fd5ff7bfc7c5134c96377102d7fe985c7809a0f5
   butterfly: a86a0229662dc58f40eeb3fa3c184713679481a1
   Database: b0f13cf309db592be7e5c9ba4819dced8e19d6fd
+  Dessert: f3d63ac6cd9daeb6c339daab2f23017993562b33
   RenderImage: 87b66596c6175aa480deb798dadb4ebbdc4d3d0a
   SPUAlert: 4adb27e15a60a2794044424bac7d54565ac2fca8
 
-PODFILE CHECKSUM: d52c9608a24aeeeebc1a771444c100b010886d58
+PODFILE CHECKSUM: 3034b6f42aea3a14ae28676d3b6f31864a4e7c0a
 
 COCOAPODS: 1.11.3
