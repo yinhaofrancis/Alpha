@@ -9,6 +9,8 @@
 #import "BIProxy.h"
 #import <objc/runtime.h>
 
+NSString * const BIProxyRunloopMode = @"BIProxyRunloop";
+
 @implementation BIProxy
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)sel {
     if([self.object respondsToSelector:sel]){
@@ -32,7 +34,10 @@
                  [invocation invoke];
              });
         }else{
-            [invocation invoke];
+            invocation
+            dispatch_sync(self.queue, ^{
+                [invocation invoke];
+            });
         }
     }else{
        [invocation invoke];

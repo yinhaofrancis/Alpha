@@ -12,10 +12,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSUInteger, ProxyMatchType) {
-    ProxyMatchAll,
-    ProxyMatchFirst,
-};
 
 @interface BIProxy : NSProxy
 
@@ -30,7 +26,5 @@ typedef NS_ENUM(NSUInteger, ProxyMatchType) {
 - (instancetype)initWithQueue:(nullable dispatch_queue_t)queue withObject:(id)object;
 
 @end
-
-
 
 NS_ASSUME_NONNULL_END

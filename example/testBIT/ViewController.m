@@ -12,11 +12,11 @@
 @protocol MarkTool <NSObject>
 
 @property(nonatomic,assign) NSInteger index;
-
+- (void(^)(id))callbackcc:(id)a;
 @end
 
 @interface vViewController ()<MarkTool>
-@property(nonatomic,strong) UIViewController<MarkTool> *vc;
+@property(nonatomic,strong) NSDate *vc;
 
 @end
 
@@ -24,19 +24,30 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    id<MarkTool> p = (id<MarkTool>)[[BIProxy alloc] initWithQueue:dispatch_get_global_queue(0, 0) withObject:self];
+
+    void(^k)(id)  = [p callbackcc:@3];
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        if(self.vc == nil){
-            UIViewController<MarkTool> *mark = BIInstantProtocolWithClass(MarkTool, UIViewController);
-            mark.index = self.index + 1;
-            [self presentViewController:mark animated:true completion:nil];
-        }
-    });
-    NSLog(@"index = %@",@(self.index));
+    
     
     // Do any additional setup after loading the view.
 }
-
+- (id)callback:(id)a{
+    NSLog(@"callback");
+    for (int i = 0; i < 10; i++){
+        sleep(1);
+    }
+    return @(1);
+}
+- (void)callback:(id)a ret:(void(^)(id))ret{
+    NSLog(@"callback");
+}
+- (void(^)(id))callbackcc:(id)a{
+    NSLog(@"callback");
+    return ^(id k){
+        
+    };
+}
 @synthesize index;
 
 @end
