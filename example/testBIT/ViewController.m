@@ -12,7 +12,8 @@
 @protocol MarkTool <NSObject>
 
 @property(nonatomic,assign) NSInteger index;
-- (void(^)(id))callbackcc:(id)a;
+@optional
+- (NSString *)callbackcc:(id)a;
 @end
 
 @interface vViewController ()<MarkTool>
@@ -24,12 +25,15 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    id<MarkTool> p = (id<MarkTool>)[[BIProxy alloc] initWithQueue:dispatch_get_global_queue(0, 0) withObject:self];
-
-    void(^k)(id)  = [p callbackcc:@3];
-    
-    
-    
+    BIInvocationProxy* a = [[BIInvocationProxy alloc] initWithProtocol:@protocol(MarkTool)];
+    [a implement:@selector(callbackcc:) methodBlock:^(NSInvocation * _Nonnull inv) {
+        NSLog(@"%@",inv);
+        [inv setReturnValue:@"aa"];
+    }];
+    NSString *ap = [a performSelector:@selector(callbackcc:) withObject:^(id c){
+        NSLog(@"%@",c);
+    }];
+    NSLog(@"%s",ap.UTF8String);
     // Do any additional setup after loading the view.
 }
 - (id)callback:(id)a{
@@ -42,12 +46,7 @@
 - (void)callback:(id)a ret:(void(^)(id))ret{
     NSLog(@"callback");
 }
-- (void(^)(id))callbackcc:(id)a{
-    NSLog(@"callback");
-    return ^(id k){
-        
-    };
-}
+
 @synthesize index;
 
 @end

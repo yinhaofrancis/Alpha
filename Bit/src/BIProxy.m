@@ -9,6 +9,10 @@
 #import "BIProxy.h"
 #import <objc/runtime.h>
 
+
+#import "BIOCRunTimeTool.h"
+
+
 NSString * const BIProxyRunloopMode = @"BIProxyRunloop";
 
 @implementation BIProxy
@@ -17,11 +21,23 @@ NSString * const BIProxyRunloopMode = @"BIProxyRunloop";
         id a = [self.object methodSignatureForSelector:sel];
         return a;
     }
+    if(self.proto){
+        [BIOCRunTimeTool classImplamentProtocol:self.proto selector:sel toClass:self.class imp:^(id obj){
+            NSLog(@"%@",obj);
+        }];
+        struct objc_method_description des = protocol_getMethodDescription(self.proto, sel, false, true);
+        return [NSMethodSignature signatureWithObjCTypes:des.types];
+    }
     return nil;
 }
 
 - (void)forwardInvocation:(NSInvocation *)invocation{
-    invocation.target = self.object;
+    if([self.object respondsToSelector:invocation.selector]){
+        invocation.target = self.object;
+    }else{
+        invocation.target = self;
+    }
+    
     if (self.queue) {
         void* v = dispatch_get_specific("self");
         if(v == (__bridge void *)(self)){
@@ -34,7 +50,6 @@ NSString * const BIProxyRunloopMode = @"BIProxyRunloop";
                  [invocation invoke];
              });
         }else{
-            invocation
             dispatch_sync(self.queue, ^{
                 [invocation invoke];
             });
@@ -42,19 +57,20 @@ NSString * const BIProxyRunloopMode = @"BIProxyRunloop";
     }else{
        [invocation invoke];
     }
-    
 }
-- (instancetype)initWithObject:(id)object{
-    return [self initWithQueue:nil withObject:object];
+- (instancetype)initWithObject:(id)object protocol:(nullable Protocol *)proto{
+    return [self initWithQueue:nil withObject:object protocol:proto];
 }
 
-- (instancetype)initWithQueue:(dispatch_queue_t)queue withObject:(nonnull id)object{
+- (instancetype)initWithQueue:(dispatch_queue_t)queue withObject:(nonnull id)object protocol:(nullable Protocol *)proto{
     self->_object = object;
     self.queue = queue;
+    self->_proto = proto;
     if(self.queue){
         dispatch_queue_set_specific(self.queue, "self", (__bridge void * _Nullable)(self), NULL);
     }
     _lock = dispatch_semaphore_create(1);
+    [BIOCRunTimeTool modifyClass:self cls:[NSString stringWithFormat:@"%@+%@",NSStringFromClass(self.class),NSStringFromProtocol(proto)]];
     return self;
 }
 
@@ -77,5 +93,36 @@ NSString * const BIProxyRunloopMode = @"BIProxyRunloop";
 }
 - (BOOL)isMemberOfClass:(Class)aClass{
     return [self isMemberOfClass:aClass];
+}
+@end
+
+@implementation BIInvocationProxy{
+    NSMutableDictionary<NSString *,void (^)(NSInvocation * _Nonnull)> *map;
+    dispatch_semaphore_t lock;
+}
+
+- (void)implement:(SEL)selector methodBlock:(void (^)(NSInvocation * _Nonnull))callback{
+    dispatch_semaphore_wait(lock, DISPATCH_TIME_FOREVER);
+    map[NSStringFromSelector(selector)] = callback;
+    dispatch_semaphore_signal(lock);
+}
+
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)sel{
+    return [BIOCRunTimeTool objectMethodSignature:self.proto sel:sel];
+}
+- (void)forwardInvocation:(NSInvocation *)invocation{
+    
+    dispatch_semaphore_wait(lock, DISPATCH_TIME_FOREVER);
+    void (^call)(NSInvocation * _Nonnull) = map[NSStringFromSelector(invocation.selector)];
+    dispatch_semaphore_signal(lock);
+    if(call){
+        call(invocation);
+    }
+}
+- (instancetype)initWithProtocol:(Protocol *)proto {
+    _proto = proto;
+    map = [NSMutableDictionary new];
+    lock = dispatch_semaphore_create(1);
+    return self;
 }
 @end

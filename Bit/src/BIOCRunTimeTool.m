@@ -41,7 +41,10 @@
     
     return newProtocol;
 }
-
++ (void)modifyClass:(id)object cls:(NSString*)className{
+    Class newClass = objc_allocateClassPair([object class], className.UTF8String, 0);
+    object_setClass(object,newClass);
+}
 +(void)swizzing:(SEL)originalSelector
            with:(SEL)swizzledSelector
             cls:(Class)className{
@@ -119,7 +122,6 @@
                 withType:(const char *)type
                      imp:(id)impBlock{
     return class_addMethod(cls, selector, imp_implementationWithBlock(impBlock), type);
-    
 }
 + (BOOL)classImplamentProtocol:(Protocol *)proto
                       selector:(SEL)selector
@@ -127,6 +129,24 @@
                            imp:(id)block{
     const char * c = protocol_getMethodDescription(proto, selector, false, true).types;
     return [BIOCRunTimeTool addMethodToClass:cls selector:selector withType:c imp:block];
+}
++ (NSMethodSignature *)objectMethodSignature:(Protocol *)proto sel:(SEL)selector{
+    NSString * r = [self objectMethodEncode:proto sel:selector];
+    if(r){
+        return [NSMethodSignature signatureWithObjCTypes:r.UTF8String];
+    }
+    return nil;
+}
++(NSString *)objectMethodEncode:(Protocol *)proto sel:(SEL)selector{
+    const char * c = protocol_getMethodDescription(proto, selector, false, true).types;
+    if(c != NULL){
+        return [NSString stringWithUTF8String:c];
+    }
+    c = protocol_getMethodDescription(proto, selector, true, true).types;
+    if(c != NULL){
+        return [NSString stringWithUTF8String:c];
+    }
+    return nil;
 }
 @end
 @implementation NSString (OCRuntime)

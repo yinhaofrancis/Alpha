@@ -25,6 +25,8 @@ typedef void(^didSetBlock)(id,void * _Nullable);
             with:(SEL)swizzledSelector
              cls:(Class)className;
 
++ (void)modifyClass:(id)object cls:(NSString*)className;
+
 + (BOOL)addSameMethod:(SEL)selector
             encodeSel:(SEL)sameSel
               toClass:(Class)cls
@@ -40,6 +42,9 @@ typedef void(^didSetBlock)(id,void * _Nullable);
                 withType:(const char *)type
                      imp:(id)impBlock;
                 
++(NSMethodSignature *)objectMethodSignature:(Protocol *)proto sel:(SEL)selector;
+
++(NSString *)objectMethodEncode:(Protocol *)proto sel:(SEL)selector;
 
 +(NSArray<NSString *> *)propertyInClass:(Class)cls;
 

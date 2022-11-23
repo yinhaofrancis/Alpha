@@ -21,9 +21,21 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property(nonatomic,readonly) id object;
 
-- (instancetype)initWithObject:(id)object;
+@property(nonatomic,readonly) Protocol *proto;
 
-- (instancetype)initWithQueue:(nullable dispatch_queue_t)queue withObject:(id)object;
+- (instancetype)initWithObject:(id)object protocol:(nullable Protocol*)proto;
+
+- (instancetype)initWithQueue:(nullable dispatch_queue_t)queue withObject:(id)object protocol:(nullable Protocol*)proto;
+
+@end
+
+@interface BIInvocationProxy : NSProxy
+
+@property(nonatomic,readonly) Protocol *proto;
+
+- (instancetype)initWithProtocol:(nullable Protocol*)proto;
+
+- (void)implement:(SEL)selector methodBlock:(void(^)(NSInvocation *))callback;
 
 @end
 

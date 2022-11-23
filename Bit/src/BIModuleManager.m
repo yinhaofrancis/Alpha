@@ -114,25 +114,25 @@ static BIModuleManager *instance;
             if([cls conformsToProtocol:@protocol(BIModuleThreadConfigure)]){
                 if([cls respondsToSelector:@selector(globalQos)]){
                     dispatch_queue_t q = dispatch_get_global_queue([cls globalQos], 0);
-                    inst = [[BIProxy alloc] initWithQueue:q withObject:inst];
+                    inst = [[BIProxy alloc] initWithQueue:q withObject:inst protocol:NSProtocolFromString(name)];
                 }else{
-                    const char* name = "";
+                    const char* queuename = "";
                     dispatch_queue_attr_t att = DISPATCH_QUEUE_SERIAL;
                     if([cls respondsToSelector:@selector(qosName)]){
-                        name = [cls qosName];
+                        queuename = [cls qosName];
                     }
                     if([cls respondsToSelector:@selector(queueAttribute)]){
                         att = [cls queueAttribute];
                     }
-                    dispatch_queue_t q = dispatch_queue_create(name, att);
-                    inst = [[BIProxy alloc] initWithQueue:q withObject:inst];
+                    dispatch_queue_t q = dispatch_queue_create(queuename, att);
+                    inst = [[BIProxy alloc] initWithQueue:q withObject:inst protocol:NSProtocolFromString(name)];
                 }
                
            }else{
                if ([cls respondsToSelector:@selector(isAsync)]){
                    if([cls isAsync]){
                        dispatch_queue_t q = dispatch_queue_create(NULL, DISPATCH_QUEUE_SERIAL);
-                       inst = [[BIProxy alloc] initWithQueue:q withObject:inst];
+                       inst = [[BIProxy alloc] initWithQueue:q withObject:inst protocol:NSProtocolFromString(name)];
                    }
                }
            }
