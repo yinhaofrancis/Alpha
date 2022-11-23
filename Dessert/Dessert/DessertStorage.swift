@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+
 public class DessertStorage{
     public var map:[String:Set<UIView>]
     
@@ -29,5 +30,7 @@ public class DessertStorage{
     public func kickOut<T:UIView>(type:T.Type)->T?{
         self.map["\(type)"]?.removeFirst() as? T
     }
-    public static let shared:DessertStorage = DessertStorage()
+    public func clean(){
+        self.map.removeAll()
+    }
 }
