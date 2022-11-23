@@ -5,9 +5,9 @@
 //  Created by KnowChat02 on 2019/10/24.
 //
 
-#import "BIOCRunTimeTool.h"
+#import "BIOCRuntimeTool.h"
 
-@implementation BIOCRunTimeTool
+@implementation BIOCRuntimeTool
 + (void)assignIVar:(NSDictionary<NSString *,id> *)kv ToObject:(id)object{
     
     Class cls = [object class];
@@ -121,14 +121,23 @@
                 selector:(SEL)selector
                 withType:(const char *)type
                      imp:(id)impBlock{
-    return class_addMethod(cls, selector, imp_implementationWithBlock(impBlock), type);
+   return class_addMethod(cls, selector, imp_implementationWithBlock(impBlock), type);
 }
-+ (BOOL)classImplamentProtocol:(Protocol *)proto
++ (void)implementMethodToClass:(Class)cls
+                selector:(SEL)selector
+                withType:(const char *)type
+                     imp:(id)impBlock{
+    BOOL success = [self addMethodToClass:cls selector:selector withType:type imp:impBlock];
+    if(!success){
+        method_setImplementation(class_getInstanceMethod(cls, selector), imp_implementationWithBlock(impBlock));
+    }
+}
++ (void)classImplamentProtocol:(Protocol *)proto
                       selector:(SEL)selector
                        toClass:(Class)cls
                            imp:(id)block{
     const char * c = protocol_getMethodDescription(proto, selector, false, true).types;
-    return [BIOCRunTimeTool addMethodToClass:cls selector:selector withType:c imp:block];
+    [BIOCRuntimeTool implementMethodToClass:cls selector:selector withType:c imp:block];
 }
 + (NSMethodSignature *)objectMethodSignature:(Protocol *)proto sel:(SEL)selector{
     NSString * r = [self objectMethodEncode:proto sel:selector];
@@ -147,6 +156,9 @@
         return [NSString stringWithUTF8String:c];
     }
     return nil;
+}
++ (Class)createClass:(Class)baseClass newClass:(NSString *)newClassName{
+    return objc_allocateClassPair(baseClass, newClassName.UTF8String, 0);
 }
 @end
 @implementation NSString (OCRuntime)

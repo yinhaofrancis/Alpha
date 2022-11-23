@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef void(^didSetBlock)(id,void * _Nullable);
 
-@interface BIOCRunTimeTool : NSObject
+@interface BIOCRuntimeTool : NSObject
 
 + (void)assignIVar:(NSDictionary<NSString *,id> *)kv
           ToObject:(id)object;
@@ -27,7 +27,7 @@ typedef void(^didSetBlock)(id,void * _Nullable);
 
 + (void)modifyClass:(id)object cls:(NSString*)className;
 
-+ (BOOL)addSameMethod:(SEL)selector
++ (void)addSameMethod:(SEL)selector
             encodeSel:(SEL)sameSel
               toClass:(Class)cls
                   imp:(id)impBlock;
@@ -57,11 +57,12 @@ typedef void(^didSetBlock)(id,void * _Nullable);
 /// @param selector selector
 /// @param cls 类
 /// @param block call
-+ (BOOL)classImplamentProtocol:(Protocol *)proto
++ (void)classImplamentProtocol:(Protocol *)proto
                       selector:(SEL)selector
                        toClass:(Class)cls
                            imp:(id)block;
 
++ (Class)createClass:(Class)baseClass newClass:(NSString *)newClassName;
 
 @end
 

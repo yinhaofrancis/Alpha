@@ -20,21 +20,13 @@
 @property(nonatomic,strong) NSDate *vc;
 
 @end
+static NSString* rr;
 
 @implementation vViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    BIInvocationProxy* a = [[BIInvocationProxy alloc] initWithProtocol:@protocol(MarkTool)];
-    [a implement:@selector(callbackcc:) methodBlock:^(NSInvocation * _Nonnull inv) {
-        NSLog(@"%@",inv);
-        [inv setReturnValue:@"aa"];
-    }];
-    NSString *ap = [a performSelector:@selector(callbackcc:) withObject:^(id c){
-        NSLog(@"%@",c);
-    }];
-    NSLog(@"%s",ap.UTF8String);
-    // Do any additional setup after loading the view.
+    BIImplementationProxy *p = [BIImplementationProxy.alloc initWithClass:UIView.class protocol:@protocol(MarkTool)];
 }
 - (id)callback:(id)a{
     NSLog(@"callback");

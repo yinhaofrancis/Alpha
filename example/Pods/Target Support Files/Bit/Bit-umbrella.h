@@ -14,7 +14,7 @@
 #import "BIAnotationStorage.h"
 #import "BIModule.h"
 #import "BIModuleManager.h"
-#import "BIOCRunTimeTool.h"
+#import "BIOCRuntimeTool.h"
 #import "BIProxy.h"
 #import "BIWeakContainer.h"
 #import "NSURL+BIURL.h"

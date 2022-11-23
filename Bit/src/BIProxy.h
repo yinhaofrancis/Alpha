@@ -29,13 +29,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface BIInvocationProxy : NSProxy
+@interface BIImplementationProxy : NSProxy
+
+
+@property(nonatomic,readonly) Class cls;
 
 @property(nonatomic,readonly) Protocol *proto;
 
-- (instancetype)initWithProtocol:(nullable Protocol*)proto;
+@property(nonatomic,readonly) id object;
 
-- (void)implement:(SEL)selector methodBlock:(void(^)(NSInvocation *))callback;
+- (instancetype)initWithClass:(Class)cls protocol:(nullable Protocol*)proto;
 
 @end
 

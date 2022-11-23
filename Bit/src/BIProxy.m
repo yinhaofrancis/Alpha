@@ -10,7 +10,7 @@
 #import <objc/runtime.h>
 
 
-#import "BIOCRunTimeTool.h"
+#import "BIOCRuntimeTool.h"
 
 
 NSString * const BIProxyRunloopMode = @"BIProxyRunloop";
@@ -22,7 +22,7 @@ NSString * const BIProxyRunloopMode = @"BIProxyRunloop";
         return a;
     }
     if(self.proto){
-        [BIOCRunTimeTool classImplamentProtocol:self.proto selector:sel toClass:self.class imp:^(id obj){
+        [BIOCRuntimeTool classImplamentProtocol:self.proto selector:sel toClass:self.class imp:^(id obj){
             NSLog(@"%@",obj);
         }];
         struct objc_method_description des = protocol_getMethodDescription(self.proto, sel, false, true);
@@ -70,7 +70,7 @@ NSString * const BIProxyRunloopMode = @"BIProxyRunloop";
         dispatch_queue_set_specific(self.queue, "self", (__bridge void * _Nullable)(self), NULL);
     }
     _lock = dispatch_semaphore_create(1);
-    [BIOCRunTimeTool modifyClass:self cls:[NSString stringWithFormat:@"%@+%@",NSStringFromClass(self.class),NSStringFromProtocol(proto)]];
+    [BIOCRuntimeTool modifyClass:self cls:[NSString stringWithFormat:@"%@+%@",NSStringFromClass(self.class),NSStringFromProtocol(proto)]];
     return self;
 }
 
@@ -96,33 +96,17 @@ NSString * const BIProxyRunloopMode = @"BIProxyRunloop";
 }
 @end
 
-@implementation BIInvocationProxy{
-    NSMutableDictionary<NSString *,void (^)(NSInvocation * _Nonnull)> *map;
-    dispatch_semaphore_t lock;
-}
+@implementation BIImplementationProxy
 
-- (void)implement:(SEL)selector methodBlock:(void (^)(NSInvocation * _Nonnull))callback{
-    dispatch_semaphore_wait(lock, DISPATCH_TIME_FOREVER);
-    map[NSStringFromSelector(selector)] = callback;
-    dispatch_semaphore_signal(lock);
-}
-
-- (NSMethodSignature *)methodSignatureForSelector:(SEL)sel{
-    return [BIOCRunTimeTool objectMethodSignature:self.proto sel:sel];
-}
-- (void)forwardInvocation:(NSInvocation *)invocation{
+- (instancetype)initWithClass:(Class)cls protocol:(Protocol *)proto
+{
     
-    dispatch_semaphore_wait(lock, DISPATCH_TIME_FOREVER);
-    void (^call)(NSInvocation * _Nonnull) = map[NSStringFromSelector(invocation.selector)];
-    dispatch_semaphore_signal(lock);
-    if(call){
-        call(invocation);
-    }
-}
-- (instancetype)initWithProtocol:(Protocol *)proto {
-    _proto = proto;
-    map = [NSMutableDictionary new];
-    lock = dispatch_semaphore_create(1);
+    self->_proto = proto;
+    Class newc = [BIOCRuntimeTool createClass:cls
+                        newClass:[NSString stringWithFormat:@"%@+%@+%@",NSStringFromClass(cls),NSStringFromProtocol(proto),[[NSUUID UUID] UUIDString]]];
+    _object = class_createInstance(newc, 0);
+    self->_cls = newc;
     return self;
 }
+
 @end
