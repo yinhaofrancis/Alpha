@@ -37,5 +37,5 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)assignAllModule:(id<NSObject>)object baseClass:(nullable Class)cls;
 
 @end
-
+void dyldPath(void);
 NS_ASSUME_NONNULL_END

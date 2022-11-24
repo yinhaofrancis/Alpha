@@ -7,6 +7,7 @@
 
 #import <Foundation/Foundation.h>
 #import <objc/runtime.h>
+#import <objc/message.h>
 NS_ASSUME_NONNULL_BEGIN
 
 typedef void(^didSetBlock)(id,void * _Nullable);
@@ -25,12 +26,8 @@ typedef void(^didSetBlock)(id,void * _Nullable);
             with:(SEL)swizzledSelector
              cls:(Class)className;
 
-+ (void)modifyClass:(id)object cls:(NSString*)className;
++ (void)modifyClass:(id)object cls:(Class)cls;
 
-+ (void)addSameMethod:(SEL)selector
-            encodeSel:(SEL)sameSel
-              toClass:(Class)cls
-                  imp:(id)impBlock;
 
 /// 尝试添加方法
 /// @param cls 类
@@ -81,7 +78,5 @@ typedef void(^didSetBlock)(id,void * _Nullable);
     objc_setAssociatedObject(self, "\"____"#name"\"", v, memory); \
 } \
 
-@interface NSString (OCRuntime)
-@property(nonatomic,readonly) NSString* firstCapitalizedString;
-@end
+
 NS_ASSUME_NONNULL_END

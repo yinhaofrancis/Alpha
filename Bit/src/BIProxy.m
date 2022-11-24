@@ -9,7 +9,6 @@
 #import "BIProxy.h"
 #import <objc/runtime.h>
 
-
 #import "BIOCRuntimeTool.h"
 
 
@@ -23,7 +22,7 @@ NSString * const BIProxyRunloopMode = @"BIProxyRunloop";
     }
     if(self.proto){
         [BIOCRuntimeTool classImplamentProtocol:self.proto selector:sel toClass:self.class imp:^(id obj){
-            NSLog(@"%@",obj);
+            
         }];
         struct objc_method_description des = protocol_getMethodDescription(self.proto, sel, false, true);
         return [NSMethodSignature signatureWithObjCTypes:des.types];
@@ -70,7 +69,6 @@ NSString * const BIProxyRunloopMode = @"BIProxyRunloop";
         dispatch_queue_set_specific(self.queue, "self", (__bridge void * _Nullable)(self), NULL);
     }
     _lock = dispatch_semaphore_create(1);
-    [BIOCRuntimeTool modifyClass:self cls:[NSString stringWithFormat:@"%@+%@",NSStringFromClass(self.class),NSStringFromProtocol(proto)]];
     return self;
 }
 
@@ -96,17 +94,33 @@ NSString * const BIProxyRunloopMode = @"BIProxyRunloop";
 }
 @end
 
-@implementation BIImplementationProxy
+@implementation BIWrap
 
-- (instancetype)initWithClass:(Class)cls protocol:(Protocol *)proto
-{
+- (instancetype)initWithObject:(id)object{
+    self->_object = object;
+    NSString *str = [NSString stringWithFormat:@"%@:%@",NSStringFromClass([object class]),@(self.hash)];
+    self->_cls = objc_duplicateClass([object class], str.UTF8String, 0);
+    object_setClass(_object, _cls);
     
-    self->_proto = proto;
-    Class newc = [BIOCRuntimeTool createClass:cls
-                        newClass:[NSString stringWithFormat:@"%@+%@+%@",NSStringFromClass(cls),NSStringFromProtocol(proto),[[NSUUID UUID] UUIDString]]];
-    _object = class_createInstance(newc, 0);
-    self->_cls = newc;
     return self;
 }
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)sel {
+    if([self.object respondsToSelector:sel]){
+        id a = [self.object methodSignatureForSelector:sel];
+        return a;
+    }
+    return nil;
+}
 
+- (void)forwardInvocation:(NSInvocation *)invocation{
+    [invocation invokeWithTarget:self.object];
+}
+
+- (BOOL)overrideMethod:(SEL)seletor callback:(id)callback{
+    Method m = class_getInstanceMethod(self.cls, seletor);
+    if (m){
+        return [BIOCRuntimeTool addMethodToClass:self.cls selector:seletor withType:method_getTypeEncoding(m) imp:callback];
+    }
+    return false;
+}
 @end

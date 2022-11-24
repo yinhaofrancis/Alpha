@@ -13,9 +13,6 @@ import Bit
 import Dessert
 class ViewController: UIViewController {
 
-    lazy var bi = {
-        return BIProxy(object: self)
-    }()
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.

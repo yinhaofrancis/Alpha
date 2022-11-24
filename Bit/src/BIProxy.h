@@ -29,16 +29,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface BIImplementationProxy : NSProxy
+@interface BIWrap<T:NSObject *> : NSProxy
 
 
 @property(nonatomic,readonly) Class cls;
 
-@property(nonatomic,readonly) Protocol *proto;
+@property(nonatomic,readonly) T object;
 
-@property(nonatomic,readonly) id object;
+- (instancetype)initWithObject:(T)object;
 
-- (instancetype)initWithClass:(Class)cls protocol:(nullable Protocol*)proto;
+- (BOOL)overrideMethod:(SEL)seletor callback:(id)callback;
 
 @end
 

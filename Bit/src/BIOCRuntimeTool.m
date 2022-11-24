@@ -41,9 +41,8 @@
     
     return newProtocol;
 }
-+ (void)modifyClass:(id)object cls:(NSString*)className{
-    Class newClass = objc_allocateClassPair([object class], className.UTF8String, 0);
-    object_setClass(object,newClass);
++ (void)modifyClass:(id)object cls:(Class)cls{
+    object_setClass(object,cls);
 }
 +(void)swizzing:(SEL)originalSelector
            with:(SEL)swizzledSelector
@@ -69,13 +68,6 @@
                                       originalMethod,
                                       swizzledMethod);
     }
-}
-
-+ (BOOL)addSameMethod:(SEL)selector encodeSel:(nonnull SEL)sameSel toClass:(nonnull Class)cls imp:(nonnull id)impBlock{
-    
-    Method m = class_getInstanceMethod(cls, selector);
-    
-    return class_addMethod(cls, sameSel, imp_implementationWithBlock(impBlock), method_getTypeEncoding(m));
 }
 
 + (NSArray<NSString *> *)propertyInClass:(Class)cls{
@@ -158,19 +150,8 @@
     return nil;
 }
 + (Class)createClass:(Class)baseClass newClass:(NSString *)newClassName{
-    return objc_allocateClassPair(baseClass, newClassName.UTF8String, 0);
+    Class nclass = objc_allocateClassPair(baseClass, newClassName.UTF8String, 0);
+    objc_registerClassPair(nclass);
+    return nclass;
 }
-@end
-@implementation NSString (OCRuntime)
-
-- (NSString *)firstCapitalizedString{
-    NSString* resultStr;
-    if(self.length>0) {
-        resultStr = [self stringByReplacingCharactersInRange:NSMakeRange(0,1)
-                                                  withString:[[self substringToIndex:1] capitalizedString]];
-    }
-    return resultStr;
-}
-
-
 @end

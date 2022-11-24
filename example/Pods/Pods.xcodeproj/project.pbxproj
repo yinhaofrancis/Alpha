@@ -163,7 +163,6 @@
 
 /* Begin PBXFileReference section */
 		03556FF259CFC1624EF1F60D0FB5487F /* Bit */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Bit; path = Bit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		07255B0B8E738937722ADBF93C526197 /* Database.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; path = Database.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		0AB3C260DA2DB4E7C42456AFF1A899D8 /* butterfly-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "butterfly-dummy.m"; sourceTree = "<group>"; };
 		0AF11F4A2746615E1A7CCE6E3118BF18 /* SPUAlert.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = SPUAlert.release.xcconfig; sourceTree = "<group>"; };
 		0B795D63A99D81D6AD1BAC5BEEC4BEE1 /* DatabaseUpdate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DatabaseUpdate.swift; path = database/DatabaseUpdate.swift; sourceTree = "<group>"; };
@@ -211,6 +210,7 @@
 		6734BF5695ED35CF72EC00D60D0A0A3F /* Pods-example-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-example-frameworks.sh"; sourceTree = "<group>"; };
 		67ADDC0A24D39A2B07FDB0E868EAF672 /* Dessert.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Dessert.release.xcconfig; sourceTree = "<group>"; };
 		69015CED6EEB14BEA1188DB14A3BA41C /* Pods-example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-example.release.xcconfig"; sourceTree = "<group>"; };
+		6B53867F5D05F2052C6705AEDB475D07 /* database.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; path = database.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		6BC90A8B7CCFCE3BB764770CCAC5C6F9 /* Database-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Database-Info.plist"; sourceTree = "<group>"; };
 		6F63DA085FAFAB297259A314F209570B /* Dessert-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Dessert-dummy.m"; sourceTree = "<group>"; };
 		73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
@@ -507,7 +507,7 @@
 				2E8527FC82F751C8A12087B725B76213 /* DatabaseModel.swift */,
 				0B795D63A99D81D6AD1BAC5BEEC4BEE1 /* DatabaseUpdate.swift */,
 				0DA41B079EC58420497EDEEBB65520C7 /* DatabaseWorkFlow.swift */,
-				E401487A80A3E036F369470E909BF57E /* Pod */,
+				C6FD694FEB6CFE4F362D72A440D1B330 /* Pod */,
 				1CD3E1958CD356C905AA312207818C51 /* Support Files */,
 			);
 			name = Database;
@@ -588,6 +588,14 @@
 			name = Pod;
 			sourceTree = "<group>";
 		};
+		C6FD694FEB6CFE4F362D72A440D1B330 /* Pod */ = {
+			isa = PBXGroup;
+			children = (
+				6B53867F5D05F2052C6705AEDB475D07 /* database.podspec */,
+			);
+			name = Pod;
+			sourceTree = "<group>";
+		};
 		CF1408CF629C7361332E53B88F7BD30C = {
 			isa = PBXGroup;
 			children = (
@@ -643,14 +651,6 @@
 			);
 			name = "Support Files";
 			path = "../example/Pods/Target Support Files/RenderImage";
-			sourceTree = "<group>";
-		};
-		E401487A80A3E036F369470E909BF57E /* Pod */ = {
-			isa = PBXGroup;
-			children = (
-				07255B0B8E738937722ADBF93C526197 /* Database.podspec */,
-			);
-			name = Pod;
 			sourceTree = "<group>";
 		};
 		F72C1960A5609894A6F5CBB607D8E9EB /* Bit */ = {

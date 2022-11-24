@@ -7,7 +7,7 @@
 
 #import "ViewController.h"
 @import Bit;
-
+#import <mach-o/loader.h>
 
 @protocol MarkTool <NSObject>
 
@@ -26,13 +26,18 @@ static NSString* rr;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    BIImplementationProxy *p = [BIImplementationProxy.alloc initWithClass:UIView.class protocol:@protocol(MarkTool)];
+    BIWrap<UIView *> *p = [[BIWrap<UIView *> alloc] initWithObject:[UIView new]];
+    [self.view addSubview:p.object];
+    p.object.frame = CGRectMake(10, 10, 100, 100);
+    p.object.backgroundColor = UIColor.redColor;
+    dyldPath();
 }
 - (id)callback:(id)a{
     NSLog(@"callback");
     for (int i = 0; i < 10; i++){
         sleep(1);
     }
+    
     return @(1);
 }
 - (void)callback:(id)a ret:(void(^)(id))ret{
@@ -42,5 +47,9 @@ static NSString* rr;
 @synthesize index;
 
 @end
+
+
+
+
 
 BIRouter(UIViewController, MarkTool, vViewController)

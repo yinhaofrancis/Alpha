@@ -12,6 +12,7 @@ target 'example' do
   pod 'SPUAlert',:path =>'../SPUAlert'
   pod 'Bit',:path =>'../Bit'
   pod 'Dessert',:path =>'../Dessert'
+#  pod 'LookinServer'
 end
 
 target 'testBIT' do
@@ -22,4 +23,5 @@ target 'testBIT' do
   pod 'SPUAlert',:path =>'../SPUAlert'
   pod 'Bit',:path =>'../Bit'
   pod 'Dessert',:path =>'../Dessert'
+#  pod 'LookinServer'
 end

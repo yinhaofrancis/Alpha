@@ -6,7 +6,7 @@
 //  Copyright © 2019 KnowChat02. All rights reserved.
 //
 #import <objc/runtime.h>
-
+#import <mach-o/dyld.h>
 
 #import "BIModuleManager.h"
 #import "BIModule.h"
@@ -263,3 +263,11 @@ static BIModuleManager *instance;
     return [self getInstanceClassByName:NSStringFromProtocol(proto) baseClass:cls];
 }
 @end
+
+void dyldPath(void){
+    uint32_t c = _dyld_image_count();
+    
+    for (int i = 0;i < c; i++){
+        NSLog(@"%@",[NSString stringWithCString:_dyld_get(i) encoding:NSUTF8StringEncoding]);
+    }
+}
