@@ -1,5 +1,5 @@
 //
-//  DessertStorage.swift
+//  DesserPool.swift
 //  Dessert
 //
 //  Created by wenyang on 2022/11/22.
@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-public class DessertStorage{
+public class DesserPool{
     public var map:[String:Set<UIView>]
     
     public init(){
@@ -19,16 +19,14 @@ public class DessertStorage{
         var sets = map[typestring]
         if(sets == nil){
             sets = Set()
+            map[typestring] = sets
         }
         sets?.insert(view)
-        map[typestring] = sets
-        for i in view.subviews{
-            self.cache(view: i)
-            i .removeFromSuperview()
-        }
+        view.removeFromSuperview()
     }
-    public func kickOut<T:UIView>(type:T.Type)->T?{
-        self.map["\(type)"]?.removeFirst() as? T
+    public func kickOut<T:UIView>(type:T.Type)->T{
+        guard let v = self.map["\(type)"]?.removeFirst() as? T else { return T()}
+        return v
     }
     public func clean(){
         self.map.removeAll()
