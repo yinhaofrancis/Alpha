@@ -262,7 +262,9 @@ static BIModuleManager *instance;
 - (Class)getInstanceClassByProtocol:(Protocol *)proto baseClass:(Class)cls{
     return [self getInstanceClassByName:NSStringFromProtocol(proto) baseClass:cls];
 }
-
+- (id)performTarget:(NSString *)name selector:(NSString *)selector param:(NSArray *)arrays{
+    return [self performTarget:name baseClass:nil selector:selector param:arrays];
+}
 - (id)performTarget:(NSString *)name baseClass:(Class)cls selector:(NSString *)selector param:(NSArray *)arrays{
     id target = [self getInstanceByName:name baseClass:cls withParam:nil];
     SEL sel = NSSelectorFromString(selector);
@@ -474,9 +476,17 @@ static BIModuleManager *instance;
 -(void *)realPtr:(void*)value{
     return (*(void**)(value));
 }
-- (id)performTarget:(NSString *)name selector:(NSString *)selector param:(NSArray *)arrays{
-   
-    return [self performTarget:name baseClass:nil selector:selector param:arrays];
+- (id)performTarget:(NSString *)name baseClass:(Class)cls selector:(NSString *)selector params:(nonnull id)param,...{
+    id objcid = param;
+    va_list args;
+    NSMutableArray * array = [NSMutableArray new];
+    va_start(args, param);
+    while (objcid != nil) {
+        [array addObject:objcid];
+        objcid = va_arg(args, id);
+    }
+    va_end(args);
+    return [self performTarget:name baseClass:cls selector:selector param:array];
 }
 @end
 BIModuleManager * BIM(void){

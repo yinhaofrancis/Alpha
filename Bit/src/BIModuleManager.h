@@ -10,6 +10,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+#define BI_FORMAT(F,A) __attribute__((format(id, F, A)))
+
 @interface BIModuleManager : NSObject
 
 +(instancetype)shared;
@@ -40,7 +42,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)performTarget:(NSString *)name baseClass:(nullable Class)cls selector:(NSString *)selector param:(NSArray *)arrays;
 
+- (id)performTarget:(NSString *)name baseClass:(nullable Class)cls selector:(NSString *)selector params:(id)args,... NS_REQUIRES_NIL_TERMINATION;
+
 @end
-BIModuleManager * BIM(void);
+ BIModuleManager * _Nonnull BIM(void); 
+
 NS_ASSUME_NONNULL_END
 
