@@ -18,6 +18,8 @@
 
 static BIModuleManager *instance;
 
+static inline void * getRealPtr(void* value);
+
 @implementation BIModuleManager{
     NSMutableDictionary<NSString *,Class> *regModules;
     NSMutableDictionary<NSString *,id> *singletons;
@@ -471,12 +473,10 @@ static BIModuleManager *instance;
 
         return [[NSString alloc] initWithCString:result encoding:NSASCIIStringEncoding];
     }
-    return (__bridge id)[self realPtr:value];
+    return (__bridge id)getRealPtr(value);
 }
--(void *)realPtr:(void*)value{
-    return (*(void**)(value));
-}
-- (id)performTarget:(NSString *)name baseClass:(Class)cls selector:(NSString *)selector params:(nonnull id)param,...{
+
+- (id)performTarget:(NSString *)name selector:(NSString *)selector params:(nonnull id)param,...{
     id objcid = param;
     va_list args;
     NSMutableArray * array = [NSMutableArray new];
@@ -486,9 +486,31 @@ static BIModuleManager *instance;
         objcid = va_arg(args, id);
     }
     va_end(args);
-    return [self performTarget:name baseClass:cls selector:selector param:array];
+    return [self performTarget:name selector:selector param:array];
 }
 @end
-BIModuleManager * BIM(void){
+
+@implementation NSObject (BIM)
++ (id)performTarget:(NSString *)name selector:(NSString *)selector params:(id)param,...{
+    id objcid = param;
+    va_list args;
+    NSMutableArray * array = [NSMutableArray new];
+    va_start(args, param);
+    while (objcid != nil) {
+        [array addObject:objcid];
+        objcid = va_arg(args, id);
+    }
+    va_end(args);
+    return [BIM() performTarget:name baseClass:[self class] selector:selector param:array];
+}
+
+
+@end
+
+inline BIModuleManager * BIM(void){
     return BIModuleManager.shared;
+}
+
+static inline void * getRealPtr(void* value){
+    return (*(void**)(value));
 }

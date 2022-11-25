@@ -33,7 +33,7 @@ static NSString* rr;
     [self.view addSubview:p.object];
     p.object.frame = CGRectMake(10, 10, 100, 100);
     p.object.backgroundColor = UIColor.redColor;
-    NSString* s = [BIM() performTarget:@"MarkTool" baseClass:UIViewController.class selector:@"callbackcc:" params:@"123", nil];
+    NSString* s = [UIViewController performTarget:@"MarkTool" selector:@"callbackcc:" params:@"123", nil];
     NSString* s1 = [BIM() performTarget:@"MarkTool" baseClass:UIViewController.class selector:@"callbackccd:" param:@[@"123"]];
     NSString* s2 = [BIM() performTarget:@"MarkTool" baseClass:UIViewController.class selector:@"callbackcd:" param:@[@(123)]];
     NSString* s3 = [BIM() performTarget:@"MarkTool" baseClass:UIViewController.class selector:@"callback:ret:" param:@[@{@"dd":@"ddd"},^void(id a){

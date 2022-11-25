@@ -42,10 +42,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)performTarget:(NSString *)name baseClass:(nullable Class)cls selector:(NSString *)selector param:(NSArray *)arrays;
 
-- (id)performTarget:(NSString *)name baseClass:(nullable Class)cls selector:(NSString *)selector params:(id)args,... NS_REQUIRES_NIL_TERMINATION;
+- (id)performTarget:(NSString *)name selector:(NSString *)selector params:(id)args,... NS_REQUIRES_NIL_TERMINATION;
 
 @end
- BIModuleManager * _Nonnull BIM(void); 
+
+@interface NSObject (BIM)
++ (id)performTarget:(NSString *)name selector:(NSString *)selector params:(id)param,... NS_REQUIRES_NIL_TERMINATION;
+@end
+
+BIModuleManager * _Nonnull BIM(void);
 
 NS_ASSUME_NONNULL_END
 
