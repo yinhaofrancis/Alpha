@@ -36,6 +36,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)assignAllModule:(id<NSObject>)object baseClass:(nullable Class)cls;
 
+- (id)performTarget:(NSString *)name selector:(NSString *)selector param:(NSArray *)arrays;
+
+- (id)performTarget:(NSString *)name baseClass:(nullable Class)cls selector:(NSString *)selector param:(NSArray *)arrays;
+
 @end
-void dyldPath(void);
+BIModuleManager * BIM(void);
 NS_ASSUME_NONNULL_END
+

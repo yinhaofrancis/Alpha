@@ -81,3 +81,5 @@ extension UIViewController:PathRoutable{
 public class BTFViewController<T>:UIViewController,ParamRoutable{
     public var param: RouteParam<T>?
 }
+
+public let BR = ButterFlyRouter.shared

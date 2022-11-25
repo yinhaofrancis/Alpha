@@ -262,12 +262,223 @@ static BIModuleManager *instance;
 - (Class)getInstanceClassByProtocol:(Protocol *)proto baseClass:(Class)cls{
     return [self getInstanceClassByName:NSStringFromProtocol(proto) baseClass:cls];
 }
-@end
 
-void dyldPath(void){
-    uint32_t c = _dyld_image_count();
-    
-    for (int i = 0;i < c; i++){
-        NSLog(@"%@",[NSString stringWithCString:_dyld_get(i) encoding:NSUTF8StringEncoding]);
+- (id)performTarget:(NSString *)name baseClass:(Class)cls selector:(NSString *)selector param:(NSArray *)arrays{
+    id target = [self getInstanceByName:name baseClass:cls withParam:nil];
+    SEL sel = NSSelectorFromString(selector);
+    NSMethodSignature * sign = [target methodSignatureForSelector:sel];
+    if(sign == nil){
+        @throw [NSException exceptionWithName:@"perform fail" reason:@"invoke target action fail" userInfo:@{@"target":name,@"selector":selector,@"param":arrays}];
     }
+    NSInvocation* invo = [NSInvocation invocationWithMethodSignature:sign];
+    invo.target = target;
+    [invo setSelector:sel];
+    if(sign.numberOfArguments > 2){
+        for (int i = 2; i < sign.numberOfArguments; i++){
+            id param = arrays[i - 2];
+            if([NSNull.null isEqual:param]){
+                continue;
+            }
+            void * temp = malloc(sizeof(void*));
+            if ([self typeParamWrap:[sign getArgumentTypeAtIndex:i] value:param result:temp]){
+                [invo setArgument:temp atIndex:i];
+            }else{
+                [invo setArgument:&param atIndex:i];
+            }
+            free(temp);
+        }
+    }
+    [invo invoke];
+    
+    const char * retType = sign.methodReturnType;
+    if(strcmp(retType, @encode(void)) == 0){
+        return nil;
+    }
+    void * resultPtr = malloc(sign.methodReturnLength);
+    [invo getReturnValue:resultPtr];
+    id result = [self typeResultWrap:retType value:resultPtr];
+    free(resultPtr);
+    return result;
+}
+- (BOOL)typeParamWrap:(const char *)retType value:(id)value result:(void *)v{
+    if(strcmp(retType, @encode(void)) == 0){
+        return true;
+    }
+
+    if (strcmp(retType, @encode(char)) == 0) {
+        char val = [(NSNumber *) value charValue];
+        char *result = v;
+        *result = val;
+        return true;
+    }
+    if (strcmp(retType, @encode(int)) == 0) {
+        int val = [(NSNumber *) value intValue];
+        int *result = v;
+        *result = val;
+        return true;
+    }
+    if (strcmp(retType, @encode(short)) == 0) {
+        short val = [(NSNumber *) value shortValue];
+        short *result = v;
+        *result = val;
+        return true;
+    }
+    if (strcmp(retType, @encode(long)) == 0) {
+        long val = [(NSNumber *) value longValue];
+        long *result = v;
+        *result = val;
+        return true;
+    }
+    if (strcmp(retType, @encode(long long)) == 0) {
+        long long val = [(NSNumber *) value longLongValue];
+        long long *result = v;
+        *result = val;
+        return true;
+    }
+    
+    if (strcmp(retType, @encode(unsigned char)) == 0) {
+        unsigned char val = [(NSNumber *) value unsignedCharValue];
+        unsigned char *result = v;
+        *result = val;
+        return true;
+    }
+    if (strcmp(retType, @encode(unsigned int)) == 0) {
+        unsigned int val = [(NSNumber *) value unsignedIntValue];
+        unsigned int *result = v;
+        *result = val;
+        return true;
+    }
+    if (strcmp(retType, @encode(unsigned short)) == 0) {
+        unsigned short val = [(NSNumber *) value unsignedShortValue];
+        unsigned short *result = v;
+        *result = val;
+        return true;
+    }
+    if (strcmp(retType, @encode(unsigned long)) == 0) {
+        unsigned long val = [(NSNumber *) value unsignedLongValue];
+        unsigned long *result = v;
+        *result = val;
+        return true;
+    }
+    if (strcmp(retType, @encode(unsigned long long)) == 0) {
+        unsigned long long val = [(NSNumber *) value unsignedLongLongValue];
+        unsigned long long *result = v;
+        *result = val;
+        return true;
+    }
+    if (strcmp(retType, @encode(BOOL)) == 0) {
+        BOOL val = [(NSNumber *) value boolValue];
+        BOOL *result = v;
+        *result = val;
+        return true;
+    }
+    if (strcmp(retType, @encode(float)) == 0) {
+        float val = [(NSNumber *) value floatValue];
+        float *result = v;
+        *result = val;
+        return true;
+    }
+    if (strcmp(retType, @encode(double)) == 0) {
+        short val = [(NSNumber *) value shortValue];
+        short *result = v;
+        *result = val;
+        return true;
+    }
+    if (strcmp(retType, @encode(const char *)) == 0) {
+        const char* result = [(NSString*) value UTF8String];
+        memcpy(v, &result, sizeof(const char *));
+        return true;
+    }
+    memcpy(v, (__bridge const void *)(value), sizeof(void *));
+    return false;
+    
+}
+- (id)typeResultWrap:(const char *)retType value:(void *)value{
+    if(strcmp(retType, @encode(void)) == 0){
+        return nil;
+    }
+
+    if (strcmp(retType, @encode(char)) == 0) {
+        char result = *((char *)value);
+        
+        return @(result);
+    }
+    if (strcmp(retType, @encode(int)) == 0) {
+        int result = *((int *)value);
+
+        return @(result);
+    }
+    if (strcmp(retType, @encode(short)) == 0) {
+        short result = *((short *)value);
+
+        return @(result);
+    }
+    if (strcmp(retType, @encode(long)) == 0) {
+        long result = *((long *)value);
+
+        return @(result);
+    }
+    if (strcmp(retType, @encode(long long)) == 0) {
+        long long result =*((long long  *)value);
+
+        return @(result);
+    }
+    
+    if (strcmp(retType, @encode(unsigned char)) == 0) {
+        unsigned char result = *((unsigned char *)value);
+
+        return @(result);
+    }
+    if (strcmp(retType, @encode(unsigned int)) == 0) {
+        unsigned int result = *((unsigned int *)value);
+
+        return @(result);
+    }
+    if (strcmp(retType, @encode(unsigned short)) == 0) {
+        unsigned short result = *((unsigned short *)value);
+
+        return @(result);
+    }
+    if (strcmp(retType, @encode(unsigned long)) == 0) {
+        unsigned long result = *((unsigned long *)value);
+
+        return @(result);
+    }
+    if (strcmp(retType, @encode(unsigned long long)) == 0) {
+        unsigned long long result = *((unsigned long long *)value);
+
+        return @(result);
+    }
+    if (strcmp(retType, @encode(BOOL)) == 0) {
+        BOOL result = *((BOOL *)value);
+
+        return @(result);
+    }
+    if (strcmp(retType, @encode(float)) == 0) {
+        float result = *((float *)value);
+
+        return @(result);
+    }
+    if (strcmp(retType, @encode(double)) == 0) {
+        double result = *((double *)value);
+
+        return @(result);
+    }
+    if (strcmp(retType, @encode(const char *)) == 0 ||strcmp(retType, @encode(char *)) == 0) {
+        char* result = *((char **)value);
+
+        return [[NSString alloc] initWithCString:result encoding:NSASCIIStringEncoding];
+    }
+    return (__bridge id)[self realPtr:value];
+}
+-(void *)realPtr:(void*)value{
+    return (*(void**)(value));
+}
+- (id)performTarget:(NSString *)name selector:(NSString *)selector param:(NSArray *)arrays{
+   
+    return [self performTarget:name baseClass:nil selector:selector param:arrays];
+}
+@end
+BIModuleManager * BIM(void){
+    return BIModuleManager.shared;
 }
