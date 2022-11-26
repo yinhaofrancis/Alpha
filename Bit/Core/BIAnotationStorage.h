@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface BIAnotationStorage : NSObject
 + (instancetype)shared;
-- (void)addName:(NSString*)name key:(NSString *)key value:(NSString *)value;
+- (void)addBaseClass:(NSString*)name name:(NSString *)key impClassName:(Class)value;
 - (NSDictionary *)getEnvConfigByName:(NSString *)name;
 @end
 

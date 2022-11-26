@@ -22,6 +22,8 @@ typedef NSString* Route;
 
 -(void)backTo:(Route)route animation:(BOOL)animation;
 
+-(void)present:(Route)route animation:(BOOL)animation;
+
 @end
 
 

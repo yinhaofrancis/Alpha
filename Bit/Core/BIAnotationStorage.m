@@ -8,6 +8,7 @@
 #import "BIAnotationStorage.h"
 @implementation BIAnotationStorage{
     NSMutableDictionary<NSString *,NSMutableDictionary<NSString *,NSString *> *> * storage;
+    dispatch_semaphore_t lock;
 }
 +(instancetype)shared{
     static BIAnotationStorage* storage;
@@ -21,18 +22,22 @@
     self = [super init];
     if(self){
         storage = [[NSMutableDictionary alloc] init];
+        lock = dispatch_semaphore_create(1);
     }
     return self;
 }
-- (void)addName:(NSString *)name key:(NSString *)key value:(NSString *)value{
+- (void)addBaseClass:(NSString *)name name:(NSString *)key impClassName:(Class)value{
+    dispatch_semaphore_wait(lock, DISPATCH_TIME_FOREVER);
     if(!storage[name]){
         storage[name] = [[NSMutableDictionary alloc] init];
     }
     storage[name][key] = value;
+    dispatch_semaphore_signal(lock);
 }
 - (NSDictionary *)getEnvConfigByName:(NSString *)name{
     return [storage[name] copy];
 }
+
 @end
 
 @implementation BIBlockAnotationStorage{

@@ -11,25 +11,51 @@ import SPUAlert
 import butterfly
 import Bit
 import Dessert
+
+var ap = 0;
+@objc
 class ViewController: UIViewController {
 
+    
+    @objc(navi)var navi:BINavigator?{
+        didSet{
+            
+        }
+    }
+    @objc var mvn:(UIView & mm)?{
+        didSet{
+            self.mvn?.backgroundColor = UIColor.red
+            self.mvn?.frame = CGRect(x: 0, y: 0, width: 100, height: 100);
+            self.view .addSubview(self.mvn!)
+            
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
-        BIM().getInstanceBy(mm.self)
-        ButterFlyRouter.shared.register(route: Router(proto: mm.self, cls: VV.self))
-        ButterFlyRouter.shared.register(route: PathRouter(name:"/a/b/c",cls: VV.self))
-        ButterFlyRouter.shared.register(route: Router(proto: mmm.self, cls: VV.self))
+        
+        if ap == 0{
+            ap += 1
+            BIM().regModuleBaseClass(UIViewController.self, withName: "ex", implement: ViewController.self)
+            BIM().regModuleBaseClass(UIView.self, withName: "mm", implement: VV.self)
+            let vc = UIViewController.getInstanceByName("ex", params: nil)
+            self .present(vc!, animated: true)
+            
+        }        // Do any additional setup after loading the view.
+        
+        
+        
     }
 
     @butterfly
     var a:mm?
 }
 
-@objc
+@objc(mm)
 public protocol mm{
     var s:String? { get set }
 }
+
 public protocol mmm:UIView{
     var ss:String? { get set }
 }

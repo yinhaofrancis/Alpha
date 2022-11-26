@@ -16,6 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 +(instancetype)shared;
 
+- (void)regModuleBaseClass:(Class)baseClass WithName:(NSString *)name implement:(Class)cls;
+
 - (void)regModuleWithName:(NSString *)name implement:(Class)cls;
 
 - (void)regModuleWithProtocol:(Protocol *)proto implement:(Class)cls;

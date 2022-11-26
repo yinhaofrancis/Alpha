@@ -25,10 +25,10 @@
             </objects>
             <point key="canvasLocation" x="1895.3846153846152" y="3.5545023696682461"/>
         </scene>
-        <!--Navi View Controller-->
+        <!--Navigation Controller-->
         <scene sceneID="QhN-MC-Hj3">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="itn-8A-IF5" customClass="NaviViewController" customModule="example" customModuleProvider="target" sceneMemberID="viewController">
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="itn-8A-IF5" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="9wI-fC-kOe">
                         <rect key="frame" x="0.0" y="47" width="390" height="44"/>

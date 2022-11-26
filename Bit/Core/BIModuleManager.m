@@ -43,7 +43,9 @@ static inline void * getRealPtr(void* value);
     });
     return instance;
 }
-
+- (void)regModuleBaseClass:(Class)baseClass WithName:(NSString *)name implement:(Class)cls{
+    [BIAnotationStorage.shared addBaseClass:NSStringFromClass(baseClass) name:name impClassName:cls];
+}
 - (void)regModuleWithName:(NSString *)name implement:(Class)cls {
 #if DEBUG
     NSAssert(name.length > 0, @"module name %@ is empty",name);
@@ -200,9 +202,10 @@ static inline void * getRealPtr(void* value);
                     setter = [NSString stringWithUTF8String:ac[j].value];
                 }
             }
-            if(ivName.length > 0){
+            NSLog(@"%@,%@",pname,type);
+            Ivar iv = class_getInstanceVariable(cls, ivName.UTF8String);
+            if(ivName.length > 0 && strlen(ivar_getTypeEncoding(iv)) > 0){
                 id objecta = [self parserObject:type];
-                Ivar iv = class_getInstanceVariable(cls, ivName.UTF8String);
                 if(objecta && iv){
                     object_setIvar(object, iv, objecta);
                 }

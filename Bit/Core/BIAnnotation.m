@@ -64,7 +64,7 @@ static void dyld_callback(const struct mach_header *mhp, intptr_t vmaddr_slide){
                 NSString *info = [json allKeys][0];
                 NSDictionary *configure = ((NSDictionary *)json)[info];
                 if(info.length > 0 && configure.count > 0){
-                    [[BIAnotationStorage shared] addName:info key:configure.allKeys[0] value:NSClassFromString(configure.allValues[0])];
+                    [[BIAnotationStorage shared] addBaseClass:info name:configure.allKeys[0] impClassName:NSClassFromString(configure.allValues[0])];
                 }
             }
         }
