@@ -10,7 +10,7 @@ target 'example' do
   pod 'RenderImage',:path =>'../RenderImage'
   pod 'Database',:path =>'../Database'
   pod 'SPUAlert',:path =>'../SPUAlert'
-  pod 'Bit',:path =>'../Bit'
+  pod 'Bit/Navigation',:path =>'../Bit'
   pod 'Dessert',:path =>'../Dessert'
 #  pod 'LookinServer'
 end
@@ -21,7 +21,7 @@ target 'testBIT' do
   pod 'RenderImage',:path =>'../RenderImage'
   pod 'Database',:path =>'../Database'
   pod 'SPUAlert',:path =>'../SPUAlert'
-  pod 'Bit',:path =>'../Bit'
+  pod 'Bit/Navigation',:path =>'../Bit'
   pod 'Dessert',:path =>'../Dessert'
 #  pod 'LookinServer'
 end

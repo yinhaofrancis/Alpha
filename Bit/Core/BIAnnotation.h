@@ -37,7 +37,7 @@ char const * BI##owner##_##key##_##value##_contr_Annotation BIDATA(BISectCustom)
 
 #define BICustomAnnotationString(owner,key,value) \
 @class BIAnnotation; \
-char const * BI##owner##_##key##_contr_Annotation BIDATA(BISectCustom) =  "{\""#owner"\":{ \""#key"\" :\"" value"\"}}";
+char const * BI##owner##_##value##_contr_Annotation BIDATA(BISectCustom) =  "{\""#owner"\":{ \""key"\" :\""#value"\"}}";
 
 
 #define BIRouter(baseClass,proto,cls) \

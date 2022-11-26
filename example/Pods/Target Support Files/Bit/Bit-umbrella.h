@@ -18,6 +18,8 @@
 #import "BIProxy.h"
 #import "BIWeakContainer.h"
 #import "NSURL+BIURL.h"
+#import "BINavigator.h"
+#import "BINavitationViewController.h"
 
 FOUNDATION_EXPORT double BitVersionNumber;
 FOUNDATION_EXPORT const unsigned char BitVersionString[];

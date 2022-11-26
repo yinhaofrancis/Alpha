@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable Class)getInstanceClassByProtocol:(Protocol *)proto baseClass:(nullable Class)cls;
 
-- (void)assignAllModule:(id<NSObject>)object baseClass:(nullable Class)cls;
+- (void)assignAllModule:(id<NSObject>)object;
 
 - (id)performTarget:(NSString *)name selector:(NSString *)selector param:(NSArray *)arrays;
 
@@ -42,6 +42,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSObject (BIM)
 + (id)performTarget:(NSString *)name selector:(NSString *)selector params:(id)param,... NS_REQUIRES_NIL_TERMINATION;
+
++ (nullable instancetype)getInstanceByProtocol:(Protocol *)proto;
+
++ (nullable instancetype)getInstanceByName:(NSString *)name params:(nullable NSDictionary *)params;
+
 @end
 
 BIModuleManager * _Nonnull BIM(void);

@@ -29,17 +29,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface BIWrap<T:NSObject *> : NSProxy
-
-
-@property(nonatomic,readonly) Class cls;
-
-@property(nonatomic,readonly) T object;
-
-- (instancetype)initWithObject:(T)object;
-
-- (BOOL)overrideMethod:(SEL)seletor callback:(id)callback;
-
-@end
-
 NS_ASSUME_NONNULL_END

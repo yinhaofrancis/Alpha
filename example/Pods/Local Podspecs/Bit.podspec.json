@@ -18,6 +18,20 @@
   "platforms": {
     "ios": "12.0"
   },
-  "source_files": "src/**/*",
-  "public_header_files": "header/*.h"
+  "default_subspecs": "Core",
+  "subspecs": [
+    {
+      "name": "Core",
+      "source_files": "Core/**/*"
+    },
+    {
+      "name": "Navigation",
+      "source_files": "Navigation/**/*",
+      "dependencies": {
+        "Bit/Core": [
+
+        ]
+      }
+    }
+  ]
 }

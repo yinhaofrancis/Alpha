@@ -153,16 +153,16 @@ static inline void * getRealPtr(void* value);
             }
             if([inst class] == BIProxy.class){
                 BIProxy* proxy = inst;
-                [self assignAllModule:proxy.object baseClass:bcls];
+                [self assignAllModule:proxy.object];
             }else{
-                [self assignAllModule:inst baseClass:bcls];
+                [self assignAllModule:inst];
             }
             return inst;
         }
     }
     return nil;
 }
--(void)assignAllModule:(id<NSObject>)object baseClass:(Class)bcls{
+-(void)assignAllModule:(id<NSObject>)object{
     Class cls = object.class;
     while (cls != [NSObject class] && cls != nil) {
         uint c;
@@ -171,6 +171,10 @@ static inline void * getRealPtr(void* value);
             uint nn = 0;
             NSString* ivName;
             NSString* type;
+            BOOL isCopy = false;
+            BOOL isReadonly = false;
+            NSString *setter = nil;
+            NSString* pname = [[NSString alloc] initWithUTF8String:property_getName(ps[i])];
             objc_property_attribute_t * ac = property_copyAttributeList(ps[i], &nn);
             for (uint j = 0; j < nn; j++) {
                 NSString* name = [NSString stringWithUTF8String:ac[j].name];
@@ -185,24 +189,46 @@ static inline void * getRealPtr(void* value);
                     }else{
                         break;
                     }
-                    
+                }
+                if([name isEqualToString:@"C"]){
+                    isCopy = true;
+                }
+                if([name isEqualToString:@"R"]){
+                    isReadonly = true;
+                }
+                if([name isEqualToString:@"S"]){
+                    setter = [NSString stringWithUTF8String:ac[j].value];
                 }
             }
             if(ivName.length > 0){
-                id objecta = [self parserObject:type baseClass:bcls];
+                id objecta = [self parserObject:type];
                 Ivar iv = class_getInstanceVariable(cls, ivName.UTF8String);
                 if(objecta && iv){
                     object_setIvar(object, iv, objecta);
                 }
+            }else if(isReadonly == false){
+                id objecta = [self parserObject:type];
+                if (objecta){
+                    if(setter == nil){
+                        setter = [NSString stringWithFormat:@"set%@:",[pname capitalizedString]];
+                    }
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+                    SEL rSelector = NSSelectorFromString(setter);
+                    if([object respondsToSelector:rSelector]){
+                        [object performSelector:NSSelectorFromString(setter) withObject:objecta];
+                    }
+    #pragma clang diagnostic pop
+                }
             }
             free(ac);
-            
         }
         cls = class_getSuperclass(cls);
         free(ps);
     }
 }
--(id)parserObject:(NSString *)type baseClass:(Class)bcls{
+-(id)parserObject:(NSString *)type{
+    Class bcls;
     if([type hasPrefix:@"<"] && [type hasSuffix:@">"]){
         type = [type substringWithRange:NSMakeRange(1, type.length - 2)];
     }else if([type containsString:@"<"] && [type hasSuffix:@">"]){
@@ -503,8 +529,12 @@ static inline void * getRealPtr(void* value);
     va_end(args);
     return [BIM() performTarget:name baseClass:[self class] selector:selector param:array];
 }
-
-
++ (instancetype)getInstanceByProtocol:(Protocol *)proto{
+    return [BIM() getInstanceByProtocol:proto baseClass:[self class]];
+}
++ (instancetype)getInstanceByName:(NSString *)name params:(nullable NSDictionary *)params{
+    return [BIM() getInstanceByName:name baseClass:[self class] withParam:params];
+}
 @end
 
 inline BIModuleManager * BIM(void){

@@ -93,34 +93,3 @@ NSString * const BIProxyRunloopMode = @"BIProxyRunloop";
     return [self isMemberOfClass:aClass];
 }
 @end
-
-@implementation BIWrap
-
-- (instancetype)initWithObject:(id)object{
-    self->_object = object;
-    NSString *str = [NSString stringWithFormat:@"%@:%@",NSStringFromClass([object class]),@(self.hash)];
-    self->_cls = objc_duplicateClass([object class], str.UTF8String, 0);
-    object_setClass(_object, _cls);
-    
-    return self;
-}
-- (NSMethodSignature *)methodSignatureForSelector:(SEL)sel {
-    if([self.object respondsToSelector:sel]){
-        id a = [self.object methodSignatureForSelector:sel];
-        return a;
-    }
-    return nil;
-}
-
-- (void)forwardInvocation:(NSInvocation *)invocation{
-    [invocation invokeWithTarget:self.object];
-}
-
-- (BOOL)overrideMethod:(SEL)seletor callback:(id)callback{
-    Method m = class_getInstanceMethod(self.cls, seletor);
-    if (m){
-        return [BIOCRuntimeTool addMethodToClass:self.cls selector:seletor withType:method_getTypeEncoding(m) imp:callback];
-    }
-    return false;
-}
-@end

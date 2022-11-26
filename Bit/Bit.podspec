@@ -29,9 +29,16 @@ francis private Module with objective-C
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '12.0'
+  s.default_subspec = "Core"
 
-  s.source_files = 'src/**/*'
   
-  s.public_header_files = 'header/*.h'
+  s.subspec 'Core' do |cs|
+    cs.source_files = 'Core/**/*'
+  end
+  
+  s.subspec 'Navigation' do |na|
+    na.source_files = 'Navigation/**/*'
+    na.dependency  'Bit/Core'
+  end
   
 end
