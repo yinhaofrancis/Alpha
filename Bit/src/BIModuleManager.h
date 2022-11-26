@@ -20,15 +20,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)regModuleWithProtocol:(Protocol *)proto implement:(Class)cls;
 
-- (nullable id)getInstanceByUrl:(NSURL *)name;
-
 - (nullable id)getInstanceByProtocol:(Protocol *)proto baseClass:(Class)cls;
 
 - (nullable id)getInstanceByProtocol:(Protocol *)proto;
-
-- (void)cleanInstanceByName:(NSString *)name;
-
-- (void)cleanInstanceByProtocol:(Protocol *)proto;
 
 - (NSArray<id> *)allSingltenObject;
 
