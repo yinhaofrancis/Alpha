@@ -64,21 +64,13 @@ static inline void * getRealPtr(void* value);
 - (void)regModuleWithProtocol:(Protocol *)proto implement:(Class)cls {
     [self regModuleWithName:NSStringFromProtocol(proto) implement:cls];
 }
-- (id)getInstanceByName:(NSString *)name {
-    return [self getInstanceByName:name withParam:nil];
-}
-- (id)getInstanceByUrl:(NSURL *)name{
-    NSString* path = name.path;
-    NSDictionary* param = [name bi_param];
-    return [self getInstanceByName:path withParam:param];
-}
 - (id)getInstanceByProtocol:(Protocol *)proto baseClass:(Class)cls{
-    return [self getInstanceByName:NSStringFromProtocol(proto) baseClass:cls withParam:nil];
+    return [self getInstanceByName:NSStringFromProtocol(proto) baseClass:cls];
 }
-- (id)getInstanceByName:(NSString *)name withParam:(NSDictionary *)param{
-    return [self getInstanceByName:name baseClass:nil withParam:param];
+- (id)getInstanceByName:(NSString *)name{
+    return [self getInstanceByName:name baseClass:nil];
 }
-- (id)getInstanceByName:(NSString *)name baseClass:(Class)bcls withParam:(NSDictionary *)param{
+- (id)getInstanceByName:(NSString *)name baseClass:(Class)bcls{
     if(name.length == 0){
         return nil;
     }
@@ -100,21 +92,11 @@ static inline void * getRealPtr(void* value);
         return inst;
     }else{
         if(cls != nil){
-            if(param != nil){
-                
-                inst = [cls alloc];
-                if ([inst respondsToSelector:@selector(setName:)]){
-                    [inst setName:name];
-                }
-                inst = [inst initWithParam:param];
-            }else{
-                inst = [cls alloc];
-                if ([inst respondsToSelector:@selector(setName:)]){
-                    [inst setName:name];
-                }
-                inst = [inst init];
+            inst = [cls alloc];
+            if ([inst respondsToSelector:@selector(setName:)]){
+                [inst setName:name];
             }
-            
+            inst = [inst init];
             if([cls conformsToProtocol:@protocol(BIModuleThreadConfigure)]){
                 if([cls respondsToSelector:@selector(globalQos)]){
                     dispatch_queue_t q = dispatch_get_global_queue([cls globalQos], 0);
@@ -202,7 +184,6 @@ static inline void * getRealPtr(void* value);
                     setter = [NSString stringWithUTF8String:ac[j].value];
                 }
             }
-            NSLog(@"%@,%@",pname,type);
             Ivar iv = class_getInstanceVariable(cls, ivName.UTF8String);
             if(ivName.length > 0 && strlen(ivar_getTypeEncoding(iv)) > 0){
                 id objecta = [self parserObject:type];
@@ -249,7 +230,7 @@ static inline void * getRealPtr(void* value);
     }
     Class cls = [self getInstanceClassByName:type baseClass:bcls];
     if(cls){
-        return [self getInstanceByName:type baseClass:bcls withParam:nil];
+        return [self getInstanceByName:type baseClass:bcls];
     }
     return nil;
 }
@@ -297,7 +278,7 @@ static inline void * getRealPtr(void* value);
     return [self performTarget:name baseClass:nil selector:selector param:arrays];
 }
 - (id)performTarget:(NSString *)name baseClass:(Class)cls selector:(NSString *)selector param:(NSArray *)arrays{
-    id target = [self getInstanceByName:name baseClass:cls withParam:nil];
+    id target = [self getInstanceByName:name baseClass:cls];
     SEL sel = NSSelectorFromString(selector);
     NSMethodSignature * sign = [target methodSignatureForSelector:sel];
     if(sign == nil){
@@ -519,7 +500,19 @@ static inline void * getRealPtr(void* value);
 }
 @end
 
+const char * routeKey = "__route";
+
+const char * paramsKey = "__params";
+
 @implementation NSObject (BIM)
+
+- (Route)route{
+    return objc_getAssociatedObject(self, routeKey);
+}
+- (NSDictionary *)params{
+    return objc_getAssociatedObject(self, paramsKey);
+}
+
 + (id)performTarget:(NSString *)name selector:(NSString *)selector params:(id)param,...{
     id objcid = param;
     va_list args;
@@ -536,8 +529,13 @@ static inline void * getRealPtr(void* value);
     return [BIM() getInstanceByProtocol:proto baseClass:[self class]];
 }
 + (instancetype)getInstanceByName:(NSString *)name params:(nullable NSDictionary *)params{
-    return [BIM() getInstanceByName:name baseClass:[self class] withParam:params];
+    id instant = [BIM() getInstanceByName:name baseClass:[self class]];
+    objc_setAssociatedObject(instant, routeKey, name, OBJC_ASSOCIATION_COPY_NONATOMIC);
+    objc_setAssociatedObject(instant, paramsKey, params, OBJC_ASSOCIATION_COPY_NONATOMIC);
+    return instant;
 }
+
+
 @end
 
 inline BIModuleManager * BIM(void){

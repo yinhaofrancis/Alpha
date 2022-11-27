@@ -22,7 +22,7 @@ class ViewController: UIViewController {
             
         }
     }
-    @objc var mvn:(UIView & mm)?{
+    @objc private(set) var mvn:(UIView & mm)?{
         didSet{
             self.mvn?.backgroundColor = UIColor.red
             self.mvn?.frame = CGRect(x: 0, y: 0, width: 100, height: 100);
@@ -42,9 +42,6 @@ class ViewController: UIViewController {
             self .present(vc!, animated: true)
             
         }        // Do any additional setup after loading the view.
-        
-        
-        
     }
 
     @butterfly

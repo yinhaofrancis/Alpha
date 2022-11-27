@@ -7,8 +7,12 @@
 
 #import "AppDelegate.h"
 
-@interface AppDelegate ()
+#import "BINavigator.h"
+#import "BIModuleManager.h"
+#import "BIAnnotation.h"
 
+@interface AppDelegate ()
+@property (nonatomic,strong) UIViewController<BINavigator> *rootNavi;
 @end
 
 @implementation AppDelegate
@@ -16,6 +20,9 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    self.rootNavi = BIInstantProtocolWithClass(BINavigator,UIViewController);
+//    self.window = [self.rootNavi window:@"/mark" newNavigator:true];
+    [self.window makeKeyAndVisible];
     return YES;
 }
 

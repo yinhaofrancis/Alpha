@@ -9,20 +9,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NSString* Route;
+
 
 
 @protocol BINavigator <NSObject>
 
--(void)show:(Route)route animation:(BOOL)animation param:(nullable NSDictionary*)params;
 
--(void)backAnimation:(BOOL)animation;
-
--(void)replace:(Route)route animation:(BOOL)animation param:(nullable NSDictionary*)params;
-
--(void)backTo:(Route)route animation:(BOOL)animation;
-
--(void)present:(Route)route animation:(BOOL)animation;
 
 @end
 

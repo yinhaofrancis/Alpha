@@ -27,8 +27,6 @@ typedef NS_ENUM(NSUInteger, BIModuleMemoryType) {
 
 @property (nonatomic,copy) NSString *name;
 
-- (instancetype)initWithParam:(NSDictionary<NSString *,NSString *> *)param;
-
 @end
 
 @protocol BIModuleThreadConfigure <NSObject>

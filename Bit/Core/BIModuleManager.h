@@ -42,12 +42,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+typedef NSString* Route;
+
 @interface NSObject (BIM)
-+ (id)performTarget:(NSString *)name selector:(NSString *)selector params:(id)param,... NS_REQUIRES_NIL_TERMINATION;
+
+@property (readonly)Route route;
+
+@property (nullable,readonly) NSDictionary *params;
+
++ (id)performTarget:(Route)name selector:(NSString *)selector params:(id)param,... NS_REQUIRES_NIL_TERMINATION;
 
 + (nullable instancetype)getInstanceByProtocol:(Protocol *)proto;
 
-+ (nullable instancetype)getInstanceByName:(NSString *)name params:(nullable NSDictionary *)params;
++ (nullable instancetype)getInstanceByName:(Route)name params:(nullable NSDictionary *)params;
 
 @end
 

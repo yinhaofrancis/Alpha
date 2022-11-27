@@ -16,9 +16,8 @@
 @end
 
 @interface vViewController ()
-@property(nonatomic,strong) NSDate *vc;
 
-@property(nonnull,strong)id<MarkTool> mm;
+@property(nonatomic,strong)id<MarkTool> mm;
 
 @property(nonnull,strong)UIViewController<MarkTool> *mmc;
 
@@ -29,8 +28,9 @@ static NSString* rr;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    UIViewController* vc = [UIViewController getInstanceByName:@"/mark" params:nil];
-    NSLog(@"%@",vc);
+    self.view.backgroundColor = UIColor.whiteColor;
+    self.mm.index = 100;
+    
 }
 @end
 

@@ -18,7 +18,6 @@
 #import "BIProxy.h"
 #import "BIWeakContainer.h"
 #import "NSURL+BIURL.h"
-#import "BINavigationImp.h"
 #import "BINavigator.h"
 
 FOUNDATION_EXPORT double BitVersionNumber;
