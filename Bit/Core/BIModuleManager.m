@@ -530,8 +530,10 @@ const char * paramsKey = "__params";
 }
 + (instancetype)getInstanceByName:(NSString *)name params:(nullable NSDictionary *)params{
     id instant = [BIM() getInstanceByName:name baseClass:[self class]];
-    objc_setAssociatedObject(instant, routeKey, name, OBJC_ASSOCIATION_COPY_NONATOMIC);
-    objc_setAssociatedObject(instant, paramsKey, params, OBJC_ASSOCIATION_COPY_NONATOMIC);
+    if (instant != nil){
+        objc_setAssociatedObject(instant, routeKey, name, OBJC_ASSOCIATION_COPY_NONATOMIC);
+        objc_setAssociatedObject(instant, paramsKey, params, OBJC_ASSOCIATION_COPY_NONATOMIC);
+    }
     return instant;
 }
 

@@ -7,9 +7,8 @@
 
 #import "AppDelegate.h"
 
-#import "BINavigator.h"
-#import "BIModuleManager.h"
-#import "BIAnnotation.h"
+
+@import Bit;
 
 @interface AppDelegate ()
 @property (nonatomic,strong) UIViewController<BINavigator> *rootNavi;
@@ -21,10 +20,19 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     self.rootNavi = BIInstantProtocolWithClass(BINavigator,UIViewController);
-//    self.window = [self.rootNavi window:@"/mark" newNavigator:true];
+    self.window = [[UIWindow alloc] init];
+    UINavigationController* nv = [UINavigationController getInstanceByName:@"/Mark" params:nil];
+    self.window.rootViewController = nv;
+    [nv pushViewController:[UIViewController getInstanceByName:@"/Marks" params:nil] animated:true];
+    
+//    self.window.rootViewController = self.rootNavi;
     [self.window makeKeyAndVisible];
     return YES;
 }
 
 
 @end
+
+BIPathRouter(UINavigationController, "/Mark", UINavigationController)
+BIPathRouter(UIViewController, "/Marks", UIViewController)
+
