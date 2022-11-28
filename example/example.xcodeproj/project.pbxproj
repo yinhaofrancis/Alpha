@@ -13,7 +13,6 @@
 		A9D5741D2913713D0025BAE3 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D5741C2913713D0025BAE3 /* ViewController.swift */; };
 		A9D574222913713F0025BAE3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A9D574212913713F0025BAE3 /* Assets.xcassets */; };
 		A9D574252913713F0025BAE3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A9D574232913713F0025BAE3 /* LaunchScreen.storyboard */; };
-		A9D5742E291390500025BAE3 /* Sender.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D5742D291390500025BAE3 /* Sender.swift */; };
 		A9E0F8402925435100B51E46 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A9E0F83F2925435100B51E46 /* AppDelegate.m */; };
 		A9E0F8462925435100B51E46 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A9E0F8452925435100B51E46 /* ViewController.m */; };
 		A9E0F84B2925435400B51E46 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A9E0F84A2925435400B51E46 /* Assets.xcassets */; };
@@ -34,7 +33,6 @@
 		A9D574212913713F0025BAE3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A9D574242913713F0025BAE3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A9D574262913713F0025BAE3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A9D5742D291390500025BAE3 /* Sender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sender.swift; sourceTree = "<group>"; };
 		A9E0F83C2925435000B51E46 /* testBIT.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = testBIT.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9E0F83E2925435100B51E46 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		A9E0F83F2925435100B51E46 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -111,7 +109,6 @@
 		A9D574172913713D0025BAE3 /* example */ = {
 			isa = PBXGroup;
 			children = (
-				A9D5742C2913902E0025BAE3 /* swui */,
 				A9D574182913713D0025BAE3 /* AppDelegate.swift */,
 				A9D5741C2913713D0025BAE3 /* ViewController.swift */,
 				A9D574212913713F0025BAE3 /* Assets.xcassets */,
@@ -120,14 +117,6 @@
 				A98B7E27292C9DAF00E2F617 /* BFUserInterfaceStyle.swift */,
 			);
 			path = example;
-			sourceTree = "<group>";
-		};
-		A9D5742C2913902E0025BAE3 /* swui */ = {
-			isa = PBXGroup;
-			children = (
-				A9D5742D291390500025BAE3 /* Sender.swift */,
-			);
-			path = swui;
 			sourceTree = "<group>";
 		};
 		A9E0F83D2925435100B51E46 /* testBIT */ = {
@@ -331,7 +320,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				A9D5741D2913713D0025BAE3 /* ViewController.swift in Sources */,
-				A9D5742E291390500025BAE3 /* Sender.swift in Sources */,
 				A9D574192913713D0025BAE3 /* AppDelegate.swift in Sources */,
 				A98B7E28292C9DAF00E2F617 /* BFUserInterfaceStyle.swift in Sources */,
 			);
@@ -553,6 +541,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 971C74CEF0BF2517E4D56830 /* Pods-testBIT.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
@@ -581,6 +570,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4262503BB73BCC8DD0D86BE0 /* Pods-testBIT.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
