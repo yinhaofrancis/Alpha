@@ -23,7 +23,8 @@
     self.window = [[UIWindow alloc] init];
     UINavigationController* nv = [UINavigationController getInstanceByName:@"/Mark" params:nil];
     self.window.rootViewController = nv;
-    [nv pushViewController:[UIViewController getInstanceByName:@"/Marks" params:nil] animated:true];
+    UIViewController * vc = [UIViewController getInstanceByName:@"/vMark" params:nil];
+    [nv pushViewController:vc animated:true];
     
 //    self.window.rootViewController = self.rootNavi;
     [self.window makeKeyAndVisible];

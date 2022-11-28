@@ -31,7 +31,7 @@
     if(!storage[name]){
         storage[name] = [[NSMutableDictionary alloc] init];
     }
-    storage[name][key] = value;
+    storage[name][key] = (id)value;
     dispatch_semaphore_signal(lock);
 }
 - (NSDictionary *)getEnvConfigByName:(NSString *)name{

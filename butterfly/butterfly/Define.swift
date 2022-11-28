@@ -20,13 +20,21 @@ public protocol Routable:AnyObject{
 
 public protocol PathRoutable:Routable{
     
-    var path:URL? { get }
+    var path:String? { get }
 }
-public protocol ParamRoutable:Routable{
+public protocol ParamRoutable:PathRoutable{
     
-    associatedtype T
-    
-    var param:RouteParam<T>? { get }
+}
+extension ParamRoutable{
+    public func bindParam(param:Dictionary<String,Any>){
+        Mirror(reflecting: self).children.filter { i in
+            i.label != nil && i.value is WrapParamButterfly
+        }.map { i in
+            i.value as! WrapParamButterfly
+        }.forEach { i in
+            i.value = param[i.name]
+        }
+    }
 }
 
 

@@ -39,11 +39,19 @@ class ViewController: UIViewController {
             BIM().regModuleBaseClass(UIViewController.self, withName: "ex", implement: ViewController.self)
             BIM().regModuleBaseClass(UIView.self, withName: "mm", implement: VV.self)
             let vc = UIViewController.getInstanceByName("ex", params: nil)
-            self .present(vc!, animated: true)
-            
+            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
+                self.present(vc!, animated: true)
+                print(self.nnn,self.aa)
+            }
         }        // Do any additional setup after loading the view.
     }
 
+    @ParamButterfly(name: "nnn")
+    var nnn:String?
+    
+    @ParamButterfly(name: "aa")
+    var aa:Float?
+    
     @butterfly
     var a:mm?
 }

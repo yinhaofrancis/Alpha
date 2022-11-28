@@ -20,7 +20,7 @@ public class ButterFlyRouter{
         self.register[route.name] = route
     }
     
-    private func dequeueRouter(name:String)->(any RouterProtocol)?{
+    public func dequeueRouter(name:String)->(any RouterProtocol)?{
         self.register[name]
     }
     
@@ -54,32 +54,34 @@ public class ButterFlyRouter{
         }
         return inst as? P
     }
-    
-    private func bind(module:Routable){
-        
-    }
-    
     public static let shared:ButterFlyRouter = ButterFlyRouter()
 }
 
-extension UIView:Routable{}
+extension UIView:ParamRoutable{
+    
+    public var path: String?  {
+        get{
+            objc_getAssociatedObject(self, &__path_key) as? String
+        }
+        set{
+            objc_setAssociatedObject(self, &__path_key, newValue,.OBJC_ASSOCIATION_COPY_NONATOMIC)
+        }
+    }
+}
+
 var __param_key = "___param"
 var __path_key = "___path"
-extension UIViewController:PathRoutable{
+extension UIViewController:ParamRoutable{
 
-    public var path: URL?  {
+    public var path: String?  {
         get{
-            objc_getAssociatedObject(self, &__path_key) as? URL
+            objc_getAssociatedObject(self, &__path_key) as? String
         }
         set{
             objc_setAssociatedObject(self, &__path_key, newValue,.OBJC_ASSOCIATION_COPY_NONATOMIC)
         }
     }
     
-}
-
-public class BTFViewController<T>:UIViewController,ParamRoutable{
-    public var param: RouteParam<T>?
 }
 
 public let BR = ButterFlyRouter.shared

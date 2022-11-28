@@ -83,6 +83,6 @@ static NSString* rr;
 
 BIRouter(UIViewController, MarkTool, vvViewController)
 
-BIPathRouter(UIViewController, "/mark", vViewController)
+BIPathRouter(UIViewController, "/vMark", vViewController)
 
 BIService(MarkTool, aaa)
