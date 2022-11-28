@@ -5,7 +5,7 @@
 //  Created by wenyang on 2022/11/12.
 //
 
-import Foundation
+import UIKit
 
 @propertyWrapper
 public class butterfly<T>{
@@ -24,6 +24,7 @@ public class butterfly<T>{
     }
     public init(){}
 }
+
 @propertyWrapper
 public class PathButterfly<T:Routable>{
     
@@ -44,6 +45,27 @@ public class PathButterfly<T:Routable>{
     }
 }
 
+@propertyWrapper
+public class StoryboardButterfly{
+    
+    public var storyboard:UIStoryboard
+    
+    public var name:String?
+    
+    public var wrappedValue: UIViewController?{
+        if let name {
+            return self.storyboard.instantiateViewController(identifier: name)
+        }else{
+            return self.storyboard.instantiateInitialViewController()
+        }
+        
+    }
+    
+    public init(storyboard:String,name:String? = nil,bundle:Bundle? = nil){
+        self.storyboard = UIStoryboard(name: storyboard, bundle: bundle)
+        self.name = name
+    }
+}
 
 public class WrapParamButterfly{
     public var name:String

@@ -12,38 +12,15 @@ import butterfly
 import Bit
 import Dessert
 
-var ap = 0;
 @objc
 class ViewController: UIViewController {
 
-    
-    @objc(navi)var navi:BINavigator?{
-        didSet{
-            
-        }
-    }
-    @objc private(set) var mvn:(UIView & mm)?{
-        didSet{
-            self.mvn?.backgroundColor = UIColor.red
-            self.mvn?.frame = CGRect(x: 0, y: 0, width: 100, height: 100);
-            self.view .addSubview(self.mvn!)
-            
-        }
-    }
-    
     override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        if ap == 0{
-            ap += 1
-            BIM().regModuleBaseClass(UIViewController.self, withName: "ex", implement: ViewController.self)
-            BIM().regModuleBaseClass(UIView.self, withName: "mm", implement: VV.self)
-            let vc = UIViewController.getInstanceByName("ex", params: nil)
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
-                self.present(vc!, animated: true)
-                print(self.nnn,self.aa)
-            }
-        }        // Do any additional setup after loading the view.
+        super.viewDidLoad()     // Do any additional setup after loading the view.
+        BR.register(route: Router(proto: mmm.self, cls: VV.self))
+        self.view.addSubview(self.a!)
+        self.a?.backgroundColor = .green
+        self.a?.frame = CGRect(x: 20, y: 20, width: 100, height: 100)
     }
 
     @ParamButterfly(name: "nnn")
@@ -53,7 +30,8 @@ class ViewController: UIViewController {
     var aa:Float?
     
     @butterfly
-    var a:mm?
+    var a:mmm?
+
 }
 
 @objc(mm)
