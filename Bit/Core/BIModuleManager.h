@@ -10,7 +10,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-#define BI_FORMAT(F,A) __attribute__((format(id, F, A)))
 
 @interface BIModuleManager : NSObject
 

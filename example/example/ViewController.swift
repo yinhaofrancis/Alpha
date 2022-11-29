@@ -17,20 +17,19 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()     // Do any additional setup after loading the view.
-        BR.register(route: Router(proto: mmm.self, cls: VV.self))
         self.view.addSubview(self.a!)
         self.a?.backgroundColor = .green
-        self.a?.frame = CGRect(x: 20, y: 20, width: 100, height: 100)
+        self.a?.frame = CGRect(x: 20, y: 40, width: 100, height: 100)
     }
 
     @ParamButterfly(name: "nnn")
     var nnn:String?
     
     @ParamButterfly(name: "aa")
-    var aa:Float?
+    var aa:Double?
     
-    @butterfly
-    var a:mmm?
+    @PathButterfly(name: "mmm")
+    var a:UIView?
 
 }
 
@@ -46,4 +45,14 @@ public class VV:UIView,mm,mmm{
     public var ss: String?
     
     public var s: String?
+}
+
+public class VVV:UILabel,mm,mmm{
+    public var ss: String?
+    
+    public var s: String?
+    public override func didMoveToWindow() {
+        super.didMoveToWindow()
+        self.text = "dasd"
+    }
 }

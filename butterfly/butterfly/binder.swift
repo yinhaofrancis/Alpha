@@ -52,13 +52,17 @@ public class StoryboardButterfly{
     
     public var name:String?
     
+    public var viewController:UIViewController?
+    
     public var wrappedValue: UIViewController?{
-        if let name {
-            return self.storyboard.instantiateViewController(identifier: name)
-        }else{
-            return self.storyboard.instantiateInitialViewController()
+        if(viewController == nil){
+            if let name {
+                self.viewController = self.storyboard.instantiateViewController(identifier: name)
+            }else{
+                self.viewController = self.storyboard.instantiateInitialViewController()
+            }
         }
-        
+        return self.viewController
     }
     
     public init(storyboard:String,name:String? = nil,bundle:Bundle? = nil){
@@ -82,12 +86,12 @@ public class ParamButterfly<T>:WrapParamButterfly{
     public var wrappedValue: T?{
         guard let value else { return nil }
         return self.parseValue(value:value)
-    
     }
-
+    
     public func parseValue(value:Any)->T?{
         return value as? T
     }
+    
     public init(name:String){
         super.init(name: name,value: nil)
     }

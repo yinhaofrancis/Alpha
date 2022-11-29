@@ -11,7 +11,7 @@
 @import Bit;
 
 @interface AppDelegate ()
-@property (nonatomic,strong) UIViewController<BINavigator> *rootNavi;
+@property (nonatomic,strong) UIViewController<BINavigation> *rootNavi;
 @end
 
 @implementation AppDelegate
@@ -19,7 +19,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
-    self.rootNavi = BIInstantProtocolWithClass(BINavigator,UIViewController);
+    self.rootNavi = BIInstantProtocolWithClass(BINavigation,UIViewController);
     self.window = [[UIWindow alloc] init];
     UINavigationController* nv = [UINavigationController getInstanceByName:@"/Mark" params:nil];
     self.window.rootViewController = nv;

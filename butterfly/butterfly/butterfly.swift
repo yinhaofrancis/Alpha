@@ -19,6 +19,15 @@ public class ButterFlyRouter{
     public func register(route: any RouterProtocol){
         self.register[route.name] = route
     }
+    public func register(routeSet:RouteSet){
+        routeSet.routes.forEach { rp in
+            self.register(route: rp)
+        }
+    }
+    
+    public func register(@RouteBuilder routeSet:() -> RouteSet){
+        self.register(routeSet: routeSet())
+    }
     
     public func dequeueRouter(name:String)->(any RouterProtocol)?{
         self.register[name]
@@ -54,7 +63,43 @@ public class ButterFlyRouter{
         }
         return inst as? P
     }
+    
     public static let shared:ButterFlyRouter = ButterFlyRouter()
+}
+
+public struct RouteSet{
+    
+    public var routes:[any RouterProtocol]
+    
+    public init(routes: [any RouterProtocol]) {
+        self.routes = routes
+    }
+}
+
+@resultBuilder
+public struct RouteBuilder{
+    public static func buildBlock(_ components: any RouterProtocol...) -> RouteSet {
+        RouteSet(routes: components)
+    }
+    public static func buildArray(_ components: [RouteSet]) -> RouteSet {
+        RouteSet(routes: components.map { rs in
+            return rs.routes
+        }.flatMap { i in
+            return i
+        })
+    }
+    public static func buildEither(first component: RouteSet) -> RouteSet {
+        return component
+    }
+    public static func buildEither(second component: RouteSet) -> RouteSet {
+        return component
+    }
+    public static func buildOptional(_ component: RouteSet?) -> RouteSet {
+        return RouteSet(routes: [])
+    }
+    public static func buildLimitedAvailability(_ component: RouteSet) -> RouteSet {
+        return component
+    }
 }
 
 extension UIView:ParamRoutable{

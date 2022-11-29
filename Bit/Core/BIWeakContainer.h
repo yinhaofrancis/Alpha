@@ -10,8 +10,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface BIWeakContainer : NSObject
-@property (weak,nonatomic) id content;
+@interface BIWeakContainer<T:NSObject*> : NSObject
+@property (weak,nonatomic) T content;
+-(instancetype)initWithContent:(T)content;
 @end
 
 NS_ASSUME_NONNULL_END
