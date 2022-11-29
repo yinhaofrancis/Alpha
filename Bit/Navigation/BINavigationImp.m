@@ -8,6 +8,10 @@
 
 #import "BINavigationImp.h"
 
+#import "BIAnnotation.h"
+
+#import "BIWeakContainer.h"
+
 @implementation BINavigationImp
 
 
@@ -81,13 +85,33 @@
 }
 
 
-- (void)pushNavigator:(nonnull id<BINavigator>)navigator {
+- (void)pushNavigator:(nonnull Route)navigator present:(BOOL)present baseClass:(nonnull Class)cls{
     if(self.stacks == nil){
         self.stacks = [NSMutableArray new];
     }
-    [self.stacks addObject:navigator];
+    UIViewController* vc = [cls getInstanceByName:navigator params:nil];
+    
+    NSString *msg = [NSString stringWithFormat:@"%@ don not comform BINavigator",navigator];
+    NSAssert([vc conformsToProtocol:@protocol(BINavigator)], msg);
+    
+    if(present){
+        [[self getTop] present:vc withAnimation:true];
+    }
+    [self.stacks addObject:[[BIWeakContainer alloc] initWithContent:vc]];
 }
-
+- (void)pushNavigator:(nonnull Route)navigator
+               window:(UIWindow*)window
+            baseClass:(nonnull Class)cls{
+    if(self.stacks == nil){
+        self.stacks = [NSMutableArray new];
+    }
+    UIViewController* vc = [cls getInstanceByName:navigator params:nil];
+    
+    NSString *msg = [NSString stringWithFormat:@"%@ don not comform BINavigator",navigator];
+    NSAssert([vc conformsToProtocol:@protocol(BINavigator)], msg);
+    window.rootViewController = vc;
+    [self.stacks addObject:[[BIWeakContainer alloc] initWithContent:vc]];
+}
 - (id<BINavigator>)getTop{
     NSInteger index = self.stacks.count - 1;
     NSMutableArray* empty = [[NSMutableArray alloc] init];
@@ -118,4 +142,51 @@
     return  vc;
 }
 
+- (void)present:(nonnull Route)route
+          param:(nullable NSDictionary *)param
+      animation:(BOOL)animation {
+    [[self getTop] present:[UIViewController getInstanceByName:route params:param] withAnimation:animation];
+}
+
+
+- (nullable UIViewController *)presentByProto:(nonnull Protocol *)proto animation:(BOOL)animation {
+    UIViewController* controller = [UIViewController getInstanceByProtocol:proto];
+    [[self getTop] present:controller withAnimation:animation];
+    return controller;
+}
++ (BIModuleMemoryType)memoryType{
+    return BIModuleWeakSinglten;
+}
 @end
+
+@implementation UINavigationController (BINavigation)
+
+- (void)backToRootWithAnimation:(BOOL)anim {
+    [self popToRootViewControllerAnimated:anim];
+}
+
+- (void)backToViewController:(nullable UIViewController *)viewControllers withAnimation:(BOOL)anim {
+    [self popToViewController:viewControllers animated:anim];
+}
+
+- (void)showViewController:(nonnull UIViewController *)viewControllers withAnimation:(BOOL)anim {
+    [self pushViewController:viewControllers animated:anim];
+}
+
+- (void)showViewControllers:(nonnull NSArray<UIViewController *> *)viewControllers withAnimation:(BOOL)anim {
+    [self setViewControllers:viewControllers animated:anim];
+}
+- (NSArray<UIViewController *> *)viewControllerStack{
+    return self.childViewControllers;
+}
+- (void)present:(nullable UIViewController *)viewController withAnimation:(BOOL)anim{
+    [self presentViewController:viewController animated:anim completion:nil];
+}
+
+
+
+@end
+
+BIPathRouter(UINavigationController, "BINavigation", UINavigationController)
+BIService(BINavigation, BINavigationImp)
+

@@ -11,22 +11,18 @@
 @import Bit;
 
 @interface AppDelegate ()
-@property (nonatomic,strong) UIViewController<BINavigation> *rootNavi;
+@property (nonatomic,strong) id<BINavigation> navi;
 @end
 
 @implementation AppDelegate
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    // Override point for customization after application launch.
-    self.rootNavi = BIInstantProtocolWithClass(BINavigation,UIViewController);
+    // Override point for customization after application launch.;
+    self.navi = [BIM() getInstanceByProtocol:@protocol(BINavigation)];
     self.window = [[UIWindow alloc] init];
-    UINavigationController* nv = [UINavigationController getInstanceByName:@"/Mark" params:nil];
-    self.window.rootViewController = nv;
-    UIViewController * vc = [UIViewController getInstanceByName:@"/vMark" params:nil];
-    [nv pushViewController:vc animated:true];
-    
-//    self.window.rootViewController = self.rootNavi;
+    [self.navi pushNavigator:@"BINavigation" window:self.window baseClass:UINavigationController.class];
+    [self.navi showWithRoute:@"/vMark" param:nil animation:true];
     [self.window makeKeyAndVisible];
     return YES;
 }

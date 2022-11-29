@@ -11,10 +11,3 @@
 
 @end
 
-@interface vvViewController : UIViewController
-
-@end
-
-@interface aaa : NSObject
-
-@end

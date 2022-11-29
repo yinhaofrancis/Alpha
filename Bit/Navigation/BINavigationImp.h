@@ -9,11 +9,17 @@
 
 #import "BINavigation.h"
 #import "BIWeakContainer.h"
+#import "BIModule.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface BINavigationImp : NSObject<BINavigation>
+@interface BINavigationImp : NSObject<BINavigation,BIModule>
 @property(nonatomic,strong) NSMutableArray<BIWeakContainer<id<BINavigator>> *> *stacks;
 @end
 
+@interface UINavigationController (BINavigation)<BINavigator>
+
+@end
 NS_ASSUME_NONNULL_END
+
+

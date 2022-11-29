@@ -9,80 +9,26 @@
 @import Bit;
 #import <mach-o/loader.h>
 
-@protocol MarkTool <NSObject>
 
-@property(nonatomic,assign) NSInteger index;
-
-@end
 
 @interface vViewController ()
 
-@property(nonatomic,strong)id<MarkTool> mm;
-
-@property(nonnull,strong)UIViewController<MarkTool> *mmc;
-
+@property (nonatomic,weak) id<BINavigation> navi;
 @end
-static NSString* rr;
+
 
 @implementation vViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.view.backgroundColor = UIColor.whiteColor;
-    self.mm.index = 100;
+    self.view.backgroundColor = [[UIColor alloc] initWithWhite:(arc4random() % 255) / 255.0 alpha:1];
+
     
 }
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
+    [self.navi showWithRoute:@"/vMark" param:nil animation:true];
+}
 @end
 
-@interface vvViewController ()<MarkTool>
-
-@end
-
-@implementation vvViewController
-
-
-
-@synthesize index;
-
-- (void)callback:(id)a ret:(void (^)(id))ret {
-    
-}
-
-- (NSString *)callbackcc:(NSString *)a {
-    return  @"dada";
-}
-
-- (const char *)callbackccd:(id)a {
-    return  "dada";
-}
-
-- (int)callbackcd:(int)a {
-    return  1;
-}
-
-- (u_long)stringLen:(const char *)a {
-    return  2;
-}
-
-
-
-@end
-
-@interface aaa ()<MarkTool>
-
-@end
-
-@implementation aaa
-
-
-
-@synthesize index;
-
-@end
-
-
-BIRouter(UIViewController, MarkTool, vvViewController)
 
 BIPathRouter(UIViewController, "/vMark", vViewController)
-
-BIService(MarkTool, aaa)

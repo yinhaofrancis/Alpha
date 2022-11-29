@@ -19,6 +19,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)backToRootWithAnimation:(BOOL)anim;
 
+- (void)present:(nullable UIViewController *)viewController withAnimation:(BOOL)anim;
+
 @property (nonatomic,readonly)NSArray<UIViewController *> * viewControllerStack;
 
 @end
@@ -44,11 +46,22 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)backToRootWithAnimation:(BOOL)animation;
 
-- (void)pushNavigator:(id<BINavigator>)navigator;
+- (void)present:(nonnull Route)route
+          param:(nullable NSDictionary *)param
+      animation:(BOOL)animation;
+
+- (nullable UIViewController *)presentByProto:(nonnull Protocol *)proto animation:(BOOL)animation;
+
+- (void)pushNavigator:(nonnull Route)navigator present:(BOOL)present baseClass:(nonnull Class)cls;
+
+- (void)pushNavigator:(nonnull Route)navigator
+               window:(UIWindow*)window
+            baseClass:(nonnull Class)cls;
 
 - (void)popNavigator;
 
 - (nullable UIViewController *)quertCurrentNavigatorStack:(NSString *)routeOrProto;
+
 
 @end
 
