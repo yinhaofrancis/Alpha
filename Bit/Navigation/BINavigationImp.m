@@ -36,7 +36,6 @@
         UIViewController* next = [UIViewController getInstanceByName:currentRoute.route params:currentRoute.param];
         [current showViewController:next withAnimation:false];
         current = (UIViewController<BINavigator> *)next;
-        
     }
     return top;
 }
@@ -207,6 +206,6 @@
 
 
 
-BIPathRouter(UIViewController, "BINavigation", UINavigationController)
+BIPathRouter(UIViewController, "/BINavigation", UINavigationController)
 BIService(BINavigation, BINavigationImp)
 

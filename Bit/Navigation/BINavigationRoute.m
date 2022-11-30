@@ -6,6 +6,7 @@
 //
 
 #import "BINavigationRoute.h"
+#import "NSURL+BIURL.h"
 
 @implementation BINavigationRoute{
     NSMutableDictionary* _param;
@@ -33,9 +34,29 @@
     if (self) {
         _route = route;
         _next = next;
-        _param = [_param mutableCopy];
+        _param = [param mutableCopy];
     }
     return self;
+}
+
++ (instancetype)route:(Route)route param:(nullable NSDictionary*)param{
+    NSMutableArray* a = [NSMutableArray new];
+    [[route componentsSeparatedByString:@"/"] enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        
+        if(obj.length > 0){
+            [a addObject:[NSString stringWithFormat:@"/%@",obj]];
+        }
+    }];
+    NSEnumerator<NSString *>* e = a.reverseObjectEnumerator;
+    NSString* routeItem;
+    BINavigationRoute *current;
+    while ((routeItem = e.nextObject)) {
+        current = [[BINavigationRoute alloc] initWithRoute:routeItem param:param next:current];
+    }
+    return current;
+}
++ (instancetype)url:(NSURL *)url{
+    return [self route:url.path param:url.bi_param];
 }
 
 @end

@@ -22,11 +22,17 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [[UIColor alloc] initWithWhite:(arc4random() % 255) / 255.0 alpha:1];
-
+    NSLog(@"%@",self.route);
+    NSLog(@"%@",self.params);
+    
     
 }
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-    [self.navi showWithRoute:@"/vMark" param:nil animation:true];
+    
+    BINavigationRoute* route = [BINavigationRoute route:@"/Mark/vMark" param:@{
+        @"mark":@"mark"
+    }];
+    [self.navi present:route withAnimation:true];
 
 }
 @end

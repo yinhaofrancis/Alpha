@@ -8,6 +8,7 @@
 #import <Foundation/Foundation.h>
 
 #import "BIModuleManager.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 
@@ -27,6 +28,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithRoute:(Route)route next:(nullable BINavigationRoute *)next;
 
 - (instancetype)initWithRoute:(Route)route param:(nullable NSDictionary*)param next:(nullable BINavigationRoute *)next;
+
++ (instancetype)route:(Route)route param:(nullable NSDictionary*)param;
+
++ (instancetype)url:(NSURL *)url;
+
 @end
 
 NS_ASSUME_NONNULL_END

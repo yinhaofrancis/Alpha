@@ -22,7 +22,8 @@
     self.navi = [BIM() getInstanceByProtocol:@protocol(BINavigation)];
     self.window = [[UIWindow alloc] init];
 
-    [self.navi present:[BINavigationRoute.alloc initWithRoute:@"BINavigation" next:[BINavigationRoute.alloc initWithRoute:@"/vMark"]] onWindow:self.window];
+    BINavigationRoute *rb = [BINavigationRoute url:[NSURL URLWithString:@"/BINavigation/vMark?a=1"]];
+    [self.navi present:rb onWindow:self.window];
     [self.window makeKeyAndVisible];
     return YES;
 }
