@@ -27,6 +27,7 @@
 }
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
     [self.navi showWithRoute:@"/vMark" param:nil animation:true];
+
 }
 @end
 

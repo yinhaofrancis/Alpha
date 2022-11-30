@@ -6,10 +6,12 @@
 //
 
 #import <UIKit/UIkit.h>
-
+#import "BINavigationRoute.h"
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol BINavigator <NSObject>
+
+#pragma mark - push & pop
 
 - (void)showViewControllers:(NSArray<UIViewController *>*)viewControllers withAnimation:(BOOL)anim;
 
@@ -19,7 +21,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)backToRootWithAnimation:(BOOL)anim;
 
+#pragma mark - present
+
 - (void)present:(nullable UIViewController *)viewController withAnimation:(BOOL)anim;
+
+- (void)dismissWithAnimation:(BOOL)anim;
+
+#pragma mark - children view controllers
 
 @property (nonatomic,readonly)NSArray<UIViewController *> * viewControllerStack;
 
@@ -27,40 +35,38 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 @protocol BINavigation <NSObject>
-
+#pragma mark - get View Controller
 - (nullable UIViewController *)getViewControllerWithProto:(Protocol *)proto;
 
-- (nullable UIViewController *)getViewControllerWithRoute:(Route)routeName param:(nullable NSDictionary *)param;
+- (nullable UIViewController *)getViewControllerWithRoute:(BINavigationRoute *)route;
+
+- (nullable UIViewController *)quertCurrentNavigatorStack:(NSString *)routeOrProto;
+
+#pragma mark - present
+
+- (nullable UIViewController *)presentByProto:(nonnull Protocol *)proto animation:(BOOL)animation;
+
+- (void)present:(BINavigationRoute *)route withAnimation:(BOOL)anim;
+
+- (void)present:(nonnull BINavigationRoute *)route onWindow:(UIWindow*)window;
+
+- (void)dismissAnimation:(BOOL)animation;
+
+#pragma mark - push & pop
+
+- (nullable UIViewController *)showWithProto:(Protocol *)proto animation:(BOOL)animation;
 
 - (nullable UIViewController *)showWithProto:(Protocol *)proto replaceCurrent:(BOOL)current animation:(BOOL)animation;
 
 - (void)showWithRoute:(Route)routeName replaceCurrent:(BOOL)current param:(nullable NSDictionary *)param animation:(BOOL)animation;
 
-- (nullable UIViewController *)showWithProto:(Protocol *)proto animation:(BOOL)animation;
-
 - (void)showWithRoute:(Route)routeName param:(nullable NSDictionary *)param animation:(BOOL)animation;
- 
-- (void)backTo:(nullable Route)routeOrProto animation:(BOOL)animation;
 
 - (void)backWithAnimation:(BOOL)animation;
 
 - (void)backToRootWithAnimation:(BOOL)animation;
 
-- (void)present:(nonnull Route)route
-          param:(nullable NSDictionary *)param
-      animation:(BOOL)animation;
-
-- (nullable UIViewController *)presentByProto:(nonnull Protocol *)proto animation:(BOOL)animation;
-
-- (void)pushNavigator:(nonnull Route)navigator present:(BOOL)present baseClass:(nonnull Class)cls;
-
-- (void)pushNavigator:(nonnull Route)navigator
-               window:(UIWindow*)window
-            baseClass:(nonnull Class)cls;
-
-- (void)popNavigator;
-
-- (nullable UIViewController *)quertCurrentNavigatorStack:(NSString *)routeOrProto;
+- (void)backTo:(nullable Route)routeOrProto animation:(BOOL)animation;
 
 
 @end

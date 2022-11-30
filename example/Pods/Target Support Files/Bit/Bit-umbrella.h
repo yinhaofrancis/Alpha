@@ -20,6 +20,7 @@
 #import "NSURL+BIURL.h"
 #import "BINavigation.h"
 #import "BINavigationImp.h"
+#import "BINavigationRoute.h"
 
 FOUNDATION_EXPORT double BitVersionNumber;
 FOUNDATION_EXPORT const unsigned char BitVersionString[];

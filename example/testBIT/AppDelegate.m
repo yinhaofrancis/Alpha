@@ -21,8 +21,8 @@
     // Override point for customization after application launch.;
     self.navi = [BIM() getInstanceByProtocol:@protocol(BINavigation)];
     self.window = [[UIWindow alloc] init];
-    [self.navi pushNavigator:@"BINavigation" window:self.window baseClass:UINavigationController.class];
-    [self.navi showWithRoute:@"/vMark" param:nil animation:true];
+
+    [self.navi present:[BINavigationRoute.alloc initWithRoute:@"BINavigation" next:[BINavigationRoute.alloc initWithRoute:@"/vMark"]] onWindow:self.window];
     [self.window makeKeyAndVisible];
     return YES;
 }
@@ -30,6 +30,6 @@
 
 @end
 
-BIPathRouter(UINavigationController, "/Mark", UINavigationController)
+BIPathRouter(UIViewController, "/Mark", UINavigationController)
 BIPathRouter(UIViewController, "/Marks", UIViewController)
 
