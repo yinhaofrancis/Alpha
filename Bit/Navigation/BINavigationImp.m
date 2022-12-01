@@ -14,6 +14,7 @@
 
 @implementation BINavigationImp
 #pragma mark - init
+
 - (instancetype)init
 {
     self = [super init];
@@ -22,7 +23,9 @@
     }
     return self;
 }
+
 #pragma mark - get viewController
+
 - (nullable UIViewController *)getViewControllerWithProto:(nonnull Protocol *)proto {
     return [UIViewController getInstanceByProtocol:proto];
 }
@@ -39,6 +42,7 @@
     }
     return top;
 }
+
 - (nullable UIViewController *)quertCurrentNavigatorStack:(NSString *)routeOrProto{
     __block UIViewController* vc = nil;
     [[[self getTop] viewControllerStack] enumerateObjectsUsingBlock:^(UIViewController * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -51,7 +55,6 @@
 }
 
 #pragma mark - push & pop
-
 
 - (UIViewController *)showWithProto:(nonnull Protocol *)proto animation:(BOOL)animation {
     return [self showWithProto:proto replaceCurrent:false animation:animation];
@@ -90,7 +93,6 @@
     [self showWithRoute:route replaceCurrent:false animation:animation];
 }
 
-
 - (void)showWithRoute:(nonnull BINavigationRoute*)route replaceCurrent:(BOOL)current animation:(BOOL)animation {
     if(current){
         NSMutableArray<UIViewController *> *vcs = [[[self getTop] viewControllerStack] mutableCopy];
@@ -102,7 +104,6 @@
     }else{
         UIViewController* vc = [self getViewControllerWithRoute:route];
         [[self getTop] showViewController:vc withAnimation:animation];
-
     }
 }
 
@@ -110,9 +111,8 @@
     [[self getTop] backToRootWithAnimation:animation];
 }
 
-
-
 #pragma mark - present
+
 - (nullable UIViewController *)presentByProto:(nonnull Protocol *)proto animation:(BOOL)animation {
     UIViewController* controller = [UIViewController getInstanceByProtocol:proto];
     [[self getTop] present:controller withAnimation:animation];
@@ -143,11 +143,13 @@
 }
 
 #pragma mark - memory
+
 + (BIModuleMemoryType)memoryType{
     return BIModuleWeakSinglten;
 }
 
 #pragma mark - private
+
 - (id<BINavigator>)getTop{
     NSInteger index = self.stacks.count - 1;
     NSMutableArray* empty = [[NSMutableArray alloc] init];
