@@ -46,7 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable UIViewController *)presentByProto:(nonnull Protocol *)proto animation:(BOOL)animation;
 
-- (void)present:(BINavigationRoute *)route withAnimation:(BOOL)anim;
+- (void)present:(nonnull BINavigationRoute *)route withAnimation:(BOOL)anim;
 
 - (void)present:(nonnull BINavigationRoute *)route onWindow:(UIWindow*)window;
 
