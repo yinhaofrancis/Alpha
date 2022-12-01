@@ -21,21 +21,33 @@ static BIModuleManager *instance;
 static inline void * getRealPtr(void* value);
 
 @implementation BIModuleManager{
+    
     NSMutableDictionary<NSString *,Class> *regModules;
+    
     NSMutableDictionary<NSString *,id> *singletons;
+    
     NSMutableDictionary<NSString *,BIWeakContainer*> *weaksingletons;
+    
     dispatch_semaphore_t sem;
 }
+
+#pragma mark - init
+
 - (instancetype)init {
     self = [super init];
     if (self) {
+        
         regModules = [[NSMutableDictionary alloc] init];
+        
         singletons = [[NSMutableDictionary alloc] init];
+        
         weaksingletons = [[NSMutableDictionary alloc] init];
+        
         sem = dispatch_semaphore_create(1);
     }
     return self;
 }
+
 +(instancetype)shared {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -43,9 +55,13 @@ static inline void * getRealPtr(void* value);
     });
     return instance;
 }
+
+#pragma mark - register
+
 - (void)regModuleBaseClass:(Class)baseClass WithName:(NSString *)name implement:(Class)cls{
     [BIAnotationStorage.shared addBaseClass:NSStringFromClass(baseClass) name:name impClassName:cls];
 }
+
 - (void)regModuleWithName:(NSString *)name implement:(Class)cls {
 #if DEBUG
     NSAssert(name.length > 0, @"module name %@ is empty",name);
@@ -61,9 +77,13 @@ static inline void * getRealPtr(void* value);
     regModules[name] = cls;
     dispatch_semaphore_signal(sem);
 }
+
 - (void)regModuleWithProtocol:(Protocol *)proto implement:(Class)cls {
     [self regModuleWithName:NSStringFromProtocol(proto) implement:cls];
 }
+
+#pragma mark - init instance
+
 - (id)getInstanceByProtocol:(Protocol *)proto baseClass:(Class)cls{
     return [self getInstanceByName:NSStringFromProtocol(proto) baseClass:cls];
 }
@@ -146,6 +166,9 @@ static inline void * getRealPtr(void* value);
     }
     return nil;
 }
+
+#pragma mark - 模块装配
+
 -(void)assignAllModule:(id<NSObject>)object{
     Class cls = object.class;
     while (cls != [NSObject class] && cls != nil) {
@@ -211,6 +234,7 @@ static inline void * getRealPtr(void* value);
         free(ps);
     }
 }
+
 -(id)parserObject:(NSString *)type{
     Class bcls;
     if([type hasPrefix:@"<"] && [type hasSuffix:@">"]){
@@ -234,6 +258,8 @@ static inline void * getRealPtr(void* value);
     }
     return nil;
 }
+
+#pragma mark - query state
 
 - (BIModuleMemoryType) getMemoryTypeByProtocol:(Protocol *)protocol baseClass:(Class)bcls{
     return  [self getMemoryTypeByName:NSStringFromProtocol(protocol) baseClass:bcls];
@@ -274,9 +300,26 @@ static inline void * getRealPtr(void* value);
 - (Class)getInstanceClassByProtocol:(Protocol *)proto baseClass:(Class)cls{
     return [self getInstanceClassByName:NSStringFromProtocol(proto) baseClass:cls];
 }
+
+#pragma mark - target & action
+
+- (id)performTarget:(NSString *)name selector:(NSString *)selector params:(nonnull id)param,...{
+    id objcid = param;
+    va_list args;
+    NSMutableArray * array = [NSMutableArray new];
+    va_start(args, param);
+    while (objcid != nil) {
+        [array addObject:objcid];
+        objcid = va_arg(args, id);
+    }
+    va_end(args);
+    return [self performTarget:name selector:selector param:array];
+}
+
 - (id)performTarget:(NSString *)name selector:(NSString *)selector param:(NSArray *)arrays{
     return [self performTarget:name baseClass:nil selector:selector param:arrays];
 }
+
 - (id)performTarget:(NSString *)name baseClass:(Class)cls selector:(NSString *)selector param:(NSArray *)arrays{
     id target = [self getInstanceByName:name baseClass:cls];
     SEL sel = NSSelectorFromString(selector);
@@ -314,6 +357,9 @@ static inline void * getRealPtr(void* value);
     free(resultPtr);
     return result;
 }
+
+#pragma mark - type cast
+
 - (BOOL)typeParamWrap:(const char *)retType value:(id)value result:(void *)v{
     if(strcmp(retType, @encode(void)) == 0){
         return true;
@@ -407,6 +453,7 @@ static inline void * getRealPtr(void* value);
     return false;
     
 }
+
 - (id)typeResultWrap:(const char *)retType value:(void *)value{
     if(strcmp(retType, @encode(void)) == 0){
         return nil;
@@ -486,18 +533,6 @@ static inline void * getRealPtr(void* value);
     return (__bridge id)getRealPtr(value);
 }
 
-- (id)performTarget:(NSString *)name selector:(NSString *)selector params:(nonnull id)param,...{
-    id objcid = param;
-    va_list args;
-    NSMutableArray * array = [NSMutableArray new];
-    va_start(args, param);
-    while (objcid != nil) {
-        [array addObject:objcid];
-        objcid = va_arg(args, id);
-    }
-    va_end(args);
-    return [self performTarget:name selector:selector param:array];
-}
 @end
 
 const char * routeKey = "__route";
@@ -506,6 +541,8 @@ const char * paramsKey = "__params";
 
 @implementation NSObject (BIM)
 
+#pragma mark - property
+
 - (Route)bi_route{
     return objc_getAssociatedObject(self, routeKey);
 }
@@ -513,6 +550,7 @@ const char * paramsKey = "__params";
     return objc_getAssociatedObject(self, paramsKey);
 }
 
+#pragma mark - target & action
 + (id)performTarget:(NSString *)name selector:(NSString *)selector params:(id)param,...{
     id objcid = param;
     va_list args;
@@ -525,9 +563,13 @@ const char * paramsKey = "__params";
     va_end(args);
     return [BIM() performTarget:name baseClass:[self class] selector:selector param:array];
 }
+
+#pragma mark - instace
+
 + (instancetype)getInstanceByProtocol:(Protocol *)proto{
     return [BIM() getInstanceByProtocol:proto baseClass:[self class]];
 }
+
 + (instancetype)getInstanceByName:(NSString *)name params:(nullable NSDictionary *)params{
     id instant = [BIM() getInstanceByName:name baseClass:[self class]];
     if (instant != nil){
@@ -536,7 +578,6 @@ const char * paramsKey = "__params";
     }
     return instant;
 }
-
 
 @end
 
