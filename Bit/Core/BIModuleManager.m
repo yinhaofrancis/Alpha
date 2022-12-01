@@ -210,6 +210,9 @@ static inline void * getRealPtr(void* value);
             Ivar iv = class_getInstanceVariable(cls, ivName.UTF8String);
             if(ivName.length > 0 && strlen(ivar_getTypeEncoding(iv)) > 0){
                 id objecta = [self parserObject:type];
+                if (isCopy){
+                    objecta = [objecta copy];
+                }
                 if(objecta && iv){
                     object_setIvar(object, iv, objecta);
                 }
