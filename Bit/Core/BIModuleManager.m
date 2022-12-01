@@ -58,8 +58,8 @@ static inline void * getRealPtr(void* value);
 
 #pragma mark - register
 
-- (void)regModuleBaseClass:(Class)baseClass WithName:(NSString *)name implement:(Class)cls{
-    [BIAnotationStorage.shared addBaseClass:NSStringFromClass(baseClass) name:name impClassName:cls];
+- (void)regModuleBaseClass:(Class)baseClass WithProtocol:(Protocol *)proto implement:(Class)cls{
+    [BIAnotationStorage.shared addBaseClass:NSStringFromClass(baseClass) name:NSStringFromProtocol(proto) impClassName:cls];
 }
 
 - (void)regModuleWithName:(NSString *)name implement:(Class)cls {
@@ -314,6 +314,19 @@ static inline void * getRealPtr(void* value);
     }
     va_end(args);
     return [self performTarget:name selector:selector param:array];
+}
+
+- (id)performTarget:(NSString *)name baseClass:(Class)cls selector:(NSString *)selector params:(nonnull id)param,...{
+    id objcid = param;
+    va_list args;
+    NSMutableArray * array = [NSMutableArray new];
+    va_start(args, param);
+    while (objcid != nil) {
+        [array addObject:objcid];
+        objcid = va_arg(args, id);
+    }
+    va_end(args);
+    return [self performTarget:name baseClass:cls selector:selector param:array];
 }
 
 - (id)performTarget:(NSString *)name selector:(NSString *)selector param:(NSArray *)arrays{
