@@ -17,13 +17,14 @@ typedef NS_ENUM(NSUInteger, BIModuleMemoryType) {
     
     BIModuleNew,
 };
+
 @protocol BIModule <NSObject>
 
 @optional
 
 + (BIModuleMemoryType) memoryType;
 
-+(BOOL) isAsync;
++ (BOOL) isAsync;
 
 @property (nonatomic,copy) NSString *name;
 
