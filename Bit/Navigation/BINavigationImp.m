@@ -86,21 +86,21 @@
     }
 }
 
-- (void)showWithRoute:(nonnull Route)routeName param:(nullable NSDictionary *)param animation:(BOOL)animation {
-    [self showWithRoute:routeName replaceCurrent:false param:param animation:animation];
+- (void)showWithRoute:(nonnull BINavigationRoute*)route animation:(BOOL)animation {
+    [self showWithRoute:route replaceCurrent:false animation:animation];
 }
 
 
-- (void)showWithRoute:(nonnull Route)routeName replaceCurrent:(BOOL)current param:(nullable NSDictionary *)param animation:(BOOL)animation {
+- (void)showWithRoute:(nonnull BINavigationRoute*)route replaceCurrent:(BOOL)current animation:(BOOL)animation {
     if(current){
         NSMutableArray<UIViewController *> *vcs = [[[self getTop] viewControllerStack] mutableCopy];
         [vcs removeLastObject];
         
-        UIViewController* vc = [self getViewControllerWithRoute:[BINavigationRoute.alloc initWithRoute:routeName param:param next:nil]];
+        UIViewController* vc = [self getViewControllerWithRoute:route];
         [vcs addObject:vc];
         [[self getTop] showViewControllers:vcs withAnimation:animation];
     }else{
-        UIViewController* vc = [self getViewControllerWithRoute:[BINavigationRoute.alloc initWithRoute:routeName param:param next:nil]];
+        UIViewController* vc = [self getViewControllerWithRoute:route];
         [[self getTop] showViewController:vc withAnimation:animation];
 
     }

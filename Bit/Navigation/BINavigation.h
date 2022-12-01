@@ -58,9 +58,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable UIViewController *)showWithProto:(Protocol *)proto replaceCurrent:(BOOL)current animation:(BOOL)animation;
 
-- (void)showWithRoute:(Route)routeName replaceCurrent:(BOOL)current param:(nullable NSDictionary *)param animation:(BOOL)animation;
+- (void)showWithRoute:(nonnull BINavigationRoute*)route animation:(BOOL)animation;
 
-- (void)showWithRoute:(Route)routeName param:(nullable NSDictionary *)param animation:(BOOL)animation;
+- (void)showWithRoute:(nonnull BINavigationRoute*)route replaceCurrent:(BOOL)current animation:(BOOL)animation;
 
 - (void)backWithAnimation:(BOOL)animation;
 
