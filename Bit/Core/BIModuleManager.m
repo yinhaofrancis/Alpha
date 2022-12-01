@@ -264,6 +264,7 @@ static inline void * getRealPtr(void* value);
 - (BIModuleMemoryType) getMemoryTypeByProtocol:(Protocol *)protocol baseClass:(Class)bcls{
     return  [self getMemoryTypeByName:NSStringFromProtocol(protocol) baseClass:bcls];
 }
+
 - (BIModuleMemoryType) getMemoryTypeByName:(NSString*)name baseClass:(Class)bcls{
     Class cls = [self getInstanceClassByName:name baseClass:bcls];
     if(cls){
@@ -272,31 +273,37 @@ static inline void * getRealPtr(void* value);
         return BIModuleNew;
     }
 }
+
 - (id)getInstanceByClass:(Class)name{
     return [self getInstanceByName:NSStringFromClass(name)];
 }
+
 - (id)getInstanceByProtocol:(Protocol *)proto{
     return [self getInstanceByName:NSStringFromProtocol(proto)];
 }
+
 - (void)cleanInstanceByName:(NSString *)name{
     dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
     [singletons removeObjectForKey:name];
     dispatch_semaphore_signal(sem);
 }
+
 - (void)cleanInstanceByProtocol:(Protocol *)proto{
     [self cleanInstanceByName:NSStringFromProtocol(proto)];
 }
+
 - (NSArray<id> *)allSingltenObject{
     return singletons.allValues;
 }
+
 - (Class)getInstanceClassByName:(NSString *)name baseClass:(Class)cls{
     if(cls){
         return [BIAnotationStorage.shared getEnvConfigByName:NSStringFromClass(cls)][name];
     }else{
         return regModules[name];
     }
-    
 }
+
 - (Class)getInstanceClassByProtocol:(Protocol *)proto baseClass:(Class)cls{
     return [self getInstanceClassByName:NSStringFromProtocol(proto) baseClass:cls];
 }
