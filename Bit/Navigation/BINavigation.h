@@ -44,11 +44,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - present
 
-- (nullable UIViewController *)presentByProto:(nonnull Protocol *)proto animation:(BOOL)animation;
+- (nullable UIViewController *)presentByProto:(Protocol *)proto animation:(BOOL)animation;
 
-- (void)present:(nonnull BINavigationRoute *)route withAnimation:(BOOL)anim;
+- (void)present:(BINavigationRoute *)route withAnimation:(BOOL)anim;
 
-- (void)present:(nonnull BINavigationRoute *)route onWindow:(UIWindow*)window;
+- (void)present:(BINavigationRoute *)route onWindow:(UIWindow*)window;
 
 - (void)dismissAnimation:(BOOL)animation;
 
@@ -58,9 +58,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable UIViewController *)showWithProto:(Protocol *)proto replaceCurrent:(BOOL)current animation:(BOOL)animation;
 
-- (void)showWithRoute:(nonnull BINavigationRoute*)route animation:(BOOL)animation;
+- (void)showWithRoute:(BINavigationRoute*)route animation:(BOOL)animation;
 
-- (void)showWithRoute:(nonnull BINavigationRoute*)route replaceCurrent:(BOOL)current animation:(BOOL)animation;
+- (void)showWithRoute:(BINavigationRoute*)route replaceCurrent:(BOOL)current animation:(BOOL)animation;
 
 - (void)backWithAnimation:(BOOL)animation;
 

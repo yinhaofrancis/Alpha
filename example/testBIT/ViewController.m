@@ -25,15 +25,9 @@
     NSLog(@"%@",self.bi_route);
     NSLog(@"%@",self.bi_params);
     
-    
 }
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-    
-    BINavigationRoute* route = [BINavigationRoute route:@"/Mark/vMark" param:@{
-        @"mark":@"mark"
-    }];
-    [self.navi present:route withAnimation:true];
-
+    [self.navi present:[BINavigationRoute url:[NSURL URLWithString:@"/Mark/vMark?mark=mark"]] withAnimation:true];
 }
 @end
 
