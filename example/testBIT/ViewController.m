@@ -22,8 +22,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [[UIColor alloc] initWithWhite:(arc4random() % 255) / 255.0 alpha:1];
-    NSLog(@"%@",self.route);
-    NSLog(@"%@",self.params);
+    NSLog(@"%@",self.bi_route);
+    NSLog(@"%@",self.bi_params);
     
     
 }

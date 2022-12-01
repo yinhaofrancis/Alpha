@@ -506,10 +506,10 @@ const char * paramsKey = "__params";
 
 @implementation NSObject (BIM)
 
-- (Route)route{
+- (Route)bi_route{
     return objc_getAssociatedObject(self, routeKey);
 }
-- (NSDictionary *)params{
+- (NSDictionary *)bi_params{
     return objc_getAssociatedObject(self, paramsKey);
 }
 

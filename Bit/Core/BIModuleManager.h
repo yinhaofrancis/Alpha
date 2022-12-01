@@ -45,9 +45,9 @@ typedef NSString* Route;
 
 @interface NSObject (BIM)
 
-@property (readonly)Route route;
+@property (readonly)Route bi_route;
 
-@property (nullable,readonly) NSDictionary *params;
+@property (nullable,readonly) NSDictionary *bi_params;
 
 + (id)performTarget:(Route)name selector:(NSString *)selector params:(id)param,... NS_REQUIRES_NIL_TERMINATION;
 

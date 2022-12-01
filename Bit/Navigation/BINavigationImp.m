@@ -42,7 +42,7 @@
 - (nullable UIViewController *)quertCurrentNavigatorStack:(NSString *)routeOrProto{
     __block UIViewController* vc = nil;
     [[[self getTop] viewControllerStack] enumerateObjectsUsingBlock:^(UIViewController * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        if([obj.route isEqualToString:routeOrProto]){
+        if([obj.bi_route isEqualToString:routeOrProto]){
             vc = obj;
             *stop = true;
         }
