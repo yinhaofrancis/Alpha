@@ -5,6 +5,7 @@ PODS:
   - butterfly (0.1.0)
   - Database (0.1.0)
   - Dessert (0.1.0)
+  - Pager (0.1.0)
   - RenderImage (0.1.0)
   - SPUAlert (0.1.0)
 
@@ -13,6 +14,7 @@ DEPENDENCIES:
   - butterfly (from `../butterfly`)
   - Database (from `../Database`)
   - Dessert (from `../Dessert`)
+  - Pager (from `../Pager`)
   - RenderImage (from `../RenderImage`)
   - SPUAlert (from `../SPUAlert`)
 
@@ -25,6 +27,8 @@ EXTERNAL SOURCES:
     :path: "../Database"
   Dessert:
     :path: "../Dessert"
+  Pager:
+    :path: "../Pager"
   RenderImage:
     :path: "../RenderImage"
   SPUAlert:
@@ -32,12 +36,13 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Bit: 0397046fa5c0848f66ecfb341df3abe3704c09f2
-  butterfly: a86a0229662dc58f40eeb3fa3c184713679481a1
+  butterfly: 79d33d0e1fdf9b41a698656bb674f7a88bcd08f3
   Database: b0f13cf309db592be7e5c9ba4819dced8e19d6fd
   Dessert: f3d63ac6cd9daeb6c339daab2f23017993562b33
-  RenderImage: 87b66596c6175aa480deb798dadb4ebbdc4d3d0a
+  Pager: bd3eaa7179e6bd7f19e424f05505bbf36855348a
+  RenderImage: af07ba13a3de446c2a49f94ffc4b3a0ea7cb4e84
   SPUAlert: 4adb27e15a60a2794044424bac7d54565ac2fca8
 
-PODFILE CHECKSUM: 1afc1c10d48683636960e530d0c197d0b7513361
+PODFILE CHECKSUM: ff0021270f5d15747a4f26c3726cc44d2fbc223e
 
 COCOAPODS: 1.11.3

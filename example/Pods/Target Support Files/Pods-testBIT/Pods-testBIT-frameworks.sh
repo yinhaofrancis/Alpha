@@ -182,6 +182,7 @@ if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/RenderImage/RenderImage.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/SPUAlert/SPUAlert.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/butterfly/butterfly.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/Pager/Pager.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/Bit/Bit.framework"
@@ -190,6 +191,7 @@ if [[ "$CONFIGURATION" == "Release" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/RenderImage/RenderImage.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/SPUAlert/SPUAlert.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/butterfly/butterfly.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/Pager/Pager.framework"
 fi
 if [ "${COCOAPODS_PARALLEL_CODE_SIGN}" == "true" ]; then
   wait

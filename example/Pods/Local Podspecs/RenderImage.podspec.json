@@ -18,5 +18,7 @@
   "platforms": {
     "ios": "13.0"
   },
-  "source_files": "RenderImage/**/*.*"
+  "swift_versions": "5.0",
+  "source_files": "RenderImage/**/*.*",
+  "swift_version": "5.0"
 }
