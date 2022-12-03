@@ -77,16 +77,12 @@
 }
 
 - (void)backWithAnimation:(BOOL)animation {
-    [self backTo:nil animation:animation];
+    [[self getTop] backToViewController:nil withAnimation:animation];
 }
 
-- (void)backTo:(nullable Route)routeOrProto animation:(BOOL)animation {
-    if(routeOrProto){
-        UIViewController* vc = [self quertCurrentNavigatorStack:routeOrProto];
-        [[self getTop] backToViewController:vc withAnimation:animation];
-    }else{
-        [[self getTop] backToViewController:nil withAnimation:animation];
-    }
+- (void)backTo:(Route)routeOrProto animation:(BOOL)animation {
+    UIViewController* vc = [self quertCurrentNavigatorStack:routeOrProto];
+    [[self getTop] backToViewController:vc withAnimation:animation];
 }
 
 - (void)showWithRoute:(nonnull BINavigationRoute*)route animation:(BOOL)animation {

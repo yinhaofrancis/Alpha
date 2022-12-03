@@ -66,7 +66,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)backToRootWithAnimation:(BOOL)animation;
 
-- (void)backTo:(nullable Route)routeOrProto animation:(BOOL)animation;
+- (void)backTo:(Route)routeOrProto animation:(BOOL)animation;
 
 
 @end
