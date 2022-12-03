@@ -31,6 +31,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// 注册
 /// - Parameters:
+///   - name:模块名字
+///   - proto: 协议
+///   - cls: 模块类
+- (void)regModuleWithName:(NSString *)name WithProtocol:(Protocol *)proto implement:(Class)cls;
+/// 注册
+/// - Parameters:
 ///   - proto: 协议
 ///   - cls: 实现协议模块的类
 - (void)regModuleWithProtocol:(Protocol *)proto implement:(Class)cls;

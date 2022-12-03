@@ -21,19 +21,23 @@
 
 #ifndef Annotation
 
-#define BIDATA(sectname) __attribute((used, section("__DATA,"#sectname" ")))
+#define BIDATA(sectname) __attribute((used, section("__DATA,"#sectname)))
 
 #define BIModule(name,cls) \
 @class cls; \
-char const * BI##name##_mod BIDATA(BISectModuleName) =  "{ \""#name"\" : \""#cls"\"}";
+char const * BI##name##_mod BIDATA(BISectModuleName) =  "{ \"#name"\" : \""#cls"\"}";
 
 #define BIService(proto,cls) \
 @protocol proto; \
-char const * BI##proto##_ser##cls##end BIDATA(BISectModuleName) =  "{ \""#proto"\" : \""#cls"\"}";
+char const * BI##proto##_ser##cls##end BIDATA(BISectModuleName) =  "{ \"" #proto "\" : \"" #cls "\"}";
+
+#define BINamedService(name,proto,cls) \
+@protocol proto; \
+char const * BI##name##and##proto##_ser##cls##end BIDATA(BISectModuleName) =  "{ \"" #name "_" #proto "\" : \"" #cls "\"}";
 
 #define BICustomAnnotation(owner,key,value) \
 @class BIAnnotation; \
-char const * BI##owner##_##key##_##value##_contr_Annotation BIDATA(BISectCustom) =  "{\""#owner"\":{ \""#key"\" : \""#value"\"}}";
+char const * BI##owner##_##key##_##value##_contr_Annotation BIDATA(BISectCustom) =  "{\"" #owner "\":{ \"" #key "\" : \"" #value "\"}}";
 
 #define BICustomAnnotationString(owner,key,value) \
 @class BIAnnotation; \

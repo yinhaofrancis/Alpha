@@ -61,7 +61,9 @@ static inline void * getRealPtr(void* value);
 - (void)regModuleBaseClass:(Class)baseClass WithProtocol:(Protocol *)proto implement:(Class)cls{
     [BIAnotationStorage.shared addBaseClass:NSStringFromClass(baseClass) name:NSStringFromProtocol(proto) impClassName:cls];
 }
-
+- (void)regModuleWithName:(NSString *)name WithProtocol:(Protocol *)proto implement:(Class)cls{
+    [self regModuleWithName:[NSString stringWithFormat:@"%@_%@",name,NSStringFromProtocol(proto)] implement:cls];
+}
 - (void)regModuleWithName:(NSString *)name implement:(Class)cls {
 #if DEBUG
     NSAssert(name.length > 0, @"module name %@ is empty",name);

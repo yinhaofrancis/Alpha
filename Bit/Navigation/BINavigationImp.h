@@ -13,13 +13,19 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface BINavigationImp : NSObject<BINavigation,BIModule>
+@interface BINavigationImp : NSObject<BINavigation,BIModule,UINavigationControllerDelegate>
 @property(nonatomic,strong) NSMutableArray<BIWeakContainer<id<BINavigator>> *> *stacks;
 @end
 
 @interface UINavigationController (BINavigation)<BINavigator>
 
 @end
+
+
+@interface UIViewController (BINavigation)
+
+@end
+
 NS_ASSUME_NONNULL_END
 
 
