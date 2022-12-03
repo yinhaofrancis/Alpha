@@ -590,7 +590,11 @@ const char * paramsKey = "__params";
 #pragma mark - instace
 
 + (instancetype)getInstanceByProtocol:(Protocol *)proto{
-    return [BIM() getInstanceByProtocol:proto baseClass:[self class]];
+    id instant = [BIM() getInstanceByProtocol:proto baseClass:[self class]];
+    if (instant != nil){
+        objc_setAssociatedObject(instant, routeKey, NSStringFromProtocol(proto), OBJC_ASSOCIATION_COPY_NONATOMIC);
+    }
+    return instant;
 }
 
 + (instancetype)getInstanceByName:(NSString *)name params:(nullable NSDictionary *)params{
