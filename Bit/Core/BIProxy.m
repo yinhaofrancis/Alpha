@@ -90,6 +90,6 @@ NSString * const BIProxyRunloopMode = @"BIProxyRunloop";
     return [self.object isKindOfClass:aClass];
 }
 - (BOOL)isMemberOfClass:(Class)aClass{
-    return [self isMemberOfClass:aClass];
+    return [self.object isMemberOfClass:aClass];
 }
 @end
