@@ -93,7 +93,7 @@ static inline void * getRealPtr(void* value);
     return [self getInstanceByName:name baseClass:nil];
 }
 - (nullable id)getInstanceByProtocol:(Protocol *)proto withName:(NSString *)name{
-    return [self getInstanceByName:[NSString stringWithFormat:@"%@_%@",name,proto] baseClass:nil];
+    return [self getInstanceByName:[NSString stringWithFormat:@"%@_%@",name,NSStringFromProtocol(proto)] baseClass:nil];
 }
 - (id)getInstanceByName:(NSString *)name baseClass:(Class)bcls{
     if(name.length == 0){

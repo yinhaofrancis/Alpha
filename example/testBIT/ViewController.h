@@ -17,6 +17,16 @@
 
 @end
 
-@interface mkk : NSObject<mk>
+@protocol mk2 <NSObject>
+
+- (void)make2;
+
+@end
+
+@interface mkk : UIView<mk,mk2>
+
+@end
+
+@interface mkmk : UIColor<mk,mk2>
 
 @end

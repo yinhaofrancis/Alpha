@@ -13,7 +13,12 @@
 
 @interface vViewController ()
 
-@property (nonatomic,strong) id<BINavigation,mk> navi;
+@property (nonatomic,strong) id<BINavigation> navi;
+
+@property (nonatomic,strong) id<mk> mm;
+
+@property (nonatomic,strong) id<mk> mkm;
+
 @end
 
 
@@ -27,7 +32,9 @@
     
 }
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-    [self.navi make];
+    id a = [BIM() getInstanceByProtocol:@protocol(mk) withName:@"mm"];
+    
+    NSLog(@"%@",a);
     [self.navi present:[BINavigationRoute url:[NSURL URLWithString:@"/Mark/vMark?mark=mark"]] withAnimation:true];
 }
 @end
@@ -38,6 +45,28 @@
     NSLog(@"!!!!%@",self);
 }
 
+- (void)make2 {
+    NSLog(@"!!!!%@!!",self);
+}
+
+@end
+
+@implementation mkmk
+
+- (void)make{
+    NSLog(@"!!!!%@",self);
+}
+
+- (void)make2 {
+    NSLog(@"!!!!%@!!",self);
+}
+
 @end
 BIPathRouter(UIViewController, "/vMark", vViewController)
-BIService(mk, mkk)
+
+BIRouter(UIView, mk, mkk)
+BIRouter(UIView, mk2, mkk)
+
+BINamedService(mm, mk, mkk)
+
+BINamedService(mkm, mk, mkmk)
