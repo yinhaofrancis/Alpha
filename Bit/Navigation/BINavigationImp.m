@@ -168,6 +168,8 @@
 - (void) removeTop{
     [[self stacks] removeLastObject];
 }
+#pragma mark - UINavigation Delegate
+
 @end
 
 @implementation UINavigationController (BINavigation)

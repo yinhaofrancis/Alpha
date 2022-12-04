@@ -52,6 +52,11 @@ NS_ASSUME_NONNULL_BEGIN
 /// - Parameter proto: 协议
 - (nullable id)getInstanceByProtocol:(Protocol *)proto;
 
+/// 获取模块
+/// - Parameter proto: 协议
+/// - Parameter name: 模块名
+- (nullable id)getInstanceByProtocol:(Protocol *)proto withName:(NSString *)name;
+
 #pragma mark - 模块装配
 
 /// 装配模块依赖的模块

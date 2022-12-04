@@ -29,4 +29,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+
+@interface BIMultiProxy : NSProxy
+
+
+
+@property(nonatomic,readonly) NSArray* objects;
+
+
+
+- (instancetype)initWithObjectNames:(NSArray*)objects;
+
+@end
+
 NS_ASSUME_NONNULL_END

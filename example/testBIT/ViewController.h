@@ -11,3 +11,12 @@
 
 @end
 
+@protocol mk <NSObject>
+
+- (void)make;
+
+@end
+
+@interface mkk : NSObject<mk>
+
+@end

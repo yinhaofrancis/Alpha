@@ -57,7 +57,11 @@ public class StoryboardButterfly{
     public var wrappedValue: UIViewController?{
         if(viewController == nil){
             if let name {
-                self.viewController = self.storyboard.instantiateViewController(identifier: name)
+                if #available(iOS 13.0, *) {
+                    self.viewController = self.storyboard.instantiateViewController(identifier: name)
+                } else {
+                    self.viewController = self.storyboard.instantiateViewController(withIdentifier: name)
+                }
             }else{
                 self.viewController = self.storyboard.instantiateInitialViewController()
             }

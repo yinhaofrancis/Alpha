@@ -13,7 +13,7 @@
 
 @interface vViewController ()
 
-@property (nonatomic,weak) id<BINavigation> navi;
+@property (nonatomic,strong) id<BINavigation,mk> navi;
 @end
 
 
@@ -27,9 +27,17 @@
     
 }
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
+    [self.navi make];
     [self.navi present:[BINavigationRoute url:[NSURL URLWithString:@"/Mark/vMark?mark=mark"]] withAnimation:true];
 }
 @end
 
+@implementation mkk
 
+- (void)make{
+    NSLog(@"!!!!%@",self);
+}
+
+@end
 BIPathRouter(UIViewController, "/vMark", vViewController)
+BIService(mk, mkk)

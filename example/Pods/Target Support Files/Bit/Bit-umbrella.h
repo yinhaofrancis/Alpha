@@ -19,6 +19,7 @@
 #import "BIWeakContainer.h"
 #import "NSURL+BIURL.h"
 #import "BINavigation.h"
+#import "BINavigationAnimation.h"
 #import "BINavigationImp.h"
 #import "BINavigationRoute.h"
 

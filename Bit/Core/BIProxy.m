@@ -93,3 +93,68 @@ NSString * const BIProxyRunloopMode = @"BIProxyRunloop";
     return [self.object isMemberOfClass:aClass];
 }
 @end
+
+@implementation BIMultiProxy
+
+- (instancetype)initWithObjectNames:(NSArray<NSString *> *)objects{
+    _objects = objects;
+    return self;
+}
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)sel {
+    for (id i in self.objects) {
+        if([i respondsToSelector:sel]){
+            id a = [i methodSignatureForSelector:sel];
+            return a;
+        }
+    }
+    return nil;
+}
+
+- (void)forwardInvocation:(NSInvocation *)invocation{
+    for (id i in self.objects) {
+        if([i respondsToSelector:invocation.selector]){
+            [invocation invokeWithTarget:i];
+        }
+    }
+}
+- (BOOL)respondsToSelector:(SEL)aSelector{
+    for (id i in self.objects) {
+        if ([i respondsToSelector:aSelector]){
+            return true;
+        }
+    }
+    return false;
+}
+
+- (NSString *)description {
+    return [self.objects description];
+}
+- (NSString *)debugDescription {
+    return self.objects.debugDescription;
+}
+- (BOOL)conformsToProtocol:(Protocol *)aProtocol{
+    for (id i in self.objects) {
+        if ([i conformsToProtocol:aProtocol]){
+            return true;
+        }
+    }
+    return false;
+}
+
+- (BOOL)isKindOfClass:(Class)aClass {
+    for (id i in self.objects) {
+        if ([i isKindOfClass:aClass]){
+            return true;
+        }
+    }
+    return false;
+}
+- (BOOL)isMemberOfClass:(Class)aClass{
+    for (id i in self.objects) {
+        if ([i isMemberOfClass:aClass]){
+            return true;
+        }
+    }
+    return false;
+}
+@end

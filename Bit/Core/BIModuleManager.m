@@ -92,6 +92,9 @@ static inline void * getRealPtr(void* value);
 - (id)getInstanceByName:(NSString *)name{
     return [self getInstanceByName:name baseClass:nil];
 }
+- (nullable id)getInstanceByProtocol:(Protocol *)proto withName:(NSString *)name{
+    return [self getInstanceByName:[NSString stringWithFormat:@"%@_%@",name,proto] baseClass:nil];
+}
 - (id)getInstanceByName:(NSString *)name baseClass:(Class)bcls{
     if(name.length == 0){
         return nil;
@@ -211,7 +214,7 @@ static inline void * getRealPtr(void* value);
             }
             Ivar iv = class_getInstanceVariable(cls, ivName.UTF8String);
             if(ivName.length > 0 && strlen(ivar_getTypeEncoding(iv)) > 0){
-                id objecta = [self parserObject:type];
+                id objecta = [self parserObject:type name:pname];
                 if (isCopy){
                     objecta = [objecta copy];
                 }
@@ -219,7 +222,7 @@ static inline void * getRealPtr(void* value);
                     object_setIvar(object, iv, objecta);
                 }
             }else if(isReadonly == false){
-                id objecta = [self parserObject:type];
+                id objecta = [self parserObject:type name:pname];
                 if (objecta){
                     if(setter == nil){
                         setter = [NSString stringWithFormat:@"set%@:",[pname capitalizedString]];
@@ -240,9 +243,52 @@ static inline void * getRealPtr(void* value);
     }
 }
 
--(id)parserObject:(NSString *)type{
+-(id)parserObject:(NSString *)type name:(NSString *)name{
     Class bcls;
-    if([type hasPrefix:@"<"] && [type hasSuffix:@">"]){
+    if([type containsString:@"><"]){
+        BOOL hasBaseClass = ![type hasPrefix:@"<"];
+        NSArray<NSString *> *types = [type componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"><"]];
+        NSMutableArray * proto = [NSMutableArray new];
+        [types enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            if(obj.length > 0){
+                [proto addObject:obj];
+            }
+        }];
+        NSString * baseClass = hasBaseClass ? proto.firstObject : nil;
+        if(hasBaseClass){
+            [proto removeObject:baseClass];
+        }
+        if(baseClass == nil){
+            NSMutableArray *instance = [NSMutableArray new];
+            for (NSString* name in proto) {
+                if([self getInstanceClassByName:name baseClass:NSClassFromString(baseClass)]){
+                    [instance addObject: [self getInstanceByName:name baseClass:NSClassFromString(baseClass)]];
+                }else{
+                    return nil;
+                }
+            }
+            return [[BIMultiProxy alloc] initWithObjectNames:instance.copy];
+        }else{
+            id instance;
+            for (NSString* name in proto) {
+                if([self getInstanceClassByName:name baseClass:NSClassFromString(baseClass)]){
+                    if(instance != nil){
+                        if ([instance conformsToProtocol:NSProtocolFromString(name)]){
+                            continue;
+                        }else{
+                            return nil;
+                        }
+                    }else{
+                        instance = [self getInstanceByName:name baseClass:NSClassFromString(baseClass)];
+                    }
+                }else{
+                    return nil;
+                }
+            }
+            return instance;
+        }
+        
+    }else if([type hasPrefix:@"<"] && [type hasSuffix:@">"]){
         type = [type substringWithRange:NSMakeRange(1, type.length - 2)];
     }else if([type containsString:@"<"] && [type hasSuffix:@">"]){
         NSString *temp_type = [type substringWithRange:NSMakeRange(0, type.length - 1)];
@@ -257,8 +303,13 @@ static inline void * getRealPtr(void* value);
     if([type hasPrefix:@"<"] && [type hasSuffix:@">"]){
         type = [type substringWithRange:NSMakeRange(1, type.length - 2)];
     }
-    Class cls = [self getInstanceClassByName:type baseClass:bcls];
-    if(cls){
+    NSString* dy = [NSString stringWithFormat:@"%@_%@",name,type];
+    
+    if([self getInstanceClassByName:dy baseClass:bcls]){
+        return [self getInstanceByName:dy baseClass:bcls];
+    }
+    
+    if([self getInstanceClassByName:type baseClass:bcls]){
         return [self getInstanceByName:type baseClass:bcls];
     }
     return nil;
