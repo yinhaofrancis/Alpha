@@ -20,13 +20,6 @@ NSString * const BIProxyRunloopMode = @"BIProxyRunloop";
         id a = [self.object methodSignatureForSelector:sel];
         return a;
     }
-    if(self.proto){
-        [BIOCRuntimeTool classImplamentProtocol:self.proto selector:sel toClass:self.class imp:^(id obj){
-            
-        }];
-        struct objc_method_description des = protocol_getMethodDescription(self.proto, sel, false, true);
-        return [NSMethodSignature signatureWithObjCTypes:des.types];
-    }
     return nil;
 }
 
@@ -57,14 +50,13 @@ NSString * const BIProxyRunloopMode = @"BIProxyRunloop";
        [invocation invoke];
     }
 }
-- (instancetype)initWithObject:(id)object protocol:(nullable Protocol *)proto{
-    return [self initWithQueue:nil withObject:object protocol:proto];
+- (instancetype)initWithObject:(id)object{
+    return [self initWithQueue:nil withObject:object];
 }
 
-- (instancetype)initWithQueue:(dispatch_queue_t)queue withObject:(nonnull id)object protocol:(nullable Protocol *)proto{
+- (instancetype)initWithQueue:(dispatch_queue_t)queue withObject:(nonnull id)object{
     self->_object = object;
     self.queue = queue;
-    self->_proto = proto;
     if(self.queue){
         dispatch_queue_set_specific(self.queue, "self", (__bridge void * _Nullable)(self), NULL);
     }

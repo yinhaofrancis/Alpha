@@ -11,6 +11,7 @@ target 'example' do
   pod 'Database',:path =>'../Database'
   pod 'SPUAlert',:path =>'../SPUAlert'
   pod 'Bit/Navigation',:path =>'../Bit'
+  pod 'Bit/Net',:path =>'../Bit'
   pod 'Dessert',:path =>'../Dessert'
 #  pod 'LookinServer'
 end
@@ -22,6 +23,7 @@ target 'testBIT' do
   pod 'Database',:path =>'../Database'
   pod 'SPUAlert',:path =>'../SPUAlert'
   pod 'Bit/Navigation',:path =>'../Bit'
+  pod 'Bit/Net',:path =>'../Bit'
   pod 'Dessert',:path =>'../Dessert'
   pod 'Pager',:path =>'../Pager'
 

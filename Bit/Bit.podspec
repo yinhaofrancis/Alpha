@@ -41,4 +41,9 @@ francis private Module with objective-C
     na.dependency  'Bit/Core'
   end
   
+  s.subspec 'Net' do |na|
+    na.source_files = 'Net/**/*'
+    na.dependency  'Bit/Core'
+  end
+  
 end

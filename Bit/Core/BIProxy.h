@@ -21,11 +21,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property(nonatomic,readonly) id object;
 
-@property(nonatomic,readonly) Protocol *proto;
+- (instancetype)initWithObject:(id)object;
 
-- (instancetype)initWithObject:(id)object protocol:(nullable Protocol*)proto;
-
-- (instancetype)initWithQueue:(nullable dispatch_queue_t)queue withObject:(id)object protocol:(nullable Protocol*)proto;
+- (instancetype)initWithQueue:(nullable dispatch_queue_t)queue withObject:(id)object;
 
 @end
 

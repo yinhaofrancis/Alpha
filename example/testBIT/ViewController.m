@@ -4,7 +4,7 @@
 //
 //  Created by wenyang on 2022/11/17.
 //
-
+#import <sys/signal.h>
 #import "ViewController.h"
 @import Bit;
 #import <mach-o/loader.h>
@@ -13,11 +13,7 @@
 
 @interface vViewController ()
 
-@property (nonatomic,strong) id<BINavigation> navi;
-
-@property (nonatomic,strong) id<mk> mm;
-
-@property (nonatomic,strong) id<mk> mkm;
+@property (nonatomic,strong) id<BIRequest> bitRequest;
 
 @end
 
@@ -32,10 +28,9 @@
     
 }
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-    id a = [BIM() getInstanceByProtocol:@protocol(mk) withName:@"mm"];
-    
-    NSLog(@"%@",a);
-    [self.navi present:[BINavigationRoute url:[NSURL URLWithString:@"/Mark/vMark?mark=mark"]] withAnimation:true];
+    [self.bitRequest get:@"www.json.cn" path:@"/json/json2csharp.html" param:nil callback:^(id data, NSURLResponse * _Nullable response, NSError * _Nullable e) {
+        NSLog(@"%@",response);
+    }];
 }
 @end
 

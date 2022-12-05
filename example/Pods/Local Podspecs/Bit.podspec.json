@@ -32,6 +32,15 @@
 
         ]
       }
+    },
+    {
+      "name": "Net",
+      "source_files": "Net/**/*",
+      "dependencies": {
+        "Bit/Core": [
+
+        ]
+      }
     }
   ]
 }

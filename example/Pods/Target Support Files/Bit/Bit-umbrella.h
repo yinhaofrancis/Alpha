@@ -21,6 +21,8 @@
 #import "BINavigation.h"
 #import "BINavigationImp.h"
 #import "BINavigationRoute.h"
+#import "BIRequest.h"
+#import "BIRequestImp.h"
 
 FOUNDATION_EXPORT double BitVersionNumber;
 FOUNDATION_EXPORT const unsigned char BitVersionString[];
