@@ -515,17 +515,20 @@ static inline void * getRealPtr(void* value);
         return true;
     }
     if (strcmp(retType, @encode(double)) == 0) {
-        short val = [(NSNumber *) value shortValue];
-        short *result = v;
+        double val = [(NSNumber *) value doubleValue];
+        double *result = v;
         *result = val;
         return true;
     }
-    if (strcmp(retType, @encode(const char *)) == 0) {
-        const char* result = [(NSString*) value UTF8String];
-        memcpy(v, &result, sizeof(const char *));
-        return true;
+    if (strcmp(retType, @encode(const char *)) == 0 || strcmp(retType, @encode(char *)) == 0) {
+        if([value respondsToSelector:@selector(UTF8String)]){
+            const char* result = [(NSString*) value UTF8String];
+            memcpy(v, &result, sizeof(const char *));
+            return true;
+        }else{
+            return false;
+        }
     }
-    memcpy(v, (__bridge const void *)(value), sizeof(void *));
     return false;
     
 }
@@ -604,7 +607,7 @@ static inline void * getRealPtr(void* value);
     if (strcmp(retType, @encode(const char *)) == 0 ||strcmp(retType, @encode(char *)) == 0) {
         char* result = *((char **)value);
 
-        return [[NSString alloc] initWithCString:result encoding:NSASCIIStringEncoding];
+        return [[NSString alloc] initWithCString:result encoding:NSUTF8StringEncoding];
     }
     return (__bridge id)getRealPtr(value);
 }
