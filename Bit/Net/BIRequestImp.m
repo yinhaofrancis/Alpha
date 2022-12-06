@@ -10,7 +10,6 @@
 #import "BIAnnotation.h"
 
 @interface BIRequestImp ()<BIModule>
-@property (nonatomic,nonnull) dispatch_queue_t queue;
 @property (nonatomic,nonnull) NSURLSession *session;
 @end
 
@@ -20,7 +19,6 @@
 {
     self = [super init];
     if (self) {
-        self.queue = dispatch_queue_create("BIRequestImp", DISPATCH_QUEUE_CONCURRENT_WITH_AUTORELEASE_POOL);
         self.session = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.defaultSessionConfiguration];
     }
     return self;
