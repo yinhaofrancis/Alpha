@@ -1,6 +1,0 @@
-framework module Dessert {
-  umbrella header "Dessert-umbrella.h"
-
-  export *
-  module * { export * }
-}

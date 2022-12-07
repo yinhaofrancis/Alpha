@@ -1,6 +1,0 @@
-framework module butterfly {
-  umbrella header "butterfly-umbrella.h"
-
-  export *
-  module * { export * }
-}

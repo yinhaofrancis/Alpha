@@ -1,29 +1,30 @@
 # Uncomment the next line to define a global platform for your project
 
 source 'https://cdn.cocoapods.org/'
+source 'git@github.com:yinhaofrancis/FSCocoapods.git'
 platform :ios, '12.0'
 use_frameworks!
 
 target 'example' do
 
-  pod 'butterfly',:path =>'../butterfly'
-  pod 'RenderImage',:path =>'../RenderImage'
+  pod 'butterfly'
+#  pod 'RenderImage'
   pod 'Database',:path =>'../Database'
   pod 'SPUAlert',:path =>'../SPUAlert'
-  pod 'Bit/Navigation',:path =>'../Bit'
-  pod 'Bit/Net',:path =>'../Bit'
+  pod 'Bit/Navigation'
+  pod 'Bit/Net'
   pod 'Dessert',:path =>'../Dessert'
 #  pod 'LookinServer'
 end
 
 target 'testBIT' do
 
-  pod 'butterfly',:path =>'../butterfly'
-  pod 'RenderImage',:path =>'../RenderImage'
+  pod 'butterfly'
+#  pod 'RenderImage'
   pod 'Database',:path =>'../Database'
   pod 'SPUAlert',:path =>'../SPUAlert'
-  pod 'Bit/Navigation',:path =>'../Bit'
-  pod 'Bit/Net',:path =>'../Bit'
+  pod 'Bit/Navigation'
+  pod 'Bit/Net'
   pod 'Dessert',:path =>'../Dessert'
   pod 'Pager',:path =>'../Pager'
 
