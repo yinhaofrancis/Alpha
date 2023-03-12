@@ -8,13 +8,14 @@ final class DapaTests: XCTestCase {
         for i in 0 ..< 10{
             var m = nnn()
             m.m = "\(i)"
-            m.n = "\(i)00"
-            try m.insert(db: k)
+            m.n = "\(i)000"
+            try m.replace(db: k)
         }
+        nnn().createIndex(index: "indexMm", withColumn: "n", db: k)
     }
     func testExample11() throws {
         let k = try Database(name: "mm")
-        let n:[nnn] = try DatabaseQueryModel<nnn>(select: .init(tableName: .init(table: .name(name: "mm")),orderBy: [.init(colume: "m", asc: false)],limit: 5,offset: 0)).query(db: k)
+        let n:[nnn] = try DatabaseQueryModel<nnn>(select: .init(tableName: .init(table: .name(name: "mm")),orderBy: [.init(colume: "m", asc: true)],limit: 5,offset: 0)).query(db: k)
         print(n)
     }
     
@@ -34,7 +35,7 @@ public struct nnn:DatabaseModel{
     public static var declare: [Dapa.DatabaseColumeDeclare] {
         [
             DatabaseColumeDeclare(name: "m", type: .textDecType,primary: true),
-            DatabaseColumeDeclare(name: "n", type: .textDecType)
+            DatabaseColumeDeclare(name: "n", type: .doubleDecType)
         ]
     }
     

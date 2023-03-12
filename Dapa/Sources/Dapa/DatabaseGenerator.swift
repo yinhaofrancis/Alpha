@@ -83,10 +83,10 @@ extension DatabaseGenerator{
         }
         public struct JoinTable{
             public var table:String
-            public init(table:TableName){
+            public init(table:ItemName){
                 self.table = table.description
             }
-            public func join(type:TableJoin,table:TableName)->JoinTable{
+            public func join(type:TableJoin,table:ItemName)->JoinTable{
                 var jt = JoinTable(table: .name(name: ""))
                 jt.table = self.table + " " + type.rawValue + table.description
                 return jt
@@ -96,7 +96,7 @@ extension DatabaseGenerator{
 }
 
 extension DatabaseGenerator {
-    public enum TableName:CustomStringConvertible{
+    public enum ItemName:CustomStringConvertible{
         case withSchema(schema:String,name:String)
         case name(name:String)
         public var description: String{
@@ -112,7 +112,7 @@ extension DatabaseGenerator {
     public struct Table:DatabaseExpress{
         public init(istemp: Bool = false,
                     ifNotExists: Bool = false,
-                    tableName: TableName,
+                    tableName: ItemName,
                     columeDefine: [DatabaseColumeDeclare]) {
             self.istemp = istemp
             self.ifNotExists = ifNotExists
@@ -124,7 +124,7 @@ extension DatabaseGenerator {
         
         public var ifNotExists:Bool = false
         
-        public var tableName:TableName
+        public var tableName:ItemName
         
         public var columeDefine:[DatabaseColumeDeclare]
         
@@ -160,13 +160,13 @@ extension DatabaseGenerator {
         public var value:String
         public var insertType:InsertType
         
-        public init(insert:InsertType, table: TableName, colume: [String], value: [String]) {
+        public init(insert:InsertType, table: ItemName, colume: [String], value: [String]) {
             self.table = table.description
             self.colume = colume
             self.insertType = insert
             self.value = " VALUES (\(value.joined(separator: ",")))"
         }
-        public init(insert:InsertType,table: TableName, colume: [String], value: Select) {
+        public init(insert:InsertType,table: ItemName, colume: [String], value: Select) {
             self.insertType = insert
             self.table = table.description
             self.colume = colume
@@ -182,10 +182,10 @@ extension DatabaseGenerator {
             "DELETE FROM " + self.table.description + " WHERE " + condition
         }
         
-        public var table:TableName
+        public var table:ItemName
         public var condition:String
         
-        public init(table: TableName, condition:String) {
+        public init(table: ItemName, condition:String) {
             self.table = table
             self.condition = condition
         }
@@ -198,7 +198,7 @@ extension DatabaseGenerator {
         }
         
         public var keyValue:[String:String]
-        public var table:TableName
+        public var table:ItemName
         public var condition:String
     }
 }
@@ -207,7 +207,7 @@ extension DatabaseGenerator {
     public struct Index:DatabaseExpress{
         public init(isUnique: Bool = false,
                     ifNotExists: Bool = false,
-                    indexName: TableName,
+                    indexName: ItemName,
                     tableName:String,
                     columes: [String],
                     condition:String? = nil) {
@@ -225,7 +225,7 @@ extension DatabaseGenerator {
         
         public var tableName:String
         
-        public var indexName:TableName
+        public var indexName:ItemName
         
         public var columes:[String]
         

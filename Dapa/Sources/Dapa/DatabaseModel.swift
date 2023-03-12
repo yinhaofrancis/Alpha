@@ -76,6 +76,10 @@ extension DatabaseModel{
         let sql = DatabaseGenerator.Table(ifNotExists: true, tableName: .name(name:Self.tableName), columeDefine: Self.declare)
         db.exec(sql: sql.sqlCode)
     }
+    public func createIndex(index:String,withColumn:String,db:Database){
+        let sql = DatabaseGenerator.Index(indexName: .name(name: index), tableName: Self.tableName, columes: [withColumn])
+        db.exec(sql: sql.sqlCode)
+    }
     public func insert(db:Database) throws {
         let col = Self.declare.map{$0.name}
         let sql = DatabaseGenerator.Insert(insert: .insert, table: .name(name: Self.tableName), colume:col , value: col.map { "@" + $0 })
