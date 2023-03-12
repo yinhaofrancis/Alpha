@@ -47,7 +47,7 @@ public struct Database:Hashable{
             return false
         }
     }
-    public var DatabaseVersion:Int{
+    public var UserVersion:Int{
         get{
             do {
                 let rs = try self.prepare(sql: "PRAGMA user_version")
@@ -216,6 +216,44 @@ public struct Database:Hashable{
             String(cString: sqlite3_column_text(self.stmt, index))
         }
  
+        public func colume(index:Int32,type:CollumnDecType)->Codable{
+            switch type{
+            case .intDecType:
+                return self.columeInt(index: index)
+            case .doubleDecType:
+                return self.columeDouble(index: index)
+            case .textDecType:
+                return self.columeString(index: index)
+            case .dataDecType:
+                return self.columeData(index: index)
+            case .jsonDecType:
+                return self.columeData(index: index)
+            case .dateDecType:
+                return self.columeDate(index: index)
+            }
+        }
+        public func colume<T:Codable>(index:Int32,type:CollumnDecType,valueType:T.Type)->Codable{
+            switch type{
+            case .intDecType:
+                return self.columeInt(index: index)
+            case .doubleDecType:
+                return self.columeDouble(index: index)
+            case .textDecType:
+                return self.columeString(index: index)
+            case .dataDecType:
+                return self.columeData(index: index)
+            case .jsonDecType:
+                let a = self.columeData(index: index)
+                do{
+                    return try DapaJsonDecoder.decode(valueType, from: a)
+                }catch{
+                    return a
+                }
+            case .dateDecType:
+                return self.columeDate(index: index)
+            }
+        }
+        
         public func columeDate(index:Int32)->Date{
             let time = sqlite3_column_double(self.stmt, index)
             return Date(timeIntervalSince1970: time)

@@ -14,9 +14,9 @@ final class DapaTests: XCTestCase {
         
         print(sql)
         
-        let sqq = DatabaseGenerator.Insert(table: .name(name: "mmm"), colume: [], value: ["1","2"]).sqlCode
+        let sqq = DatabaseGenerator.Insert(insert: .insert, table: .name(name: "mmm"), colume: [], value: ["1","2"]).sqlCode
         
-        let sqqq = DatabaseGenerator.Insert(table: .name(name: "mmm"), colume: [], value: DatabaseGenerator.Select(tableName: .init(table: .name(name: "mmm")))).sqlCode
+        let sqqq = DatabaseGenerator.Insert(insert: .replace, table: .name(name: "mmm"), colume: [], value: DatabaseGenerator.Select(tableName: .init(table: .name(name: "mmm")))).sqlCode
         print(sqq)
         print(sqqq)
         
@@ -26,18 +26,38 @@ final class DapaTests: XCTestCase {
         print(DatabaseGenerator.Delete(table: .name(name: "mmm"), condition: "a == 1").sqlCode)
         
         print(DatabaseGenerator.Index(indexName: .name(name: "imm"), tableName: "mmm", columes: ["a"], condition: "a > 0").sqlCode)
+        var m = mmm()
+        m["a"] = "k"
+        m["b"] = nnn(a: "ll", b: 1)
+        var g = m.modelMap
+        print(g)
+        print(m)
+        let a = try! Database(name: "dd")
+        a.exec(sql: DatabaseGenerator.Table(tableName: .name(name: mmm.tableName), columeDefine: mmm.declare).sqlCode)
+        let tryj = try a.prepare(sql: "select * from mmm")
+        try tryj.step()
+        var mx = mmm()
+        tryj.colume(model: &mx)
+        tryj.close()
     }
 }
 
-public class mmm:DatabaseModel{
+public struct nnn:Codable{
+    var a:String
+    var b:Int
+}
+
+public struct mmm:DatabaseModel{
     public static var tableName: String{
         return "mmm"
     }
     
     public static var declare: [Dapa.DatabaseColumeDeclare]{
-        DatabaseColumeDeclare(name: "a", type: .textDecType)
-        DatabaseColumeDeclare(name: "b", type: .jsonDecType)
+        DatabaseColumeTypeDeclare(name: "a", type: .textDecType, keyPath: \mmm.a)
+        DatabaseColumeJSONDeclare(name: "b", keyPath: \mmm.b)
     }
     
+    public var a:String = ""
+    public var b:String = "dasd"
     
 }

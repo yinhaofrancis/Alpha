@@ -146,20 +146,28 @@ extension DatabaseGenerator {
 
 extension DatabaseGenerator {
     public struct Insert:DatabaseExpress{
+        public enum InsertType:String{
+            case insert = "INSERT INTO"
+            case replace = "REPLACE INTO"
+            case insertReplace = "INSERT OR REPLACE INTO"
+        }
         public var sqlCode: String{
-            "INSERT INTO \(table) \(colume.count == 0 ? "" : "(" + colume.joined(separator: ",") + ")")" +  value
+            "\(insertType.rawValue) \(table) \(colume.count == 0 ? "" : "(" + colume.joined(separator: ",") + ")")" +  value
         }
         
         public var table:String
         public var colume:[String]
         public var value:String
+        public var insertType:InsertType
         
-        public init(table: TableName, colume: [String], value: [String]) {
+        public init(insert:InsertType, table: TableName, colume: [String], value: [String]) {
             self.table = table.description
             self.colume = colume
+            self.insertType = insert
             self.value = " VALUES (\(value.joined(separator: ",")))"
         }
-        public init(table: TableName, colume: [String], value: Select) {
+        public init(insert:InsertType,table: TableName, colume: [String], value: Select) {
+            self.insertType = insert
             self.table = table.description
             self.colume = colume
             self.value = value.sqlCode
