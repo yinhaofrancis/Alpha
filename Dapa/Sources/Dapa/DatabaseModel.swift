@@ -43,25 +43,17 @@ public enum CollumnDecType:String{
     }
 }
 
-@resultBuilder
-public struct ColumeDefine{
-    public static func buildBlock(_ components: DatabaseColumeDeclare...) -> [DatabaseColumeDeclare] {
-        return components
-    }
-}
-
 public class DatabaseColumeDeclare{
     public init(name:String,
                 type: CollumnDecType,
                 primary: Bool = false,
                 unique: Bool = false,
-                notNull: Bool = false,keyPath:AnyKeyPath) {
+                notNull: Bool = false) {
         self.type = type
         self.name = name
         self.unique = unique
         self.notNull = notNull
         self.primary = primary
-        self.keyPath = keyPath
     }
     
     public var name:String
@@ -69,77 +61,67 @@ public class DatabaseColumeDeclare{
     public var unique:Bool = false
     public var notNull:Bool = false
     public var primary:Bool = false
-    public var keyPath:AnyKeyPath
-
-}
-public class DatabaseColumeTypeDeclare<K,V>:DatabaseColumeDeclare{
-    public init(name: String,
-                type: CollumnDecType,
-                primary: Bool = false,
-                unique: Bool = false,
-                notNull: Bool = false,
-                keyPath: WritableKeyPath<K,V>) {
-        super.init(name: name, type: type, primary: primary, unique: unique, notNull: notNull, keyPath: keyPath)
-    }
-}
-public class DatabaseColumeJSONDeclare<K,V:Codable>:DatabaseColumeDeclare{
-    public init(name: String,
-                notNull: Bool = false,
-                keyPath: WritableKeyPath<K,V>) {
-        super.init(name: name, type: .jsonDecType, primary: false, unique: false, notNull: notNull, keyPath: keyPath)
-    }
 }
 
+@dynamicMemberLookup
 public protocol DatabaseModel{
     static var tableName:String { get }
-    @ColumeDefine static var declare:[DatabaseColumeDeclare] { get }
+    static var declare:[DatabaseColumeDeclare] { get }
+    var model:Dictionary<String,Any> { get set}
+    init()
 }
 extension DatabaseModel{
-    public func keyPath<T>(key:String,type:T.Type)->AnyKeyPath?{
-        Self.declare.first {$0.name == key}?.keyPath
+
+    public func create(db:Database){
+        let sql = DatabaseGenerator.Table(ifNotExists: true, tableName: .name(name:Self.tableName), columeDefine: Self.declare)
+        db.exec(sql: sql.sqlCode)
     }
-    public func keyValue<T>(key:String,type:T.Type)->T?{
-        if let kvp = self.keyPath(key: key,type: type) as? WritableKeyPath<Self,T>{
-            return self[keyPath: kvp]
-        }
-        if let kvp = self.keyPath(key: key,type: type) as? WritableKeyPath<Self,T?>{
-            return self[keyPath: kvp]
-        }
-        return nil
+    public func insert(db:Database) throws {
+        let col = Self.declare.map{$0.name}
+        let sql = DatabaseGenerator.Insert(insert: .insert, table: .name(name: Self.tableName), colume:col , value: col.map { "@" + $0 })
+        let rs = try db.prepare(sql: sql.sqlCode)
+        try rs.bind(model: self)
+        _ = try rs.step()
+        rs.close()
     }
-    public mutating func setKeyValue<T>(key:String,value:T){
-        if let kvp = self.keyPath(key: key,type: T.self) as? WritableKeyPath<Self,T>{
-            self[keyPath: kvp] = value
-        }
-        if let kvp = self.keyPath(key: key,type: T.self) as? WritableKeyPath<Self,T?>{
-            self[keyPath: kvp] = value
-        }
-    }
-    public subscript<T>(key:String)->T{
-        get{
-            self.keyValue(key: key, type: T.self)!
-        }
-        mutating set{
-            self.setKeyValue(key: key, value: newValue)
-        }
-    }
-    public func isJson(key:String)->Bool{
-        return Self.declare.first { $0.name == key }?.type == .jsonDecType
-    }
-    public func setJson<T:Codable>(key:String,data:Data) throws ->T?{
-        return try DapaJsonDecoder.decode(T.self, from: data)
+    public func replace(db:Database) throws {
+        let col = Self.declare.map{$0.name}
+        let sql = DatabaseGenerator.Insert(insert: .insertReplace, table: .name(name: Self.tableName), colume:col , value: col.map { "@" + $0 })
+        let rs = try db.prepare(sql: sql.sqlCode)
+        try rs.bind(model: self)
+        try rs.step()
+        rs.close()
     }
     
-    public func setJson<T:Codable>(json:T) throws ->Data{
-        return try DapaJsonEncoder.encode(json)
+    public func update(db:Database) throws {
+        
+        let kv:[String:String] = self.model.keys.reduce(into: [:]) { partialResult, s in
+            partialResult[s] = "@" + s
+        }
+        let sql = DatabaseGenerator.Update(keyValue: kv, table: .name(name: Self.tableName), condition: self.primaryCondition)
+        let rs = try db.prepare(sql: sql.sqlCode)
+        try rs.bind(model: self)
+        try rs.step()
+        rs.close()
     }
-    public var modelMap:[String:Any]{
-        let c = Mirror(reflecting: self).children.filter{ $0.label != nil }.reduce(into: [:]) { partialResult, v in
-            partialResult[v.label!] = v.value
-        }
-        return Self.declare.reduce(into: [:]) { partialResult, v in
-            partialResult[v.name] = c[v.name]
-        }
+    public func delete(db:Database) throws {
+ 
+        let sql = DatabaseGenerator.Delete(table: .name(name: Self.tableName), condition: self.primaryCondition)
+        let rs = try db.prepare(sql: sql.sqlCode)
+        try rs.bind(model: self)
+        _ = try rs.step()
+        rs.close()
+    }
+    public mutating func sync(db:Database) throws {
+        let sql = DatabaseGenerator.Select(tableName: .init(table: .name(name: Self.tableName)),condition: self.primaryCondition)
+        let rs = try db.prepare(sql: sql.sqlCode)
+        try rs.bind(model: self)
+        try rs.step()
+        rs.colume(model: &self)
+        rs.close()
+    }
+    public var primaryCondition:String{
+        Self.declare.filter { $0.primary }.map{ $0.name + "=@" + $0.name }.joined(separator: " and ")
     }
 }
 
@@ -160,15 +142,52 @@ public let DapaJsonEncoder:JSONEncoder = {
 
 extension Database.ResultSet{
     public func bind<T:DatabaseModel>(model:T) throws{
-        let  model = model.modelMap
+        let  model = model.model
         for i in model{
-            try self.bind(name: i.key, value: i.value)
+            try self.bind(name: "@" + i.key, value: i.value)
         }
     }
-    public func colume<T:DatabaseModel>( model:inout T){
-        for i in (0 ..< self.columeCount){
-            let a = self.colume(index: i, type: self.columeDecType(index: i) ?? .textDecType)
-            print(a)
+    public func colume<T:DatabaseModel>(model:inout T){
+        for i in 0 ..< self.columeCount{
+            model.model[self.columeName(index: i)] = self.colume(index: i)
         }
+    }
+}
+
+extension DatabaseModel{
+    public subscript<T>(dynamicMember dynamicMember:String)->T?{
+        get{
+            self.model[dynamicMember] as? T
+        }
+        set{
+            self.model[dynamicMember] = newValue
+        }
+    }
+}
+
+public struct DatabaseQueryModel<T:DatabaseModel>{
+    public var select:DatabaseGenerator.Select
+    public init(select:DatabaseGenerator.Select){
+        self.select = select
+    }
+    public func query(db:Database,param:DatabaseModel? = nil) throws ->[T] {
+        let rs = try db.prepare(sql: self.select.sqlCode)
+        var results:[T] = []
+        if let dn = param{
+            try rs.bind(model: dn)
+        }
+        while try rs.step() == .hasColumn {
+            var result = T()
+            rs.colume(model: &result)
+            results.append(result)
+        }
+        rs.close()
+        return results
+    }
+    public func insert<P:DatabaseModel>(db:Database,model:P) throws {
+        let sql = DatabaseGenerator.Insert(insert: .insert, table: .name(name: P.tableName), colume: P.declare.map{$0.name}, value:select).sqlCode
+        let rs = try db.prepare(sql: sql)
+        try rs.step()
+        rs.close()
     }
 }

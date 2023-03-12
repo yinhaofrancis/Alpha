@@ -183,6 +183,7 @@ public struct Database:Hashable{
                 throw NSError(domain: Database.errormsg(pointer: self.sqlite), code: 4)
             }
         }
+        @discardableResult
         public func step() throws ->ResultSet.StepResult{
             let rc = sqlite3_step(self.stmt)
             if rc == SQLITE_ROW{
@@ -213,7 +214,11 @@ public struct Database:Hashable{
             Float(sqlite3_column_double(self.stmt, index))
         }
         public func columeString(index:Int32)->String{
-            String(cString: sqlite3_column_text(self.stmt, index))
+            guard let cstr = sqlite3_column_text(self.stmt, index) else {
+                return ""
+            }
+            
+            return String(cString: cstr)
         }
  
         public func colume(index:Int32,type:CollumnDecType)->Codable{
@@ -232,7 +237,27 @@ public struct Database:Hashable{
                 return self.columeDate(index: index)
             }
         }
-        public func colume<T:Codable>(index:Int32,type:CollumnDecType,valueType:T.Type)->Codable{
+        public func colume(index:Int32)->Codable{
+            let type = self.columeDecType(index: index)
+            switch type{
+            case .intDecType:
+                return self.columeInt(index: index)
+            case .doubleDecType:
+                return self.columeDouble(index: index)
+            case .textDecType:
+                return self.columeString(index: index)
+            case .dataDecType:
+                return self.columeData(index: index)
+            case .jsonDecType:
+                return self.columeData(index: index)
+            case .dateDecType:
+                return self.columeDate(index: index)
+            case .none:
+                return self.columeString(index: index)
+            }
+        }
+        public func colume<T:Codable>(index:Int32,valueType:T.Type)->Codable{
+            let type:CollumnDecType = self.columeDecType(index: index) ?? .textDecType
             switch type{
             case .intDecType:
                 return self.columeInt(index: index)
