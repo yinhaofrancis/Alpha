@@ -168,17 +168,46 @@ extension DatabaseModel{
         }
     }
 }
-
-public struct DatabaseQueryModel<T:DatabaseModel>{
-    public var select:DatabaseGenerator.Select
-    public init(select:DatabaseGenerator.Select){
-        self.select = select
+extension DatabaseModel{
+    public static func select(condition:String? = nil,
+                              orderBy: [DatabaseGenerator.OrderBy] = [],
+                              limit:UInt64? = nil,
+                              offset:UInt64? = nil)->DatabaseQueryModel{
+        let sql = DatabaseGenerator.Select(tableName: .init(table: .name(name: self.tableName)),
+                                           condition: condition,
+                                           orderBy: orderBy,
+                                           limit: limit,
+                                           offset: offset)
+        return DatabaseQueryModel(sql: sql)
     }
-    public func query(db:Database,param:DatabaseModel? = nil) throws ->[T] {
-        let rs = try db.prepare(sql: self.select.sqlCode)
+    public static func update(keyValues:[String:String],condition:String)->DatabaseQueryModel{
+        let sql = DatabaseGenerator.Update(keyValue: keyValues, table: .name(name: self.tableName), condition: condition)
+        return DatabaseQueryModel(sql: sql)
+    }
+    public static func delete(condition:String)->DatabaseQueryModel{
+        let sql = DatabaseGenerator.Delete(table: .name(name: self.tableName), condition: condition)
+        return DatabaseQueryModel(sql: sql)
+    }
+    public func insert(type:DatabaseGenerator.Insert.InsertType)->DatabaseQueryModel{
+        let keys = self.model.keys
+        let sql = DatabaseGenerator.Insert(insert: type, table: .name(name: Self.tableName), colume: keys.map{$0}, value:keys.map{"@"+$0})
+        return DatabaseQueryModel(sql: sql)
+    }
+    public static func count(condition:String? = nil)->DatabaseQueryModel{
+        let sql = DatabaseGenerator.Select(colume: [.colume(name: "COUNT(*)")],tableName: .init(table: .name(name: Self.tableName)),condition: condition)
+        return DatabaseQueryModel(sql: sql)
+    }
+}
+public struct DatabaseQueryModel{
+    public var sql:DatabaseExpress
+    public init(sql:DatabaseExpress){
+        self.sql = sql
+    }
+    public func query<T:DatabaseModel>(db:Database,param:[String:String] = [:]) throws ->[T] {
+        let rs = try db.prepare(sql: self.sql.sqlCode)
         var results:[T] = []
-        if let dn = param{
-            try rs.bind(model: dn)
+        for i in param{
+            try rs.bind(name: i.key, value: i.value)
         }
         while try rs.step() == .hasColumn {
             var result = T()
@@ -188,9 +217,11 @@ public struct DatabaseQueryModel<T:DatabaseModel>{
         rs.close()
         return results
     }
-    public func insert<P:DatabaseModel>(db:Database,model:P) throws {
-        let sql = DatabaseGenerator.Insert(insert: .insert, table: .name(name: P.tableName), colume: P.declare.map{$0.name}, value:select).sqlCode
-        let rs = try db.prepare(sql: sql)
+    public func exec(db:Database,param:[String:String] = [:]) throws {
+        let rs = try db.prepare(sql: self.sql.sqlCode)
+        for i in param{
+            try rs.bind(name: i.key, value: i.value)
+        }
         try rs.step()
         rs.close()
     }

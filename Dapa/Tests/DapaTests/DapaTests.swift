@@ -14,9 +14,8 @@ final class DapaTests: XCTestCase {
         nnn().createIndex(index: "indexMm", withColumn: "n", db: k)
     }
     func testExample11() throws {
-        let k = try Database(name: "mm")
-        let n:[nnn] = try DatabaseQueryModel<nnn>(select: .init(tableName: .init(table: .name(name: "mm")),orderBy: [.init(colume: "m", asc: true)],limit: 5,offset: 0)).query(db: k)
-        print(n)
+        let c = nnn.count()
+        print(c.sql.sqlCode)
     }
     
 }
