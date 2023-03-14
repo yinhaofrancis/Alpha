@@ -14,8 +14,10 @@ final class DapaTests: XCTestCase {
         nnn().createIndex(index: "indexMm", withColumn: "n", db: k)
     }
     func testExample11() throws {
-        let c = nnn.count()
-        print(c.sql.sqlCode)
+        let k = try Database(name: "mm")
+        try nnn.update(keyValues: ["n":"@m"]).exec(db: k,param: ["@m":"dada".data(using: .utf8)])
+
+//        print(c)
     }
     
 }

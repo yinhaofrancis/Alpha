@@ -64,11 +64,22 @@ public class DatabaseColumeDeclare{
 }
 
 @dynamicMemberLookup
-public protocol DatabaseModel{
-    static var tableName:String { get }
-    static var declare:[DatabaseColumeDeclare] { get }
+public protocol DatabaseResult{
     var model:Dictionary<String,Any> { get set}
     init()
+}
+
+public struct DatabaseResultModel:DatabaseResult{
+    public init() {
+        self.model = Dictionary()
+    }
+    public var model: Dictionary<String, Any>
+}
+
+public protocol DatabaseModel:DatabaseResult{
+    static var tableName:String { get }
+    static var declare:[DatabaseColumeDeclare] { get }
+    
 }
 extension DatabaseModel{
 
@@ -145,26 +156,31 @@ public let DapaJsonEncoder:JSONEncoder = {
 }()
 
 extension Database.ResultSet{
-    public func bind<T:DatabaseModel>(model:T) throws{
+    public func bind<T:DatabaseResult>(model:T) throws{
         let  model = model.model
         for i in model{
             try self.bind(name: "@" + i.key, value: i.value)
         }
     }
-    public func colume<T:DatabaseModel>(model:inout T){
+    public func colume<T:DatabaseResult>(model:inout T){
         for i in 0 ..< self.columeCount{
             model.model[self.columeName(index: i)] = self.colume(index: i)
         }
     }
 }
 
-extension DatabaseModel{
-    public subscript<T>(dynamicMember dynamicMember:String)->T?{
+extension DatabaseResult{
+    public subscript(dynamicMember dynamicMember:String)->Any{
         get{
-            self.model[dynamicMember] as? T
+            self.model[dynamicMember] as Any
         }
         set{
             self.model[dynamicMember] = newValue
+        }
+    }
+    public subscript<T>(dynamicMember dynamicMember:String)->T?{
+        get{
+            self.model[dynamicMember] as? T
         }
     }
 }
@@ -180,7 +196,7 @@ extension DatabaseModel{
                                            offset: offset)
         return DatabaseQueryModel(sql: sql)
     }
-    public static func update(keyValues:[String:String],condition:String)->DatabaseQueryModel{
+    public static func update(keyValues:[String:String],condition:String? = nil)->DatabaseQueryModel{
         let sql = DatabaseGenerator.Update(keyValue: keyValues, table: .name(name: self.tableName), condition: condition)
         return DatabaseQueryModel(sql: sql)
     }
@@ -194,7 +210,7 @@ extension DatabaseModel{
         return DatabaseQueryModel(sql: sql)
     }
     public static func count(condition:String? = nil)->DatabaseQueryModel{
-        let sql = DatabaseGenerator.Select(colume: [.colume(name: "COUNT(*)")],tableName: .init(table: .name(name: Self.tableName)),condition: condition)
+        let sql = DatabaseGenerator.Select(colume: [.colume(name: "COUNT(*) as count")],tableName: .init(table: .name(name: Self.tableName)),condition: condition)
         return DatabaseQueryModel(sql: sql)
     }
 }
@@ -203,7 +219,7 @@ public struct DatabaseQueryModel{
     public init(sql:DatabaseExpress){
         self.sql = sql
     }
-    public func query<T:DatabaseModel>(db:Database,param:[String:String] = [:]) throws ->[T] {
+    public func query<T:DatabaseResult>(db:Database,param:[String:Any] = [:]) throws ->[T] {
         let rs = try db.prepare(sql: self.sql.sqlCode)
         var results:[T] = []
         for i in param{
@@ -217,7 +233,7 @@ public struct DatabaseQueryModel{
         rs.close()
         return results
     }
-    public func exec(db:Database,param:[String:String] = [:]) throws {
+    public func exec(db:Database,param:[String:Any] = [:]) throws {
         let rs = try db.prepare(sql: self.sql.sqlCode)
         for i in param{
             try rs.bind(name: i.key, value: i.value)

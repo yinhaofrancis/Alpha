@@ -303,7 +303,22 @@ public struct Database:Hashable{
             return .nullCollumn
         }
         public func columeDecType(index:Int32)->CollumnDecType?{
-            guard let r = sqlite3_column_decltype(self.stmt, index) else { return nil }
+            guard let r = sqlite3_column_decltype(self.stmt, index) else {
+                let type = self.columeType(index: index)
+                switch(type){
+                    
+                case .nullCollumn:
+                    return nil
+                case .intCollumn:
+                    return .intDecType
+                case .doubleCollumn:
+                    return .doubleDecType
+                case .textCollumn:
+                    return .textDecType
+                case .dataCollumn:
+                    return .dataDecType
+                }
+            }
             return CollumnDecType(rawValue: String(cString: r))
         }
         public var columeCount:Int32{

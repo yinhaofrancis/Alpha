@@ -193,13 +193,22 @@ extension DatabaseGenerator {
 }
 extension DatabaseGenerator {
     public struct Update:DatabaseExpress{
+        public init(keyValue: [String : String],
+                    table: DatabaseGenerator.ItemName,
+                    condition: String? = nil) {
+            self.keyValue = keyValue
+            self.table = table
+            self.condition = condition
+        }
+        
         public var sqlCode: String{
-            "UPDATE " + table.description + " SET " + keyValue.map{$0.key + "=" + $0.value}.joined(separator: ",") + " WHERE " + condition
+            "UPDATE " + table.description + " SET " + keyValue.map{$0.key + "=" + $0.value}.joined(separator: ",") + (condition != nil ? " WHERE " + condition! : "")
         }
         
         public var keyValue:[String:String]
         public var table:ItemName
-        public var condition:String
+        public var condition:String?
+        
     }
 }
 
