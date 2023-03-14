@@ -176,6 +176,9 @@ public struct Database:Hashable{
                 flag = sqlite3_bind_blob64(self.stmt, index, m, sqlite3_uint64(str.count), { p in p?.deallocate()})
             }else if (value is Date){
                 flag = sqlite3_bind_double(self.stmt, index, (value as! Date).timeIntervalSince1970)
+            }else if (value is Dictionary<String,Codable>){
+                let data = try JSONSerialization.data(withJSONObject: value)
+                try self.bind(index: index, value: data)
             }else{
                 flag = sqlite3_bind_value(self.stmt, index, value as? OpaquePointer)
             }
@@ -237,7 +240,7 @@ public struct Database:Hashable{
                 return self.columeDate(index: index)
             }
         }
-        public func colume(index:Int32)->Codable{
+        public func colume(index:Int32)->Any{
             let type = self.columeDecType(index: index)
             switch type{
             case .intDecType:
@@ -249,7 +252,8 @@ public struct Database:Hashable{
             case .dataDecType:
                 return self.columeData(index: index)
             case .jsonDecType:
-                return self.columeData(index: index)
+                let data =  self.columeData(index: index)
+                return (try? JSONSerialization.jsonObject(with: data)) ?? data
             case .dateDecType:
                 return self.columeDate(index: index)
             case .none:
