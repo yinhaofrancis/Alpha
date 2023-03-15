@@ -179,8 +179,6 @@ public struct Database:Hashable{
             }else if (value is Dictionary<String,Codable>){
                 let data = try JSONSerialization.data(withJSONObject: value)
                 try self.bind(index: index, value: data)
-            }else{
-                flag = sqlite3_bind_value(self.stmt, index, value as? OpaquePointer)
             }
             if(flag != noErr){
                 throw NSError(domain: Database.errormsg(pointer: self.sqlite), code: 4)
@@ -260,6 +258,7 @@ public struct Database:Hashable{
                 return self.columeString(index: index)
             }
         }
+
         public func colume<T:Codable>(index:Int32,valueType:T.Type)->Codable{
             let type:CollumnDecType = self.columeDecType(index: index) ?? .textDecType
             switch type{
@@ -358,4 +357,33 @@ public struct Database:Hashable{
     }
 }
 
+extension Database.ResultSet{
+    public func bind<T:DatabaseResult>(model:T) throws{
+        let  model = model.model
+        for i in model{
+            try self.bind(name: "@" + i.key, value: i.value)
+        }
+    }
+    public func colume<T:DatabaseResult>(model:inout T){
+        for i in 0 ..< self.columeCount{
+            model.model[self.columeName(index: i)] = self.colume(index: i)
+        }
+    }
+}
 
+
+
+public let DapaJsonDecoder:JSONDecoder = {
+    let json = JSONDecoder();
+    if #available(iOS 15.0,macOS 12.0, *) {
+        json.allowsJSON5 = true
+    } else {
+
+    };
+    return json
+}()
+
+public let DapaJsonEncoder:JSONEncoder = {
+    let json = JSONEncoder()
+    return json
+}()

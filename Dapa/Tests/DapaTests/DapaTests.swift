@@ -2,61 +2,56 @@ import XCTest
 @testable import Dapa
 
 final class DapaTests: XCTestCase {
-    func testExample() throws {
-        let k = try Database(name: "mm")
-        nnn().create(db: k)
-        for i in 0 ..< 10{
-            var m = nnn()
-            m.m = "\(i)"
-            m.n = "\(i)000"
-            m.json = ["dsds":"asdada"]
-            m.date = Date()
-            try m.replace(db: k)
-        }
-        nnn().createIndex(index: "indexMm", withColumn: "n", db: k)
-        
-        
-        nm().create(db: k)
-        for i in 0 ..< 10{
-            var m = nm()
-            m.name = "dadad"
-            m.age = i
-            try m.replace(db: k)
-        }
-        nm().createIndex(index: "indexMmd", withColumn: "name", db: k)
-    }
-    func testExample11() throws {
-        print(nm.declare.map({$0.name}))
-        let k = try Database(name: "mm")
-        let a:[DatabaseResultModel] = try nnn.select().query(db: k)
-        try nnn.update(keyValues: ["n":"@m"]).exec(db: k,param: ["@m":"dada".data(using: .utf8)])
-        let b:[nm] = try nm.select().query(db: k)
-        print(a)
-        print(b.map({ nm in
-            nm.model
-        }))
-//        print(c)
-    }
     
-}
-
-@propertyWrapper
-public struct DapaPropery<T>{
-    public var wrappedValue: T
-    public init(wrappedValue: T) {
-        self.wrappedValue = wrappedValue
+    func testCreate() throws {
+        let db = try Database(name: "db")
+        Member().create(db: db)
+        MemberOnline().create(db: db)
+        MemberRelation().create(db: db)
+        for i in 0 ..< 100{
+            var mem = Member()
+            mem.domain = "\(i)"
+            mem.username = "name \(i)"
+            mem.remark = "remark \(i)"
+            mem.avatar = "avatar \(i)"
+            try mem.insert(db: db)
+            
+            var onl = MemberOnline()
+            onl.domain = mem.domain
+            onl.online = (i % 2 == 0 ? 1 : 0)
+            try onl.insert(db: db)
+        }
+        
+        for i in 0 ..< 100{
+            var rl = MemberRelation()
+            
+            rl.domain1 = "\(i)"
+            rl.domain2 = "\(Int.random(in: 0 ..< 100))"
+            try? rl.insert(db: db)
+        }
+        
+    }
+    func testSelect() throws {
+        
+        let db = try Database(name: "db")
+    
+        let q = DatabaseGenerator.DatabaseCondition(stringLiteral: "MemberOnline.domain == Member.domain").and(condition: "Member.domain").in(select: .init(colume: [.colume(name: "domain1")], tableName: .init(table: .name(name: "MemberRelation")), condition: "domain2 = 89"))
+        let user:[DatabaseResultModel] = try MemberDisplay().query(condition: q).query(db: db)
+        print(user)
+        
     }
 }
 
-public struct nnn:DatabaseModel{
-    public static var tableName: String = "mmu"
+public struct Member:DatabaseModel{
+    public static var tableName: String = "Member"
     
     public static var declare: [Dapa.DatabaseColumeDeclare] {
         [
-            DatabaseColumeDeclare(name: "m", type: .textDecType,primary: true),
-            DatabaseColumeDeclare(name: "n", type: .doubleDecType),
-            DatabaseColumeDeclare(name: "json", type: .jsonDecType),
-            DatabaseColumeDeclare(name: "date", type: .dateDecType)
+            DatabaseColumeDeclare(name: "domain", type: .textDecType,primary: true),
+            DatabaseColumeDeclare(name: "username", type: .textDecType),
+            DatabaseColumeDeclare(name: "remark", type: .textDecType),
+            DatabaseColumeDeclare(name: "avatar", type: .textDecType)
+            
         ]
     }
     
@@ -66,16 +61,55 @@ public struct nnn:DatabaseModel{
     
 }
 
-public struct nm:DatabaseWrapModel{
-    public static var tableName: String{
-        return "nm"
+public struct MemberOnline:DatabaseModel{
+    public static var tableName: String = "MemberOnline"
+    
+    public static var declare: [Dapa.DatabaseColumeDeclare] {
+        [
+            DatabaseColumeDeclare(name: "domain", type: .textDecType,primary: true),
+            DatabaseColumeDeclare(name: "online", type: .intDecType)
+        ]
     }
-    public init() {}
     
-    @DapaColume(type: .textDecType)
-    public var name:String = ""
+    public init () {}
     
-    @DapaColume(type: .intDecType,primary: true)
-    public var age:Int = 0
+    public var model: Dictionary<String, Any> = [:]
+    
+}
+
+public struct MemberRelation:DatabaseModel{
+    public static var tableName: String = "MemberRelation"
+    
+    public static var declare: [Dapa.DatabaseColumeDeclare] {
+        [
+            DatabaseColumeDeclare(name: "domain1", type: .textDecType,primary: true),
+            DatabaseColumeDeclare(name: "domain2", type: .textDecType,primary: true)
+        ]
+    }
+    
+    public init () {}
+    
+    public var model: Dictionary<String, Any> = [:]
+    
+}
+
+public struct MemberDisplay:DatabaseQueryModel{
+    public init() {
+        self.model = [:]
+    }
+    
+    public static var queryDeclare: [Dapa.DatabaseQueryColumeDeclare] = [
+        .init(name: "MemberOnline.domain", type: .textDecType),
+        .init(name: "username", type: .textDecType),
+        .init(name: "remark", type: .textDecType),
+        .init(name: "avatar", type: .textDecType),
+        .init(name: "online", type: .textDecType),
+    ]
+    
+    public static var table: Dapa.DatabaseGenerator.Select.JoinTable{
+        .init(table: .name(name: "Member")).join(type: .join, table: .name(name: "MemberOnline"))
+    }
+    
+    public var model: Dictionary<String, Any>
     
 }

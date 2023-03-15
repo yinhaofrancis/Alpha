@@ -39,11 +39,10 @@ extension DatabaseGenerator{
         public var asc:Bool
         
     }
-
     public struct Select:DatabaseExpress{
         public init(colume: [ResultColume] = [],
                    tableName: DatabaseGenerator.Select.JoinTable,
-                   condition: String? = nil,
+                   condition: DatabaseCondition? = nil,
                    groupBy: [String] = [],
                    orderBy: [OrderBy] = [],
                    limit: UInt64? = nil,
@@ -56,10 +55,9 @@ extension DatabaseGenerator{
             self.limit = limit
             self.offset = offset
         }
-        
         public var sqlCode: String{
             let c = colume.count > 0 ? colume.map{$0.description}.joined(separator: ",") : " * "
-            let condition = self.condition != nil ? " WHERE " + self.condition! : ""
+            let condition = self.condition != nil ? " WHERE " + self.condition!.sqlCode : ""
             let group = self.groupBy.count == 0 ? "" : " GROUP BY \(groupBy.joined(separator: ","))"
             let offset = offset == nil ? "" : " OFFSET " + offset!.description
             let limit = limit == nil ? "" : " LIMIT " + limit!.description
@@ -69,7 +67,7 @@ extension DatabaseGenerator{
         
         public var colume:[ResultColume] = []
         public var tableName:JoinTable
-        public var condition:String? = nil
+        public var condition:DatabaseCondition? = nil
         public var groupBy:[String] = []
         public var orderBy:[OrderBy] = []
         public var limit:UInt64? = nil
@@ -179,13 +177,13 @@ extension DatabaseGenerator {
     public struct Delete:DatabaseExpress{
         public var sqlCode: String{
             
-            "DELETE FROM " + self.table.description + " WHERE " + condition
+            "DELETE FROM " + self.table.description + " WHERE " + condition.sqlCode
         }
         
         public var table:ItemName
-        public var condition:String
+        public var condition:DatabaseCondition
         
-        public init(table: ItemName, condition:String) {
+        public init(table: ItemName, condition:DatabaseCondition) {
             self.table = table
             self.condition = condition
         }
@@ -195,19 +193,19 @@ extension DatabaseGenerator {
     public struct Update:DatabaseExpress{
         public init(keyValue: [String : String],
                     table: DatabaseGenerator.ItemName,
-                    condition: String? = nil) {
+                    condition: DatabaseCondition? = nil) {
             self.keyValue = keyValue
             self.table = table
             self.condition = condition
         }
         
         public var sqlCode: String{
-            "UPDATE " + table.description + " SET " + keyValue.map{$0.key + "=" + $0.value}.joined(separator: ",") + (condition != nil ? " WHERE " + condition! : "")
+            "UPDATE " + table.description + " SET " + keyValue.map{$0.key + "=" + $0.value}.joined(separator: ",") + (condition != nil ? " WHERE " + condition!.sqlCode : "")
         }
         
         public var keyValue:[String:String]
         public var table:ItemName
-        public var condition:String?
+        public var condition:DatabaseCondition?
         
     }
 }
@@ -219,7 +217,7 @@ extension DatabaseGenerator {
                     indexName: ItemName,
                     tableName:String,
                     columes: [String],
-                    condition:String? = nil) {
+                    condition:DatabaseCondition? = nil) {
             self.isUnique = isUnique
             self.ifNotExists = ifNotExists
             self.indexName = indexName
@@ -238,13 +236,37 @@ extension DatabaseGenerator {
         
         public var columes:[String]
         
-        public var condition:String?
+        public var condition:DatabaseCondition?
         
         public var sqlCode:String{
-            let code = "CREATE \( isUnique ? "UNIQUE" : "") INDEX \(ifNotExists ? "IF NOT EXISTS" : "") \(indexName) ON \(tableName) (\(columes.joined(separator: ",")))" + (condition == nil ? "" : " WHERE " + condition!)
+            let code = "CREATE \( isUnique ? "UNIQUE" : "") INDEX \(ifNotExists ? "IF NOT EXISTS" : "") \(indexName) ON \(tableName) (\(columes.joined(separator: ",")))" + (condition == nil ? "" : " WHERE " + condition!.sqlCode)
 
             return code
         }
     }
 }
 
+extension DatabaseGenerator{
+    public struct DatabaseCondition:DatabaseExpress,CustomStringConvertible,ExpressibleByStringLiteral{
+        public typealias StringLiteralType = String
+        
+        public var sqlCode: String
+        public init(stringLiteral sqlCode: String) {
+            self.sqlCode = sqlCode
+        }
+        public func `in`(select:DatabaseGenerator.Select)->DatabaseCondition{
+            
+            return DatabaseCondition(stringLiteral: sqlCode + " in (\(select.sqlCode)) ")
+        }
+        public func and(condition: DatabaseCondition)->DatabaseCondition{
+            DatabaseCondition(stringLiteral: self.sqlCode + " and " + condition.sqlCode)
+        }
+        public func or(condition: DatabaseCondition)->DatabaseCondition{
+            DatabaseCondition(stringLiteral: self.sqlCode + " or " + condition.sqlCode)
+        }
+        public var description: String{
+            return self.sqlCode
+        }
+    }
+
+}
