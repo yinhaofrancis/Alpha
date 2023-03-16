@@ -36,9 +36,22 @@ final class DapaTests: XCTestCase {
         let db = try Database(name: "db")
     
         let q = DatabaseGenerator.DatabaseCondition(stringLiteral: "MemberOnline.domain == Member.domain").and(condition: "Member.domain").in(select: .init(colume: [.colume(name: "domain1")], tableName: .init(table: .name(name: "MemberRelation")), condition: "domain2 = 22"))
-        let user:[DatabaseResultModel] = try MemberDisplay().query(condition: q).query(db: db)
+        let user:[MemberStaticDisplay] = try MemberStaticDisplay().query(condition: q).query(db: db)
         print(user)
         
+    }
+    
+    func testMMM() throws{
+        let mm = MemberStaticDisplay()
+        mm.domain = "dada"
+        mm.username = "ds"
+        mm.avatar = "dada"
+        mm.online = "dd"
+        mm.remark = "dadad"
+        
+        var nn = MemberStaticDisplay()
+        nn.model = mm.model
+        print(nn)
     }
 }
 
@@ -112,4 +125,25 @@ public struct MemberDisplay:DatabaseQueryModel{
     
     public var model: Dictionary<String, Any>
     
+}
+
+public struct MemberStaticDisplay:DatabaseQueryWrapModel{
+    
+    public static var table: Dapa.DatabaseGenerator.Select.JoinTable{
+        .init(table: .name(name: "Member")).join(type: .join, table: .name(name: "MemberOnline"))
+    }
+    
+    public init(){ }
+    
+    @DapaQueryColume(name:"MemberOnline.domain",colume: "domain",type: .textDecType)
+    public var domain:String = ""
+    @DapaQueryColume(name: "username",type: .textDecType)
+    public var username:String = ""
+    @DapaQueryColume(name: "remark",type: .textDecType)
+    public var remark:String = ""
+    @DapaQueryColume(name: "avatar",type: .textDecType)
+    public var avatar:String = ""
+    @DapaQueryColume(name: "online",type: .textDecType)
+    public var online:String = ""
+
 }

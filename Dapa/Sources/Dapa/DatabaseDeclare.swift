@@ -52,7 +52,7 @@ public class DatabaseColumeDeclare:DatabaseQueryColumeDeclare{
         self.unique = unique
         self.notNull = notNull
         self.primary = primary
-        super.init(name: name, type: type)
+        super.init(name: name, colume: name, type: type)
     }
     
     public var unique:Bool = false
@@ -62,9 +62,11 @@ public class DatabaseColumeDeclare:DatabaseQueryColumeDeclare{
 
 public class DatabaseQueryColumeDeclare{
     public var name:String
+    public var colume:String
     public var type:CollumnDecType
-    public init(name: String, type: CollumnDecType) {
+    public init(name: String,colume:String? = nil,type: CollumnDecType) {
         self.name = name
         self.type = type
+        self.colume = colume ?? name
     }
 }
