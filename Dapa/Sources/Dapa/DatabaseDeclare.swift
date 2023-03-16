@@ -43,21 +43,18 @@ public enum CollumnDecType:String{
     }
 }
 
-public class DatabaseColumeDeclare{
+public class DatabaseColumeDeclare:DatabaseQueryColumeDeclare{
     public init(name:String,
                 type: CollumnDecType,
                 primary: Bool = false,
                 unique: Bool = false,
                 notNull: Bool = false) {
-        self.type = type
-        self.name = name
         self.unique = unique
         self.notNull = notNull
         self.primary = primary
+        super.init(name: name, type: type)
     }
     
-    public var name:String
-    public var type:CollumnDecType
     public var unique:Bool = false
     public var notNull:Bool = false
     public var primary:Bool = false

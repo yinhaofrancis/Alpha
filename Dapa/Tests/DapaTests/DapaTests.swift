@@ -35,7 +35,7 @@ final class DapaTests: XCTestCase {
         
         let db = try Database(name: "db")
     
-        let q = DatabaseGenerator.DatabaseCondition(stringLiteral: "MemberOnline.domain == Member.domain").and(condition: "Member.domain").in(select: .init(colume: [.colume(name: "domain1")], tableName: .init(table: .name(name: "MemberRelation")), condition: "domain2 = 89"))
+        let q = DatabaseGenerator.DatabaseCondition(stringLiteral: "MemberOnline.domain == Member.domain").and(condition: "Member.domain").in(select: .init(colume: [.colume(name: "domain1")], tableName: .init(table: .name(name: "MemberRelation")), condition: "domain2 = 22"))
         let user:[DatabaseResultModel] = try MemberDisplay().query(condition: q).query(db: db)
         print(user)
         
