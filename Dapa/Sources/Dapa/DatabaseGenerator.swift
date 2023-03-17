@@ -247,6 +247,28 @@ extension DatabaseGenerator {
 }
 
 extension DatabaseGenerator{
+    public struct View:DatabaseExpress{
+        public var sqlCode: String{
+            return "CREATE \( istemp ? "TEMP" : "") VIEW \(ifNotExists ? "IF NOT EXISTS" : "") \(viewName) AS \(self.select.sqlCode)"
+        }
+        
+        public init(istemp: Bool = false,
+                    ifNotExists: Bool = false,
+                    viewName: ItemName,
+                    select:Select){
+            self.istemp = istemp
+            self.ifNotExists = ifNotExists
+            self.viewName = viewName
+            self.select = select
+        }
+        var istemp: Bool
+        var ifNotExists: Bool
+        var viewName: ItemName
+        var select:Select
+    }
+}
+
+extension DatabaseGenerator{
     public struct DatabaseCondition:DatabaseExpress,CustomStringConvertible,ExpressibleByStringLiteral{
         public typealias StringLiteralType = String
         

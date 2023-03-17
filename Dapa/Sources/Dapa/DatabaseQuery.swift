@@ -42,14 +42,59 @@ public protocol DatabaseQueryModel:DatabaseResult{
 }
 
 extension DatabaseQueryModel{
-    public func query(condition:DatabaseGenerator.DatabaseCondition? = nil,
+    public static func query(condition:DatabaseGenerator.DatabaseCondition? = nil,
+                      groupBy:[String] = [],
                       orderBy: [DatabaseGenerator.OrderBy] = [],
                       limit:UInt64? = nil,
                       offset:UInt64? = nil)->DatabaseQuery{
-        let array:[DatabaseGenerator.ResultColume] = Self.queryDeclare.map { dqcd in
+        let array:[DatabaseGenerator.ResultColume] = self.queryDeclare.map { dqcd in
                 .colume(name: dqcd.name)
         }
-        let sql = DatabaseGenerator.Select(colume: array, tableName: Self.table, condition: condition, groupBy: [], orderBy: orderBy, limit: limit, offset: offset)
+        let sql = DatabaseGenerator.Select(colume: array, tableName: self.table, condition: condition, groupBy: groupBy, orderBy: orderBy, limit: limit, offset: offset)
         return DatabaseQuery(sql: sql)
+    }
+    public static func select(condition:DatabaseGenerator.DatabaseCondition? = nil,
+                             groupBy:[String] = [],
+                             orderBy: [DatabaseGenerator.OrderBy] = [],
+                             limit:UInt64? = nil,
+                             offset:UInt64? = nil)->DatabaseGenerator.Select{
+        let array:[DatabaseGenerator.ResultColume] = self.queryDeclare.map { dqcd in
+                .colume(name: dqcd.name)
+        }
+        return DatabaseGenerator.Select(colume: array, tableName: self.table, condition: condition, groupBy: groupBy, orderBy: orderBy, limit: limit, offset: offset)
+    }
+    public static func createView(db:Database,
+                            viewName:DatabaseGenerator.ItemName,
+                            condition:DatabaseGenerator.DatabaseCondition? = nil,
+                            groupBy:[String] = [],
+                            orderBy: [DatabaseGenerator.OrderBy] = [],
+                            limit:UInt64? = nil,
+                            offset:UInt64? = nil){
+        db.exec(sql: DatabaseGenerator.View(viewName: viewName, select: self.select(condition: condition, groupBy: groupBy, orderBy: orderBy, limit: limit, offset: offset)).sqlCode)
+        
+    }
+}
+
+
+public protocol DatabaseViewModel:DatabaseQueryModel{
+    static var view:DatabaseGenerator.ItemName { get }
+}
+
+extension DatabaseViewModel{
+    public static func View(db:Database,
+                            condition:DatabaseGenerator.DatabaseCondition? = nil,
+                            groupBy:[String] = [],
+                            orderBy: [DatabaseGenerator.OrderBy] = [],
+                            limit:UInt64? = nil,
+                            offset:UInt64? = nil){
+        db.exec(sql: DatabaseGenerator.View(viewName: self.view, select: self.select(condition: condition, groupBy: groupBy, orderBy: orderBy, limit: limit, offset: offset)).sqlCode)
+        
+    }
+    public static func query(condition:DatabaseGenerator.DatabaseCondition? = nil,
+                             groupBy:[String] = [],
+                             orderBy: [DatabaseGenerator.OrderBy] = [],
+                             limit:UInt64? = nil,
+                             offset:UInt64? = nil)->DatabaseQuery{
+        return DatabaseQuery(sql: DatabaseGenerator.Select(tableName: .init(table: self.view), condition: condition, groupBy: groupBy, orderBy: orderBy, limit: limit, offset: offset))
     }
 }

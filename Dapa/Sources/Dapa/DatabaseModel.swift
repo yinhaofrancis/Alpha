@@ -46,11 +46,11 @@ extension DatabaseModel{
 }
 extension DatabaseModel{
 
-    public func create(db:Database){
-        let sql = DatabaseGenerator.Table(ifNotExists: true, tableName: .name(name:Self.tableName), columeDefine: Self.declare)
+    public static func create(db:Database){
+        let sql = DatabaseGenerator.Table(ifNotExists: true, tableName: .name(name:self.tableName), columeDefine: self.declare)
         db.exec(sql: sql.sqlCode)
     }
-    public func createIndex(index:String,withColumn:String,db:Database){
+    public static func createIndex(index:String,withColumn:String,db:Database){
         let sql = DatabaseGenerator.Index(indexName: .name(name: index), tableName: Self.tableName, columes: [withColumn])
         db.exec(sql: sql.sqlCode)
     }
