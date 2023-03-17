@@ -8,7 +8,8 @@ final class DapaTests: XCTestCase {
         Member.create(db: db)
         MemberOnline.create(db: db)
         MemberRelation.create(db: db)
-        MemberDisplay.View(db: db,condition: MemberDisplay.condition,groupBy: ["domain1"])
+        MemberDisplay.View(db: db)
+        MemberCanVisible.View(db: db)
         for i in 0 ..< 100{
             var mem = Member()
             mem.domain = "\(i)"
@@ -23,6 +24,12 @@ final class DapaTests: XCTestCase {
             try onl.insert(db: db)
         }
         
+        
+        
+        
+    }
+    func testRelation() throws{
+        let db = try Database(name: "db")
         for i in 0 ..< 100{
             var rl = MemberRelation()
             
@@ -30,8 +37,6 @@ final class DapaTests: XCTestCase {
             rl.domain2 = "\(Int.random(in: 0 ..< 100))"
             try? rl.insert(db: db)
         }
-        
-        
     }
     func testSelect() throws {
         
@@ -112,19 +117,16 @@ public struct MemberRelation:DatabaseModel{
 }
 
 public struct MemberDisplay:DatabaseViewModel{
+    public static var groupBy: [String] = ["domain1"]
+    
     
     public static var view: Dapa.DatabaseGenerator.ItemName {
         DatabaseGenerator.ItemName.name(name: "MemberDisplay")
     }
-    public static var groupBy: [String]{
-        [
-            "domain1"
-        ]
-    }
-    
+
     public static var condition: Dapa.DatabaseGenerator.DatabaseCondition?{
         
-        return DatabaseGenerator.DatabaseCondition(stringLiteral: "MemberOnline.domain == Member.domain").and(condition: "Member.domain = MemberRelation.domain1")
+        return DatabaseGenerator.DatabaseCondition(stringLiteral: "MemberOnline.domain == Member.domain").and(condition: "MemberRelation.domain2 = 89") .and(condition: "Member.domain = MemberRelation.domain1")
     }
     
     public init() {
@@ -137,7 +139,6 @@ public struct MemberDisplay:DatabaseViewModel{
         .init(name: "remark", type: .textDecType),
         .init(name: "avatar", type: .textDecType),
         .init(name: "online", type: .textDecType),
-//        .init(name: "domain1", type: .textDecType),
         .init(name: "domain2", type: .textDecType),
     ]
     
@@ -148,7 +149,38 @@ public struct MemberDisplay:DatabaseViewModel{
     public var model: Dictionary<String, Any>
     
 }
-
+public struct MemberCanVisible:DatabaseViewModel{
+    public static var groupBy: [String] = []
+    
+    
+    public static var view: Dapa.DatabaseGenerator.ItemName {
+        DatabaseGenerator.ItemName.name(name: "MemberCanVisible")
+    }
+    
+    public static var condition: Dapa.DatabaseGenerator.DatabaseCondition?{
+        
+        return DatabaseGenerator.DatabaseCondition(stringLiteral: "MemberOnline.domain = Member.domain").and(condition: "MemberOnline.online = 1")
+    }
+    
+    public init() {
+        self.model = [:]
+    }
+    
+    public static var queryDeclare: [Dapa.DatabaseQueryColumeDeclare] = [
+        .init(name: "MemberOnline.domain", type: .textDecType),
+        .init(name: "username", type: .textDecType),
+        .init(name: "remark", type: .textDecType),
+        .init(name: "avatar", type: .textDecType),
+        .init(name: "online", type: .textDecType),
+    ]
+    
+    public static var table: Dapa.DatabaseGenerator.Select.JoinTable{
+        .init(table: .name(name: "Member")).join(type: .join, table: .name(name: "MemberOnline"))
+    }
+    
+    public var model: Dictionary<String, Any>
+    
+}
 public struct MemberStaticDisplay:DatabaseQueryWrapModel{
     
     public static var table: Dapa.DatabaseGenerator.Select.JoinTable{

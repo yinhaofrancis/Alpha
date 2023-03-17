@@ -78,12 +78,12 @@ extension DatabaseQueryModel{
 
 public protocol DatabaseViewModel:DatabaseQueryModel{
     static var view:DatabaseGenerator.ItemName { get }
+    static var condition: Dapa.DatabaseGenerator.DatabaseCondition? { get }
+    static var groupBy:[String] { get }
 }
 
 extension DatabaseViewModel{
     public static func View(db:Database,
-                            condition:DatabaseGenerator.DatabaseCondition? = nil,
-                            groupBy:[String] = [],
                             orderBy: [DatabaseGenerator.OrderBy] = [],
                             limit:UInt64? = nil,
                             offset:UInt64? = nil){

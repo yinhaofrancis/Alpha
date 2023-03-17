@@ -253,7 +253,7 @@ extension DatabaseGenerator{
         }
         
         public init(istemp: Bool = false,
-                    ifNotExists: Bool = false,
+                    ifNotExists: Bool = true,
                     viewName: ItemName,
                     select:Select){
             self.istemp = istemp
