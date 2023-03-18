@@ -25,6 +25,12 @@ public struct Database:Hashable{
             throw NSError(domain: "数据库打开失败", code: 0)
         }
     }
+    public init() throws {
+        self.url = URL(string: "file::memory:?cache=shared")!
+        if sqlite3_open(self.url.path, &self.sqlite) != noErr || self.sqlite == nil{
+            throw NSError(domain: "数据库打开失败", code: 0)
+        }
+    }
     public init(name:String,readonly:Bool = false,mutex:Bool = false) throws {
         let url = try Database.checkDir().appendingPathComponent(name)
         try self.init(url: url, readonly: readonly, mutex: mutex)
@@ -112,9 +118,13 @@ public struct Database:Hashable{
         #endif
         sqlite3_exec(self.sqlite, sql, nil, nil, nil)
     }
+    public var changedRowNumber:Int32{
+        return sqlite3_total_changes(self.sqlite)
+    }
     public func close(){
         sqlite3_close(self.sqlite)
     }
+ 
     public struct ResultSet{
         public let sqlite:OpaquePointer
         public let stmt:OpaquePointer

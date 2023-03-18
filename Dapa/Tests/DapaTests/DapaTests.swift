@@ -10,6 +10,10 @@ final class DapaTests: XCTestCase {
         MemberRelation.create(db: db)
         MemberDisplay.View(db: db)
         MemberCanVisible.View(db: db)
+    }
+    
+    func testInsert() throws{
+        let db = try Database(name: "db")
         for i in 0 ..< 100{
             var mem = Member()
             mem.domain = "\(i)"
@@ -23,10 +27,7 @@ final class DapaTests: XCTestCase {
             onl.online = (i % 2 == 0 ? 1 : 0)
             try onl.insert(db: db)
         }
-        
-        
-        
-        
+        db.close()
     }
     func testRelation() throws{
         let db = try Database(name: "db")
@@ -37,10 +38,11 @@ final class DapaTests: XCTestCase {
             rl.domain2 = "\(Int.random(in: 0 ..< 100))"
             try? rl.insert(db: db)
         }
+        db.close()
     }
     func testSelect() throws {
         
-        let db = try Database(name: "db")
+        let db = try Database(name: "db",readonly: true)
         
         let q = DatabaseGenerator.DatabaseCondition(stringLiteral: "MemberOnline.domain == Member.domain").and(condition: "MemberRelation.domain2 = 89") .and(condition: "Member.domain = MemberRelation.domain1")
         let user:[MemberStaticDisplay] = try MemberStaticDisplay.query(condition: q,groupBy: ["domain1"]).query(db: db)
@@ -49,19 +51,45 @@ final class DapaTests: XCTestCase {
         let st:[MemberDisplay] = try MemberDisplay.query(condition: "domain2=89").query(db: db)
         print(user)
         print(st)
+        db.close()
     }
     
     func testMMM() throws{
-        let mm = MemberStaticDisplay()
-        mm.domain = "dada"
-        mm.username = "ds"
-        mm.avatar = "dada"
-        mm.online = "dd"
-        mm.remark = "dadad"
+        let db = try Database()
+        Member.create(db: db)
+        MemberOnline.create(db: db)
+        MemberRelation.create(db: db)
+        MemberDisplay.View(db: db)
+        MemberCanVisible.View(db: db)
+        for i in 0 ..< 100{
+            var mem = Member()
+            mem.domain = "\(i)"
+            mem.username = "name \(i)"
+            mem.remark = "remark \(i)"
+            mem.avatar = "avatar \(i)"
+            try mem.insert(db: db)
+            
+            var onl = MemberOnline()
+            onl.domain = mem.domain
+            onl.online = (i % 2 == 0 ? 1 : 0)
+            try onl.insert(db: db)
+        }
+        for i in 0 ..< 100{
+            var rl = MemberRelation()
+            
+            rl.domain1 = "\(i)"
+            rl.domain2 = "\(Int.random(in: 0 ..< 100))"
+            try? rl.insert(db: db)
+        }
+        let q = DatabaseGenerator.DatabaseCondition(stringLiteral: "MemberOnline.domain == Member.domain").and(condition: "MemberRelation.domain2 = 89") .and(condition: "Member.domain = MemberRelation.domain1")
+        let user:[MemberStaticDisplay] = try MemberStaticDisplay.query(condition: q,groupBy: ["domain1"]).query(db: db)
         
-        var nn = MemberStaticDisplay()
-        nn.model = mm.model
-        print(nn)
+//        let st:[MemberDisplay] = try MemberDisplay.select(db: db,condtion: "domain2=89")
+        let st:[MemberDisplay] = try MemberDisplay.query(condition: "domain2=89").query(db: db)
+        let backup = try DatabaseBackup(name: "mmm", database: db)
+        backup.backup()
+        
+        
     }
 }
 
