@@ -56,6 +56,7 @@ final class DapaTests: XCTestCase {
     
     func testMMM() throws{
         let db = try Database()
+        
         Member.create(db: db)
         MemberOnline.create(db: db)
         MemberRelation.create(db: db)
@@ -71,7 +72,7 @@ final class DapaTests: XCTestCase {
             
             var onl = MemberOnline()
             onl.domain = mem.domain
-            onl.online = (i % 2 == 0 ? 1 : 0)
+            onl.online = Int.random(in: 0 ..< 2)
             try onl.insert(db: db)
         }
         for i in 0 ..< 100{

@@ -9,6 +9,10 @@ import Foundation
 import SQLite3
 import SQLite3.Ext
 
+
+
+
+
 public struct Database:Hashable{
     
     public let url:URL
@@ -397,3 +401,76 @@ public let DapaJsonEncoder:JSONEncoder = {
     let json = JSONEncoder()
     return json
 }()
+
+extension Database{
+    public enum JournalMode:String{
+        case DELETE
+        case TRUNCATE
+        case PERSIST
+        case MEMORY
+        case WAL
+        case OFF
+    }
+    
+    public var journalMode:JournalMode{
+        get{
+            do{
+                let rs = try self.prepare(sql: "PRAGMA journal_mode")
+                defer {
+                    rs.close()
+                }
+                try rs.step()
+                let jm = rs.columeString(index: 0)
+                return JournalMode(rawValue: jm) ?? .OFF
+            }catch{
+                return .OFF
+            }
+        }
+        set{
+            self.exec(sql: "PRAGMA journal_mode = \(newValue)")
+        }
+    }
+    
+    public enum CheckPointMode:Int32{
+        case PASSIVE = 0
+        case FULL = 1
+        case RESTART = 2
+        case TRUNCATE = 3
+    }
+    
+    public func checkPoint(mode:CheckPointMode = .FULL){
+        if SQLITE_OK == sqlite3_wal_checkpoint_v2(self.sqlite, nil, mode.rawValue, nil, nil){
+            print("check point ok")
+        }
+        sqlite3_os_init()
+    }
+    
+    public func autoCheckPoint(n:Int32 = 10000){
+        sqlite3_wal_autocheckpoint(self.sqlite, n)
+    }
+    public var synchronous:Synchronous{
+        get{
+            do{
+                let rs = try self.prepare(sql: "PRAGMA synchronous")
+                defer {
+                    rs.close()
+                }
+                try rs.step()
+                let jm = rs.columeInt(index: 0)
+                return Synchronous(rawValue: jm) ?? .OFF
+            }catch{
+                return .OFF
+            }
+        }
+        
+        set{
+            self.exec(sql: "PRAGMA synchronous = \(newValue)")
+        }
+    }
+    public enum Synchronous:Int{
+        case OFF = 0
+        case NORMAL = 1
+        case FULL = 2
+        case EXTRA = 3
+    }
+}

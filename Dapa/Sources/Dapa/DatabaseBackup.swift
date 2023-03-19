@@ -27,14 +27,9 @@ public class DatabaseBackup{
     public func backup(){
         let back = sqlite3_backup_init(self.backupDb.sqlite!, "main", self.database.sqlite!, "main");
         if(back != nil){
-            repeat{
-                let rc = sqlite3_backup_step(back, 5)
-                let count = sqlite3_backup_pagecount(back)
-                let remain = sqlite3_backup_remaining(back)
-                if(remain >= count){
-                    break
-                }
-            }while(true);
+            while(sqlite3_backup_remaining(back) > 0){
+                sqlite3_backup_step(back, sqlite3_backup_pagecount(back))
+            }
         }
         self.backupDb.close()
         self.database.close()
