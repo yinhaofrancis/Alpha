@@ -15,10 +15,12 @@ import SQLite3.Ext
 
 public struct Database:Hashable{
     
+    // MARK: store property
     public let url:URL
     
     public private(set) var sqlite:OpaquePointer?
     
+    // MARK: init
     public init(url:URL,readonly:Bool = false,mutex:Bool = false) throws {
         self.url = url
         #if DEBUG
@@ -39,6 +41,7 @@ public struct Database:Hashable{
         let url = try Database.checkDir().appendingPathComponent(name)
         try self.init(url: url, readonly: readonly, mutex: mutex)
     }
+    // MARK: hasable
     public static func == (lhs: Database, rhs: Database) -> Bool {
         return lhs.url == rhs.url
     }
@@ -46,6 +49,7 @@ public struct Database:Hashable{
     public func hash(into hasher: inout Hasher) {
         hasher.combine(url)
     }
+    // MARK: db api
     public func tableExist(name:String) throws->Bool{
         let rs = try self.prepare(sql: "PRAGMA table_info(\(name))")
         defer{
@@ -55,45 +59,6 @@ public struct Database:Hashable{
             return true
         }else{
             return false
-        }
-    }
-    public var UserVersion:Int{
-        get{
-            do {
-                let rs = try self.prepare(sql: "PRAGMA user_version")
-                defer{
-                    rs.close()
-                }
-                _ = try rs.step()
-                let v = rs.columeInt(index: 0)
-                
-                return v
-            }catch{
-                return 0
-            }
-        }
-        set{
-            self.exec(sql: "PRAGMA user_version = \(newValue)")
-        }
-    }
-    public var foreignKeys:Bool{
-        set{
-            self.exec(sql: "PRAGMA foreign_keys = \(newValue ? 1 : 0)")
-        }
-        get{
-            do {
-                let rs = try self.prepare(sql: "PRAGMA foreign_keys")
-                defer{
-                    rs.close()
-                }
-                _ = try rs.step()
-                let v = rs.columeInt(index: 0) > 0
-                
-                return v
-            }catch{
-                return false
-            }
-            
         }
     }
     public func begin(){
@@ -116,26 +81,41 @@ public struct Database:Hashable{
         return Database.ResultSet(sqlite: self.sqlite!, stmt: stmt!)
     }
     
-    public func exec(sql:String){
-        #if DEBUG
-            print(sql)
-        #endif
-        sqlite3_exec(self.sqlite, sql, nil, nil, nil)
-    }
-    public var changedRowNumber:Int32{
-        return sqlite3_total_changes(self.sqlite)
-    }
     public func close(){
         sqlite3_close(self.sqlite)
     }
+    static public func checkDir() throws->URL{
+        let name = Bundle.main.bundleIdentifier ?? "main" + ".Database"
+        let url = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true).appendingPathComponent(name)
+        var b:ObjCBool = false
+        let a = FileManager.default.fileExists(atPath: url.path, isDirectory: &b)
+        if !(b.boolValue && a){
+            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
+        }
+        return url
+    }
+    public static func errormsg(pointer:OpaquePointer?)->String{
+        String(cString: sqlite3_errmsg(pointer))
+    }
+    public func deleteDatabaseFile(){
+        do{
+            try FileManager.default.removeItem(at: self.url)
+        }catch{
+            print(error)
+        }
+    }
  
+    // MARK: Result set
     public struct ResultSet{
+        // MARK: store property
         public let sqlite:OpaquePointer
         public let stmt:OpaquePointer
+        // MARK: init
         public init(sqlite:OpaquePointer,stmt:OpaquePointer){
             self.sqlite = sqlite
             self.stmt = stmt
         }
+        // MARK: result set api
         public func getParamIndexBy(name:String)->Int32{
             sqlite3_bind_parameter_index(self.stmt, name)
         }
@@ -349,26 +329,6 @@ public struct Database:Hashable{
             case end
         }
     }
-    static public func checkDir() throws->URL{
-        let name = Bundle.main.bundleIdentifier ?? "main" + ".Database"
-        let url = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true).appendingPathComponent(name)
-        var b:ObjCBool = false
-        let a = FileManager.default.fileExists(atPath: url.path, isDirectory: &b)
-        if !(b.boolValue && a){
-            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
-        }
-        return url
-    }
-    public static func errormsg(pointer:OpaquePointer?)->String{
-        String(cString: sqlite3_errmsg(pointer))
-    }
-    public func deleteDatabaseFile(){
-        do{
-            try FileManager.default.removeItem(at: self.url)
-        }catch{
-            print(error)
-        }
-    }
 }
 
 extension Database.ResultSet{
@@ -403,6 +363,14 @@ public let DapaJsonEncoder:JSONEncoder = {
 }()
 
 extension Database{
+    // MARK: state
+    public enum CheckPointMode:Int32{
+        case PASSIVE = 0
+        case FULL = 1
+        case RESTART = 2
+        case TRUNCATE = 3
+    }
+    
     public enum JournalMode:String{
         case DELETE
         case TRUNCATE
@@ -410,6 +378,56 @@ extension Database{
         case MEMORY
         case WAL
         case OFF
+    }
+    
+    public enum Synchronous:Int{
+        case OFF = 0
+        case NORMAL = 1
+        case FULL = 2
+        case EXTRA = 3
+    }
+    // MARK: db state
+    public var UserVersion:Int{
+        get{
+            do {
+                let rs = try self.prepare(sql: "PRAGMA user_version")
+                defer{
+                    rs.close()
+                }
+                _ = try rs.step()
+                let v = rs.columeInt(index: 0)
+                
+                return v
+            }catch{
+                return 0
+            }
+        }
+        set{
+            self.exec(sql: "PRAGMA user_version = \(newValue)")
+        }
+    }
+    public var changedRowNumber:Int32{
+        return sqlite3_total_changes(self.sqlite)
+    }
+    public var foreignKeys:Bool{
+        set{
+            self.exec(sql: "PRAGMA foreign_keys = \(newValue ? 1 : 0)")
+        }
+        get{
+            do {
+                let rs = try self.prepare(sql: "PRAGMA foreign_keys")
+                defer{
+                    rs.close()
+                }
+                _ = try rs.step()
+                let v = rs.columeInt(index: 0) > 0
+                
+                return v
+            }catch{
+                return false
+            }
+            
+        }
     }
     
     public var journalMode:JournalMode{
@@ -431,23 +449,6 @@ extension Database{
         }
     }
     
-    public enum CheckPointMode:Int32{
-        case PASSIVE = 0
-        case FULL = 1
-        case RESTART = 2
-        case TRUNCATE = 3
-    }
-    
-    public func checkPoint(mode:CheckPointMode = .FULL){
-        if SQLITE_OK == sqlite3_wal_checkpoint_v2(self.sqlite, nil, mode.rawValue, nil, nil){
-            print("check point ok")
-        }
-        sqlite3_os_init()
-    }
-    
-    public func autoCheckPoint(n:Int32 = 10000){
-        sqlite3_wal_autocheckpoint(self.sqlite, n)
-    }
     public var synchronous:Synchronous{
         get{
             do{
@@ -467,10 +468,106 @@ extension Database{
             self.exec(sql: "PRAGMA synchronous = \(newValue)")
         }
     }
-    public enum Synchronous:Int{
-        case OFF = 0
-        case NORMAL = 1
-        case FULL = 2
-        case EXTRA = 3
+    
+    public func checkPoint(mode:CheckPointMode = .FULL){
+        if SQLITE_OK == sqlite3_wal_checkpoint_v2(self.sqlite, nil, mode.rawValue, nil, nil){
+            print("check point ok")
+        }
+        sqlite3_os_init()
+    }
+    
+    public func autoCheckPoint(n:Int32 = 10000){
+        sqlite3_wal_autocheckpoint(self.sqlite, n)
+    }
+}
+
+extension Database{
+    public func registerFunction(function:DatabaseFuntion){
+        if function.xFunc != nil{
+            sqlite3_create_function_v2(self.sqlite, function.name, function.nArg, SQLITE_UTF8, Unmanaged<DatabaseFuntion>.passRetained(function).toOpaque(), { ctx, n, params in
+                let df = Unmanaged<DatabaseFuntion>.fromOpaque(sqlite3_user_data(ctx))
+                df.takeUnretainedValue().xFunc?(FunctionContext(ctx: ctx),Database.makeParam(n: n, param: params))
+            }, nil, nil,{app in
+                guard let point = app else { return }
+                Unmanaged<DatabaseFuntion>.fromOpaque(point).release()
+            })
+        }else{
+            sqlite3_create_function_v2(self.sqlite, function.name, function.nArg, SQLITE_UTF8, Unmanaged<DatabaseFuntion>.passRetained(function).toOpaque(), nil, { ctx, n, params in
+                let df = Unmanaged<DatabaseFuntion>.fromOpaque(sqlite3_user_data(ctx))
+                df.takeUnretainedValue().xStep?(FunctionContext(ctx: ctx),Database.makeParam(n: n, param: params))
+            },{ctx in
+                let df = Unmanaged<DatabaseFuntion>.fromOpaque(sqlite3_user_data(ctx))
+                df.takeUnretainedValue().xFinal?(FunctionContext(ctx: ctx))
+            },{app in
+                guard let point = app else { return }
+                Unmanaged<DatabaseFuntion>.fromOpaque(point).release()
+            })
+        }
+
+    }
+    private static func makeParam(n:Int32,param:UnsafeMutablePointer<OpaquePointer?>?)->[DatabaseValue?]{
+        var array:[DatabaseValue?] = []
+        for i in 0 ..< n{
+            guard let ptr = param?.advanced(by: Int(i)).pointee else {
+                array.append(nil)
+                continue
+            }
+            array.append(DatabaseValue(sqlValue: ptr))
+        }
+        return array
+    }
+}
+
+extension Database{
+    
+    
+    public class Result:CustomStringConvertible{
+        public var description: String{
+            return "\(self.result)"
+        }
+        
+        @dynamicMemberLookup
+        public struct Colume:CustomStringConvertible{
+            public var description: String{
+                return "\(self.colume)"
+            }
+            
+            public var colume:[String:String]
+            
+            public subscript(dynamicMember dynamicMember:String)->String?{
+                return colume[dynamicMember]
+            }
+            public mutating func load(argc:Int32,
+                             argv:UnsafeMutablePointer<UnsafeMutablePointer<CChar>?>?,
+                             col:UnsafeMutablePointer<UnsafeMutablePointer<CChar>?>?){
+                for i in 0 ..< argc{
+                    guard let k = col?.advanced(by: Int(i)).pointee else { continue }
+                    guard let v = argv?.advanced(by: Int(i)).pointee else { continue }
+                    
+                    self.colume[String(cString: k)] = String(cString: v)
+                }
+            }
+        }
+        public var result:[Colume] = []
+    }
+    
+    @discardableResult
+    public func exec(sql:String)->Database.Result{
+        #if DEBUG
+            print(sql)
+        #endif
+
+        let pointer = Database.Result()
+        let um = Unmanaged<Database.Result>.passUnretained(pointer)
+        sqlite3_exec(self.sqlite, sql, { data, argc, argv, col in
+            let dr = Unmanaged<Database.Result>.fromOpaque(data!).takeUnretainedValue()
+            var drc = Database.Result.Colume(colume: [:])
+            drc.load(argc: argc, argv: argv, col: col)
+            dr.result.append(drc)
+            return 0
+        },um.toOpaque() , nil)
+        
+        return pointer
+    
     }
 }

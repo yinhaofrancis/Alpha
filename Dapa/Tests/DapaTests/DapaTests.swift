@@ -1,5 +1,6 @@
 import XCTest
 @testable import Dapa
+import SQLite3
 
 final class DapaTests: XCTestCase {
     
@@ -43,12 +44,16 @@ final class DapaTests: XCTestCase {
     func testSelect() throws {
         
         let db = try Database(name: "db",readonly: true)
+        db.registerFunction(function: DatabaseFuntion(name: "go", nArg: 1,xFunc: { ctx, params in
+            sqlite3_result_int(ctx!.ctx, 89)
+        }))
+        
         
         let q = DatabaseGenerator.DatabaseCondition(stringLiteral: "MemberOnline.domain == Member.domain").and(condition: "MemberRelation.domain2 = 89") .and(condition: "Member.domain = MemberRelation.domain1")
         let user:[MemberStaticDisplay] = try MemberStaticDisplay.query(condition: q,groupBy: ["domain1"]).query(db: db)
         
 //        let st:[MemberDisplay] = try MemberDisplay.select(db: db,condtion: "domain2=89")
-        let st:[MemberDisplay] = try MemberDisplay.query(condition: "domain2=89").query(db: db)
+        let st:[MemberDisplay] = try MemberDisplay.query(condition: "domain2=go(80)").query(db: db)
         print(user)
         print(st)
         db.close()
@@ -90,6 +95,25 @@ final class DapaTests: XCTestCase {
         let backup = try DatabaseBackup(name: "mmm", database: db)
         backup.backup()
         
+        
+    }
+    
+    func testMK() throws{
+        let db = try Database(name: "db",readonly: true)
+        db.registerFunction(function: DatabaseFuntion(name: "mm", nArg: 1,xStep: { ctx, param in
+            let a:UnsafeMutablePointer<Int64>? = ctx?.pointer()
+            let v:Int64 = param.first??.value() ?? 0
+            a?.pointee += v
+            
+        },xFinal: { ctx in
+            guard let a:UnsafeMutablePointer<Int64> = ctx?.pointer() else {
+                ctx?.result(value: 0)
+                return
+            }
+            ctx?.result(value: a.pointee)
+        }))
+        let result = db.exec(sql: "select mm(domain) from Member")
+        print(result)
         
     }
 }
